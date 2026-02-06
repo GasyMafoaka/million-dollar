@@ -1,40 +1,117 @@
-import React from "react";
-import { FlatList, View , Text, ActivityIndicator} from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
+import { Calendar } from "react-native-calendars";
 import { useListTransactionContext } from "../context/listTransactionContext";
 
+const ListTransactionPage = () => {
+  const {
+    filteredTransactions,
+    markedDates,
+    selectedDate,
+    setSelectedDate,
+    loading,
+    fetchData,
+    hasMore,
+  } = useListTransactionContext();
 
-const ListTransactionPage = ()=>{
-    const {
-        listTransaction,
-        loading,
-        fetchData,
-        hasMore}  = useListTransactionContext();
+  const [showCalendar, setShowCalendar] = useState(false);
 
-    return (
-    <View>
+  return (
+    <View style={{ flex: 1 }}>
+     
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          padding: 10,
+        }}
+      >
+       
+        <TouchableOpacity
+          onPress={() => {
+            setShowCalendar((prev) => !prev);
+            if (showCalendar) {
+             
+              setSelectedDate(null);
+            }
+          }}
+          style={{
+            padding: 10,
+            backgroundColor: "#2196F3",
+            borderRadius: 5,
+          }}
+        >
+          <Text style={{ color: "#fff" }}>
+            {showCalendar ? "Hide Calendar" : "Show Calendar"}
+          </Text>
+        </TouchableOpacity>
+
+        {selectedDate && (
+          <TouchableOpacity
+            onPress={() => setSelectedDate(null)}
+            style={{
+              padding: 10,
+              backgroundColor: "#4CAF50",
+              borderRadius: 5,
+            }}
+          >
+            <Text style={{ color: "#fff" }}>Voir toutes</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      
+      {showCalendar && (
+        <Calendar
+          markedDates={markedDates}
+          onDayPress={(day) => setSelectedDate(day.dateString)}
+        />
+      )}
+
+      
+      {selectedDate && (
+        <Text
+          style={{
+            textAlign: "center",
+            marginVertical: 8,
+            fontWeight: "bold",
+          }}
+        >
+          Transactions du {selectedDate}
+        </Text>
+      )}
+
+   
       <FlatList
-        data={listTransaction}
-        keyExtractor={(item : any) => item.id.toString()}
-        renderItem={({ item } : { item : any}) => (
-          <View>
-            <View>
-              <Text>{item.title}</Text>
-            </View>
-            <View>
-               <Text>{item.body}</Text>
-            </View>
+        data={filteredTransactions}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View
+            style={{
+              padding: 12,
+              borderBottomWidth: 1,
+              borderColor: "#ddd",
+            }}
+          >
+            <Text style={{ fontWeight: "bold" }}>{item.title}</Text>
+            <Text>{item.body}</Text>
+            <Text style={{ fontSize: 12, color: "#555" }}>{item.date}</Text>
           </View>
         )}
-        onEndReached={()=>{
-            if(!loading && hasMore){
-                fetchData()
-            }
+        onEndReached={() => {
+          if (!loading && hasMore) fetchData();
         }}
         onEndReachedThreshold={0.5}
         ListFooterComponent={loading ? <ActivityIndicator /> : null}
       />
     </View>
   );
-}
+};
 
 export default ListTransactionPage;

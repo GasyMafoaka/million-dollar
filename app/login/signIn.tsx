@@ -49,7 +49,7 @@ export default function SignIp(){
                 >New User ? 
                 <Text
                     style = {styles.signInText}
-                    onPress={()=> navigate('/login/signUp')}
+                    onPress={()=> navigate('/pages/listTransaction')}
                    > Register Now</Text>
             </Text>
         </View>

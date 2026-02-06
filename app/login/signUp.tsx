@@ -37,6 +37,7 @@ export default function SignUp(){
                         placeholder="Password"
                         value={password}
                         onChangeText={setPassword}
+                        secureTextEntry={true}
                     />
                 </View>
                 <View style = {styles.inputContainer}>

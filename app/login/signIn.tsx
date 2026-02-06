@@ -1,6 +1,7 @@
 import { FontAwesome } from '@expo/vector-icons';
 import { navigate } from 'expo-router/build/global-state/routing';
-import React, { useState } from "react";
+import React from 'react';
+import { useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function SignIp(){
@@ -9,7 +10,7 @@ export default function SignIp(){
     const [mail, setMail] = useState("");
     return(
         <View style = {styles.container}>
-            <h1 style={styles.loginText}>Sign In</h1>
+            <Text style={styles.loginText}>Sign In</Text>
             <View style = {styles.viewInput}>
                 <View style = {styles.inputContainer}>
                     <FontAwesome name="user" size={24} color="blue" />
@@ -36,6 +37,7 @@ export default function SignIp(){
                         placeholder="Password"
                         value={password}
                         onChangeText={setPassword}
+                        secureTextEntry={true}
                     />
                 </View>
             </View>

@@ -59,7 +59,7 @@ export default function SignIp() {
                     setTimeout(() => {
                         setShowUserNotFoundAlert(false);
                     }, 3000)
-                }if(data.message === "Bad password"){
+                } if (data.message === "Bad password") {
                     setShowBadPasswordAlert(true);
 
                     setTimeout(() => {

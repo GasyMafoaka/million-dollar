@@ -63,12 +63,12 @@ export default function SignUp() {
                         if (response.ok) {
                             setShowSuccessAlert(true);
 
-                            setTimeout(()=>{
+                            setTimeout(() => {
                                 setShowSuccessAlert(false);
                             }, 3000)
                         } else {
                             console.log(data.message);
-                            
+
                         }
                     } catch (error) {
                         console.log(error);
@@ -174,7 +174,7 @@ export default function SignUp() {
             fontWeight: 'bold',
             fontFamily: 'MoreSugar'
         },
-        signUpSucces:{
+        signUpSucces: {
             backgroundColor: "green",
             height: 60,
             width: '45%',
@@ -183,12 +183,12 @@ export default function SignUp() {
             justifyContent: 'center',
             marginTop: 12,
             borderRadius: 10,
-            color : "white",
-            fontFamily : "MoreSugar",
-            fontSize : 20,
+            color: "white",
+            fontFamily: "MoreSugar",
+            fontSize: 20,
             left: "10%",
             bottom: "5%",
-            position : "absolute"
+            position: "absolute"
         }
     });
 

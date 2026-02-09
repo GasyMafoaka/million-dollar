@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  FlatList,
   ActivityIndicator,
+  FlatList,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { useListTransactionContext } from "../context/listTransactionContext";
@@ -24,7 +24,6 @@ const ListTransactionPage = () => {
 
   return (
     <View style={{ flex: 1 }}>
-     
       <View
         style={{
           flexDirection: "row",
@@ -32,14 +31,10 @@ const ListTransactionPage = () => {
           padding: 10,
         }}
       >
-       
         <TouchableOpacity
           onPress={() => {
-            setShowCalendar((prev) => !prev);
-            if (showCalendar) {
-             
-              setSelectedDate(null);
-            }
+            setShowCalendar(!showCalendar);
+            if (showCalendar) setSelectedDate(null);
           }}
           style={{
             padding: 10,
@@ -66,7 +61,6 @@ const ListTransactionPage = () => {
         )}
       </View>
 
-      
       {showCalendar && (
         <Calendar
           markedDates={markedDates}
@@ -74,20 +68,12 @@ const ListTransactionPage = () => {
         />
       )}
 
-      
       {selectedDate && (
-        <Text
-          style={{
-            textAlign: "center",
-            marginVertical: 8,
-            fontWeight: "bold",
-          }}
-        >
+        <Text style={{ textAlign: "center", fontWeight: "bold" }}>
           Transactions du {selectedDate}
         </Text>
       )}
 
-   
       <FlatList
         data={filteredTransactions}
         keyExtractor={(item) => item.id.toString()}
@@ -101,7 +87,7 @@ const ListTransactionPage = () => {
           >
             <Text style={{ fontWeight: "bold" }}>{item.title}</Text>
             <Text>{item.body}</Text>
-            <Text style={{ fontSize: 12, color: "#555" }}>{item.date}</Text>
+            <Text style={{ fontSize: 12 }}>{item.date}</Text>
           </View>
         )}
         onEndReached={() => {

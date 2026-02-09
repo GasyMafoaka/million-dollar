@@ -1,4 +1,11 @@
-import React ,  { createContext, useContext, useEffect, useMemo, useState } from "react";
+import * as Notifications from "expo-notifications";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 type Transaction = any;
 
@@ -14,12 +21,12 @@ interface ListTransactionContextType {
   fetchData: () => Promise<void>;
   setLimite: React.Dispatch<React.SetStateAction<number>>;
   setSelectedDate: React.Dispatch<React.SetStateAction<string | null>>;
+  removeListTransaction: (id: number) => Promise<void>;
 }
 
-
-const ListTransactionContext =
-  createContext<ListTransactionContextType | undefined>(undefined);
-
+const ListTransactionContext = createContext<
+  ListTransactionContextType | undefined
+>(undefined);
 
 export const ListTransactionContextProvider = ({
   children,
@@ -33,13 +40,54 @@ export const ListTransactionContextProvider = ({
   const [limite, setLimite] = useState(20);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
+  const requestNotificationPermission = async () => {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== "granted") {
+      alert("Permission notification refusée");
+    }
+  };
+
+  const sendInstantNotification = async (title: string, body: string) => {
+    await Notifications.scheduleNotificationAsync({
+      content: { title, body },
+      trigger: null,
+    });
+  };
+
+  const scheduleDailyNotification = async () => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: " Rappel quotidien",
+        body: "Consulte tes transactions du jour",
+      },
+      trigger: {
+        hour: 8,
+        minute: 0,
+        repeats: true,
+      },
+    });
+  };
+
+  const notifyIfTransactionToday = (transactions: Transaction[]) => {
+    const today = new Date().toISOString().split("T")[0];
+
+    const hasToday = transactions.some((tx) => tx.date === today);
+
+    if (hasToday) {
+      sendInstantNotification(
+        " Transaction détectée",
+        "Tu as une transaction aujourd’hui",
+      );
+    }
+  };
+
   const fetchData = async () => {
     if (loading || !hasMore) return;
 
     setLoading(true);
     try {
       const response = await fetch(
-        `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=${limite}`
+        `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=${limite}`,
       );
 
       let data = await response.json();
@@ -51,9 +99,12 @@ export const ListTransactionContextProvider = ({
           .padStart(2, "0")}`,
       }));
 
-      
+      setListTransaction((prev) => {
+        const newList = [...prev, ...data];
+        notifyIfTransactionToday(newList);
+        return newList;
+      });
 
-      setListTransaction((prev) => [...prev, ...data]);
       setHasMore(data.length === limite);
       setPage((prev) => prev + 1);
     } catch (e) {
@@ -63,29 +114,40 @@ export const ListTransactionContextProvider = ({
     }
   };
 
-  const filteredTransactions = useMemo(()=>{
-          if(!selectedDate) return listTransaction;
+  const filteredTransactions = useMemo(() => {
+    if (!selectedDate) return listTransaction;
+    return listTransaction.filter((tx) => tx.date === selectedDate);
+  }, [listTransaction, selectedDate]);
 
-          return listTransaction.filter((transaction)=>{
-            return transaction.date === selectedDate;
-          })
-          
-   },[listTransaction ,selectedDate]) 
-
-   const markedDates = useMemo(() => {
+  const markedDates = useMemo(() => {
     const dates: Record<string, any> = {};
+
     listTransaction.forEach((tx) => {
-      if (tx.date) {
-        dates[tx.date] = { marked: true, dotColor: "blue" };
-      }
+      dates[tx.date] = { marked: true, dotColor: "blue" };
     });
+
     if (selectedDate) {
-      dates[selectedDate] = { ...dates[selectedDate], selected: true, selectedColor: "#4CAF50" };
+      dates[selectedDate] = {
+        ...dates[selectedDate],
+        selected: true,
+        selectedColor: "#4CAF50",
+      };
     }
+
     return dates;
   }, [listTransaction, selectedDate]);
 
+  const removeListTransaction = async (id: number) => {
+    await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+      method: "DELETE",
+    });
+
+    setListTransaction((prev) => prev.filter((tx) => tx.id !== id));
+  };
+
   useEffect(() => {
+    requestNotificationPermission();
+    scheduleDailyNotification();
     fetchData();
   }, []);
 
@@ -103,7 +165,7 @@ export const ListTransactionContextProvider = ({
         setLimite,
         selectedDate,
         setSelectedDate,
-
+        removeListTransaction,
       }}
     >
       {children}
@@ -111,15 +173,10 @@ export const ListTransactionContextProvider = ({
   );
 };
 
-
 export const useListTransactionContext = () => {
   const context = useContext(ListTransactionContext);
-
   if (!context) {
-    throw new Error(
-      "useListTransactionContext must be used inside ListTransactionContextProvider"
-    );
+    throw new Error("useListTransactionContext must be used inside provider");
   }
-
   return context;
 };

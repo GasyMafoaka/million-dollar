@@ -1,182 +1,127 @@
-import * as Notifications from "expo-notifications";
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from "react";
+import { transactionsApi } from "../api/transactions.api";
+import { Transaction } from "../types/Transaction";
 
-type Transaction = any;
+const PAGE_SIZE = 20;
 
-interface ListTransactionContextType {
-  listTransaction: Transaction[];
-  filteredTransactions: Transaction[];
-  markedDates: Record<string, any>;
-  loading: boolean;
-  page: number;
+type TransactionsContextType = {
+  list: Transaction[];
+  fetchMore: () => Promise<void>;
   hasMore: boolean;
-  limite: number;
+  loading: boolean;
+  add: (tx: Omit<Transaction, "id">) => Promise<void>;
+  update: (id: number, data: Partial<Transaction>) => Promise<void>;
+  remove: (id: number) => Promise<void>;
   selectedDate: string | null;
-  fetchData: () => Promise<void>;
-  setLimite: React.Dispatch<React.SetStateAction<number>>;
-  setSelectedDate: React.Dispatch<React.SetStateAction<string | null>>;
-  removeListTransaction: (id: number) => Promise<void>;
-}
+  setSelectedDate: (d: string | null) => void;
+  markedDates: any;
+};
 
-const ListTransactionContext = createContext<
-  ListTransactionContextType | undefined
->(undefined);
+const Ctx = createContext<TransactionsContextType | null>(null);
 
-export const ListTransactionContextProvider = ({
+export const TransactionsProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
-  const [listTransaction, setListTransaction] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [list, setList] = useState<Transaction[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [limite, setLimite] = useState(20);
+  const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  const requestNotificationPermission = async () => {
-    const { status } = await Notifications.requestPermissionsAsync();
-    if (status !== "granted") {
-      alert("Permission notification refusée");
-    }
-  };
-
-  const sendInstantNotification = async (title: string, body: string) => {
-    await Notifications.scheduleNotificationAsync({
-      content: { title, body },
-      trigger: null,
-    });
-  };
-
-  const scheduleDailyNotification = async () => {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: " Rappel quotidien",
-        body: "Consulte tes transactions du jour",
-      },
-      trigger: {
-        hour: 8,
-        minute: 0,
-        repeats: true,
-      },
-    });
-  };
-
-  const notifyIfTransactionToday = (transactions: Transaction[]) => {
-    const today = new Date().toISOString().split("T")[0];
-
-    const hasToday = transactions.some((tx) => tx.date === today);
-
-    if (hasToday) {
-      sendInstantNotification(
-        " Transaction détectée",
-        "Tu as une transaction aujourd’hui",
-      );
-    }
-  };
-
-  const fetchData = async () => {
+  const fetchMore = useCallback(async () => {
     if (loading || !hasMore) return;
 
-    setLoading(true);
     try {
-      const response = await fetch(
-        `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=${limite}`,
-      );
+      setLoading(true);
+      const data = await transactionsApi.list(page, PAGE_SIZE);
 
-      let data = await response.json();
-
-      data = data.map((item: any) => ({
-        ...item,
-        date: `2026-02-${Math.floor(Math.random() * 28 + 1)
-          .toString()
-          .padStart(2, "0")}`,
-      }));
-
-      setListTransaction((prev) => {
-        const newList = [...prev, ...data];
-        notifyIfTransactionToday(newList);
-        return newList;
-      });
-
-      setHasMore(data.length === limite);
+      setList((prev) => [...prev, ...data]);
+      setHasMore(data.length === PAGE_SIZE);
       setPage((prev) => prev + 1);
     } catch (e) {
-      console.error(e);
+      console.error("Erreur chargement transactions", e);
     } finally {
       setLoading(false);
     }
+  }, [page, loading, hasMore]);
+
+  const add = async (tx: Omit<Transaction, "id">) => {
+    const created = await transactionsApi.create(tx);
+    setList((prev) => [created, ...prev]);
   };
 
-  const filteredTransactions = useMemo(() => {
-    if (!selectedDate) return listTransaction;
-    return listTransaction.filter((tx) => tx.date === selectedDate);
-  }, [listTransaction, selectedDate]);
+  const update = async (id: number, data: Partial<Transaction>) => {
+    await transactionsApi.update(id, data);
+    setList((prev) =>
+      prev.map((tx) => (tx.id === id ? { ...tx, ...data } : tx)),
+    );
+  };
+
+  const remove = async (id: number) => {
+    await transactionsApi.remove(id);
+    setList((prev) => prev.filter((tx) => tx.id !== id));
+  };
+
+  const filtered = useMemo(() => {
+    if (!selectedDate) return list;
+    return list.filter((tx) => tx.date === selectedDate);
+  }, [list, selectedDate]);
 
   const markedDates = useMemo(() => {
-    const dates: Record<string, any> = {};
-
-    listTransaction.forEach((tx) => {
-      dates[tx.date] = { marked: true, dotColor: "blue" };
+    const m: Record<string, any> = {};
+    list.forEach((tx) => {
+      m[tx.date] = { marked: true };
     });
 
     if (selectedDate) {
-      dates[selectedDate] = {
-        ...dates[selectedDate],
+      m[selectedDate] = {
         selected: true,
         selectedColor: "#4CAF50",
       };
     }
 
-    return dates;
-  }, [listTransaction, selectedDate]);
-
-  const removeListTransaction = async (id: number) => {
-    await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`, {
-      method: "DELETE",
-    });
-
-    setListTransaction((prev) => prev.filter((tx) => tx.id !== id));
-  };
+    return m;
+  }, [list, selectedDate]);
 
   useEffect(() => {
-    requestNotificationPermission();
-    scheduleDailyNotification();
-    fetchData();
-  }, []);
+    fetchMore();
+  }, [fetchMore]);
 
   return (
-    <ListTransactionContext.Provider
+    <Ctx.Provider
       value={{
-        listTransaction,
-        filteredTransactions,
-        markedDates,
-        loading,
-        page,
+        list: filtered,
+        fetchMore,
         hasMore,
-        limite,
-        fetchData,
-        setLimite,
+        loading,
+        add,
+        update,
+        remove,
         selectedDate,
         setSelectedDate,
-        removeListTransaction,
+        markedDates,
       }}
     >
       {children}
-    </ListTransactionContext.Provider>
+    </Ctx.Provider>
   );
 };
 
-export const useListTransactionContext = () => {
-  const context = useContext(ListTransactionContext);
-  if (!context) {
-    throw new Error("useListTransactionContext must be used inside provider");
+export const useTransactions = () => {
+  const ctx = useContext(Ctx);
+  if (!ctx) {
+    throw new Error(
+      "useTransactions doit être utilisé dans TransactionsProvider",
+    );
   }
-  return context;
+  return ctx;
 };

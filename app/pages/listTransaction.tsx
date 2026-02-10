@@ -1,103 +1,90 @@
 import React, { useState } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { FlatList, Pressable, Text, TextInput, View } from "react-native";
 import { Calendar } from "react-native-calendars";
-import { useListTransactionContext } from "../context/listTransactionContext";
+import { useTransactions } from "../context/listTransactionContext";
 
-const ListTransactionPage = () => {
+export default function TransactionsScreen() {
   const {
-    filteredTransactions,
-    markedDates,
-    selectedDate,
-    setSelectedDate,
+    list,
+    fetchMore,
     loading,
-    fetchData,
     hasMore,
-  } = useListTransactionContext();
+    add,
+    remove,
+    setSelectedDate,
+    markedDates,
+  } = useTransactions();
 
-  const [showCalendar, setShowCalendar] = useState(false);
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState("");
+  const [date, setDate] = useState("");
+
+  const submit = async () => {
+    if (!title || !amount || !date) return;
+
+    await add({
+      title,
+      description: "",
+      amount: Number(amount),
+      date,
+    });
+
+    setTitle("");
+    setAmount("");
+    setDate("");
+  };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          padding: 10,
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            setShowCalendar(!showCalendar);
-            if (showCalendar) setSelectedDate(null);
-          }}
-          style={{
-            padding: 10,
-            backgroundColor: "#2196F3",
-            borderRadius: 5,
-          }}
-        >
-          <Text style={{ color: "#fff" }}>
-            {showCalendar ? "Hide Calendar" : "Show Calendar"}
-          </Text>
-        </TouchableOpacity>
+    <View className="flex-1 p-4 bg-white">
+      <Text className="text-xl font-bold mb-2">Calendrier</Text>
+      <Calendar
+        markedDates={markedDates}
+        onDayPress={(day) => setSelectedDate(day.dateString)}
+      />
 
-        {selectedDate && (
-          <TouchableOpacity
-            onPress={() => setSelectedDate(null)}
-            style={{
-              padding: 10,
-              backgroundColor: "#4CAF50",
-              borderRadius: 5,
-            }}
-          >
-            <Text style={{ color: "#fff" }}>Voir toutes</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+      <Text className="text-xl font-bold mt-4">Nouvelle transaction</Text>
+      <TextInput
+        placeholder="Titre"
+        value={title}
+        onChangeText={setTitle}
+        className="border p-2 rounded mt-2"
+      />
+      <TextInput
+        placeholder="Montant"
+        value={amount}
+        keyboardType="numeric"
+        onChangeText={setAmount}
+        className="border p-2 rounded mt-2"
+      />
+      <TextInput
+        placeholder="Date (YYYY-MM-DD)"
+        value={date}
+        onChangeText={setDate}
+        className="border p-2 rounded mt-2"
+      />
 
-      {showCalendar && (
-        <Calendar
-          markedDates={markedDates}
-          onDayPress={(day) => setSelectedDate(day.dateString)}
-        />
-      )}
+      <Pressable onPress={submit} className="bg-green-600 p-3 rounded mt-3">
+        <Text className="text-white text-center font-bold">Ajouter</Text>
+      </Pressable>
 
-      {selectedDate && (
-        <Text style={{ textAlign: "center", fontWeight: "bold" }}>
-          Transactions du {selectedDate}
-        </Text>
-      )}
-
+      <Text className="text-xl font-bold mt-4">Transactions</Text>
       <FlatList
-        data={filteredTransactions}
+        data={list}
         keyExtractor={(item) => item.id.toString()}
+        onEndReached={() => hasMore && fetchMore()}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={loading ? <Text>Chargement...</Text> : null}
         renderItem={({ item }) => (
-          <View
-            style={{
-              padding: 12,
-              borderBottomWidth: 1,
-              borderColor: "#ddd",
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>{item.title}</Text>
-            <Text>{item.body}</Text>
-            <Text style={{ fontSize: 12 }}>{item.date}</Text>
+          <View className="border p-3 rounded mt-2">
+            <Text className="font-bold">{item.title}</Text>
+            <Text>{item.amount} Ar</Text>
+            <Text>{item.date}</Text>
+            <Pressable onPress={() => remove(item.id)}>
+              <Text className="text-red-600 mt-1">Supprimer</Text>
+            </Pressable>
           </View>
         )}
-        onEndReached={() => {
-          if (!loading && hasMore) fetchData();
-        }}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={loading ? <ActivityIndicator /> : null}
       />
     </View>
   );
-};
-
-export default ListTransactionPage;
+}

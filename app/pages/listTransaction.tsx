@@ -13,17 +13,8 @@ import { useTransactions } from "../../context/listTransactionContext";
 import { Transaction } from "../../types/Transaction";
 
 export default function TransactionsScreen() {
-  const {
-    list,
-    fetchMore,
-    add,
-    remove,
-    update,
-    setSelectedDate,
-    setFilterType,
-    notificationHour,
-    setNotificationHour,
-  } = useTransactions();
+  const { list, fetchMore, add, remove, update, setSelectedDate } =
+    useTransactions();
 
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");

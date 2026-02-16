@@ -12,19 +12,7 @@ const getNotificationsModule = () => {
 export const requestPermission = async () => {
   const Notifications = getNotificationsModule();
   if (!Notifications) return;
-
-  const { status } = await Notifications.requestPermissionsAsync();
-  if (status !== "granted") {
-    alert("Permission refusée");
-  }
-};
-
-export const calculateTodayExpense = (list: Transaction[]) => {
-  const today = new Date().toISOString().split("T")[0];
-
-  return list
-    .filter((t) => t.type === "OUT" && t.date.startsWith(today))
-    .reduce((sum, t) => sum + t.amount, 0);
+  await Notifications.requestPermissionsAsync();
 };
 
 export const scheduleDailyNotification = async (
@@ -32,24 +20,20 @@ export const scheduleDailyNotification = async (
   hour: number,
 ) => {
   const Notifications = getNotificationsModule();
-  if (!Notifications) {
-    console.log("Notifications désactivées (Expo Go ou Web)");
-    return;
-  }
+  if (!Notifications) return;
+
+  const today = new Date().toISOString().split("T")[0];
+  const total = list
+    .filter((t) => t.type === "OUT" && t.date.startsWith(today))
+    .reduce((sum, t) => sum + t.amount, 0);
 
   await Notifications.cancelAllScheduledNotificationsAsync();
-
-  const total = calculateTodayExpense(list);
 
   await Notifications.scheduleNotificationAsync({
     content: {
       title: "Résumé des dépenses",
       body: `Total aujourd'hui : ${total} Ar`,
     },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DAILY,
-      hour,
-      minute: 0,
-    },
+    trigger: { hour, minute: 0, repeats: true },
   });
 };

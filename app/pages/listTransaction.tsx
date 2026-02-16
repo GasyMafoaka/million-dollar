@@ -1,19 +1,11 @@
 import React, { useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Modal,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { FlatList, Pressable, Text, TextInput, View } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { useTransactions } from "../../context/listTransactionContext";
 import { Transaction } from "../../types/Transaction";
 
 export default function TransactionsScreen() {
-  const { list, fetchMore, add, remove, update, setSelectedDate } =
+  const { list, fetchMore, add, remove, setSelectedDate, setFilterType } =
     useTransactions();
 
   const [title, setTitle] = useState("");
@@ -21,10 +13,9 @@ export default function TransactionsScreen() {
   const [date, setDate] = useState("");
   const [type, setType] = useState<"IN" | "OUT">("OUT");
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editingItem, setEditingItem] = useState<Transaction | null>(null);
-
   const submit = async () => {
+    if (!title || !amount || !date) return alert("Champs manquants");
+
     await add({
       title,
       description: "",
@@ -38,37 +29,27 @@ export default function TransactionsScreen() {
     setDate("");
   };
 
-  const confirmDelete = (id: string) => {
-    Alert.alert("Confirmation", "Supprimer cette transaction ?", [
-      { text: "Annuler" },
-      { text: "Oui", onPress: () => remove(id) },
-    ]);
-  };
-
-  const openEditModal = (item: Transaction) => {
-    setEditingItem(item);
-    setModalVisible(true);
-  };
-
-  const saveEdit = async () => {
-    if (!editingItem) return;
-
-    await update(editingItem.id.toString(), editingItem);
-    setModalVisible(false);
-  };
+  function setEditingItem(item: Transaction): void {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <View style={{ flex: 1, padding: 16 }}>
       <Calendar
         onDayPress={(d) => setSelectedDate(d.dateString)}
-        markedDates={{
-          ...list.reduce((acc: any, t) => {
-            const d = t.date.split("T")[0];
-            acc[d] = { marked: true };
-            return acc;
-          }, {}),
-        }}
+        markedDates={list.reduce((acc: any, t) => {
+          const d = t.date.split("T")[0];
+          acc[d] = { marked: true };
+          return acc;
+        }, {})}
       />
+
+      <Pressable onPress={() => setFilterType("OUT")}>
+        <Text>Dépenses</Text>
+      </Pressable>
+      <Pressable onPress={() => setFilterType("IN")}>
+        <Text>Revenus</Text>
+      </Pressable>
 
       <TextInput placeholder="Titre" value={title} onChangeText={setTitle} />
       <TextInput
@@ -85,52 +66,23 @@ export default function TransactionsScreen() {
 
       <FlatList
         data={list}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => String(item.id)}
         onEndReached={fetchMore}
         renderItem={({ item }) => (
           <View style={{ padding: 10, borderWidth: 1, marginVertical: 5 }}>
             <Text>{item.title}</Text>
             <Text>{item.amount} Ar</Text>
 
-            <Pressable onPress={() => openEditModal(item)}>
+            <Pressable onPress={() => setEditingItem(item)}>
               <Text>Modifier</Text>
             </Pressable>
 
-            <Pressable onPress={() => confirmDelete(item.id.toString())}>
+            <Pressable onPress={() => remove(String(item.id))}>
               <Text>Supprimer</Text>
             </Pressable>
           </View>
         )}
       />
-
-      <Modal visible={modalVisible} animationType="slide">
-        <View style={{ padding: 20 }}>
-          <Text>Modifier transaction</Text>
-
-          <TextInput
-            value={editingItem?.title}
-            onChangeText={(v) =>
-              setEditingItem((prev) => prev && { ...prev, title: v })
-            }
-          />
-
-          <TextInput
-            value={editingItem?.amount.toString()}
-            keyboardType="numeric"
-            onChangeText={(v) =>
-              setEditingItem((prev) => prev && { ...prev, amount: Number(v) })
-            }
-          />
-
-          <Pressable onPress={saveEdit}>
-            <Text>Enregistrer</Text>
-          </Pressable>
-
-          <Pressable onPress={() => setModalVisible(false)}>
-            <Text>Annuler</Text>
-          </Pressable>
-        </View>
-      </Modal>
     </View>
   );
 }

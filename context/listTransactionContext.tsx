@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import { transactionsApi } from "../api/transactions.api";
+import { useSession } from "../auth/useSession";
 import { Transaction } from "../types/Transaction";
 import {
   requestPermission,
@@ -13,82 +14,61 @@ import {
 } from "../utils/notifications";
 
 const PAGE_SIZE = 10;
-
-type CtxType = {
-  list: Transaction[];
-  loading: boolean;
-  fetchMore: () => void;
-  add: (data: Omit<Transaction, "id">) => Promise<void>;
-  update: (id: string, data: Partial<Transaction>) => Promise<void>;
-  remove: (id: string) => Promise<void>;
-  selectedDate: string | null;
-  setSelectedDate: (d: string | null) => void;
-  filterType: string | null;
-  setFilterType: (t: string | null) => void;
-  notificationHour: number;
-  setNotificationHour: (h: number) => void;
-};
-
-const Ctx = createContext<CtxType | null>(null);
+const Ctx = createContext<any>(null);
 
 export const TransactionsProvider = ({ children }: any) => {
+  const { accountId } = useSession();
+  const walletId = "main-wallet"; // temporaire (peut venir du backend)
+
   const [list, setList] = useState<Transaction[]>([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [filterType, setFilterType] = useState<"IN" | "OUT" | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [filterType, setFilterType] = useState<string | null>(null);
   const [notificationHour, setNotificationHour] = useState(20);
 
   const fetchMore = async () => {
-    if (loading || !hasMore) return;
-
-    try {
-      setLoading(true);
-
-      const data = await transactionsApi.list(page, PAGE_SIZE, {
-        type: filterType,
-      });
-
-      setList((prev) => [...prev, ...data]);
-      setHasMore(data.length === PAGE_SIZE);
-      setPage((p) => p + 1);
-    } catch (e) {
-      console.log("Erreur pagination", e);
-    } finally {
-      setLoading(false);
-    }
+    if (!accountId || !hasMore) return;
+    const data = await transactionsApi.list(accountId, page, PAGE_SIZE, {
+      type: filterType,
+    });
+    setList((p) => [...p, ...data]);
+    setHasMore(data.length === PAGE_SIZE);
+    setPage((p) => p + 1);
   };
 
   const add = async (data: Omit<Transaction, "id">) => {
-    const created = await transactionsApi.create(data);
-    setList((prev) => [created, ...prev]);
+    if (!accountId) return;
+    const created = await transactionsApi.create(accountId, walletId, data);
+    setList((p) => [created, ...p]);
   };
 
   const updateItem = async (id: string, data: Partial<Transaction>) => {
-    const updated = await transactionsApi.update(id, data);
-    setList((prev) => prev.map((t) => (String(t.id) === id ? updated : t)));
+    if (!accountId) return;
+    const updated = await transactionsApi.update(accountId, walletId, id, data);
+    setList((p) => p.map((t) => (String(t.id) === String(id) ? updated : t)));
   };
 
   const removeItem = async (id: string) => {
-    await transactionsApi.remove(id);
-    setList((prev) => prev.filter((t) => String(t.id) !== id));
+    if (!accountId) return;
+    await transactionsApi.remove(accountId, walletId, id);
+    setList((p) => p.filter((t) => String(t.id) !== String(id)));
   };
 
   const filteredList = useMemo(() => {
     let result = list;
-
     if (selectedDate)
       result = result.filter((t) => t.date.startsWith(selectedDate));
-
     return result;
   }, [list, selectedDate]);
 
   useEffect(() => {
+    if (!accountId) return;
     setList([]);
     setPage(1);
     setHasMore(true);
-  }, [filterType]);
+    fetchMore();
+  }, [filterType, accountId]);
 
   useEffect(() => {
     requestPermission();
@@ -102,7 +82,6 @@ export const TransactionsProvider = ({ children }: any) => {
     <Ctx.Provider
       value={{
         list: filteredList,
-        loading,
         fetchMore,
         add,
         update: updateItem,
@@ -120,8 +99,4 @@ export const TransactionsProvider = ({ children }: any) => {
   );
 };
 
-export const useTransactions = () => {
-  const ctx = useContext(Ctx);
-  if (!ctx) throw new Error("Provider manquant");
-  return ctx;
-};
+export const useTransactions = () => useContext(Ctx);

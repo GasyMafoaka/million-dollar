@@ -1,27 +1,58 @@
-import axios from "axios";
 import { Transaction } from "../types/Transaction";
-
-const API_URL = "http://localhost:8080";
+import { apiFetch } from "./apiFetch";
 
 export const transactionsApi = {
-  async list(page: number, pageSize: number, filters?: any) {
-    const res = await axios.get(`${API_URL}/transactions`, {
-      params: { page, pageSize, ...filters },
+  async list(accountId: string, page: number, pageSize: number, filters?: any) {
+    return apiFetch(
+      `/account/${accountId}/transaction?page=${page}&pageSize=${pageSize}&type=${filters?.type ?? ""}`,
+    );
+  },
+
+  async create(
+    accountId: string,
+    walletId: string,
+    data: Omit<Transaction, "id">,
+  ) {
+    return apiFetch(`/account/${accountId}/wallet/${walletId}/transaction`, {
+      method: "POST",
+      body: JSON.stringify({
+        amount: data.amount,
+        date: data.date,
+        description: data.title,
+        type: data.type,
+        labels: [{ id: "label-food" }],
+      }),
     });
-    return res.data.data;
   },
 
-  async create(data: Omit<Transaction, "id">) {
-    const res = await axios.post(`${API_URL}/transactions`, data);
-    return res.data;
+  async update(
+    accountId: string,
+    walletId: string,
+    id: string,
+    data: Partial<Transaction>,
+  ) {
+    return apiFetch(
+      `/account/${accountId}/wallet/${walletId}/transaction/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify({
+          id,
+          amount: data.amount,
+          date: data.date,
+          description: data.title,
+          type: data.type,
+          labels: [{ id: "label-food" }],
+        }),
+      },
+    );
   },
 
-  async update(id: string, data: Partial<Transaction>) {
-    const res = await axios.put(`${API_URL}/transactions/${id}`, data);
-    return res.data;
-  },
-
-  async remove(id: string) {
-    await axios.delete(`${API_URL}/transactions/${id}`);
+  async remove(accountId: string, walletId: string, id: string) {
+    return apiFetch(
+      `/account/${accountId}/wallet/${walletId}/transaction/${id}`,
+      {
+        method: "DELETE",
+      },
+    );
   },
 };

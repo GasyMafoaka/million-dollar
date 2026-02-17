@@ -37,7 +37,7 @@ export default function TransactionsScreen() {
     <View style={{ flex: 1, padding: 16 }}>
       <Calendar
         onDayPress={(d) => setSelectedDate(d.dateString)}
-        markedDates={list.reduce((acc: any, t) => {
+        markedDates={list.reduce((acc: any, t: { date: string }) => {
           const d = t.date.split("T")[0];
           acc[d] = { marked: true };
           return acc;

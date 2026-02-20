@@ -1,5 +1,4 @@
 import { FontAwesome } from '@expo/vector-icons';
-import { useFonts } from 'expo-font';
 import { navigate } from 'expo-router/build/global-state/routing';
 import React, { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
@@ -18,9 +17,6 @@ export default function SignIp() {
     const [showBadPasswordAlert, setShowBadPasswordAlert] = useState(false);
     const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
-    const [fontsLoaded] = useFonts({
-        'MoreSugar': require('@/assets/fonts/MoreSugar-Thin.ttf')
-    });
     const color1 = "#264653";
     const baseUrl = "http://localhost:8080"
 

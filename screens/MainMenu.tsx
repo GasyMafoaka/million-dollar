@@ -1,14 +1,9 @@
-import { useFonts } from 'expo-font';
 import React from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 export default function MainMenu() {
     const navigation = useNavigation<any>();
-    const [fontsLoaded] = useFonts({
-        'MoreSugar': require('@/assets/fonts/MoreSugar-Thin.ttf')
-    });
-    const color1 = "#264653";
 
     const styles = StyleSheet.create({
         container: {

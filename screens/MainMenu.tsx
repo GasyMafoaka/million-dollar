@@ -1,6 +1,6 @@
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 
 export default function MainMenu() {
     const navigation = useNavigation<any>();
@@ -64,6 +64,18 @@ export default function MainMenu() {
             <Pressable style={styles.button} onPress={() => navigation.navigate("Wallet")}>
                 <Text style={styles.buttonText}>
                     Wallet
+                </Text>
+            </Pressable>
+
+            <Pressable style={styles.button} onPress={() => navigation.navigate("SignIn")}>
+                <Text style={styles.buttonText}>
+                    Sign In
+                </Text>
+            </Pressable>
+
+            <Pressable style={styles.button} onPress={() => navigation.navigate("SignUp")}>
+                <Text style={styles.buttonText}>
+                    Sign Up
                 </Text>
             </Pressable>
         </View>

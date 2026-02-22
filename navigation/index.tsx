@@ -5,8 +5,8 @@ import SignIn from "@/screens/SignIn";
 import SignUp from "@/screens/SignUp";
 import Transaction from "@/screens/Transaction";
 import Wallet from "@/screens/Wallet";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Pressable, StyleSheet, Text } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +35,11 @@ export default function AppNavigator() {
         },
       })}
     >
+      <Stack.Screen
+      name="Splash"
+      component={SplashScreen}
+      options={{ headerShown:false }}
+      />
       <Stack.Screen
         name="MainMenu"
         component={MainMenu}

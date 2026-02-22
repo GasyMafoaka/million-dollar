@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
-import Animated, { CSSAnimationKeyframes } from "react-native-reanimated";
 import { useFonts } from "expo-font";
+import React, { useEffect } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import Animated, { CSSAnimationKeyframes } from "react-native-reanimated";
 
 const march: CSSAnimationKeyframes = {
   "0%": {

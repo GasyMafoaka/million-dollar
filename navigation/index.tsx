@@ -1,13 +1,13 @@
 import * as React from "react";
 // @ts-ignore
 import MainMenu from "@/screens/MainMenu";
+import Settings from "@/screens/Settings";
 import SignIn from "@/screens/SignIn";
 import SignUp from "@/screens/SignUp";
 import Transaction from "@/screens/Transaction";
 import Wallet from "@/screens/Wallet";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Pressable, StyleSheet, Text } from "react-native";
-import Settings from "@/screens/Settings";
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +36,11 @@ export default function AppNavigator() {
         },
       })}
     >
+      <Stack.Screen
+      name="Splash"
+      component={SplashScreen}
+      options={{ headerShown:false }}
+      />
       <Stack.Screen
         name="MainMenu"
         component={MainMenu}

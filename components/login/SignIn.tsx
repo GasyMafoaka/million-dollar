@@ -1,6 +1,6 @@
 import { FontAwesome } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { navigate } from "expo-router/build/global-state/routing";
 import React, { useState } from "react";
 import {
   Image,
@@ -12,6 +12,8 @@ import {
 } from "react-native";
 
 export default function SignIn() {
+  const navigation = useNavigation<any>();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   // const [mail, setMail] = useState("");
@@ -284,7 +286,7 @@ export default function SignIn() {
         New User ?
         <Text
           style={styles.signInText}
-          onPress={() => navigate("/login/signUp")}
+          onPress={() => navigation.navigate("SignUp")}
         >
           {" "}
           Register Now

@@ -1,12 +1,12 @@
-import React from 'react';
-import { FlatList, StyleSheet, View, Text } from 'react-native';
-import WalletItem from './WalletItem';
+import React from "react";
+import { FlatList, StyleSheet, View, Text } from "react-native";
+import WalletItem from "./WalletItem";
 
 interface Wallet {
   id: string;
   name: string;
   reference: string;
-  type: 'CASH' | 'BANK_ACCOUNT' | 'MOBILE_MONEY' | 'CRYPTO';
+  type: "CASH" | "BANK_ACCOUNT" | "MOBILE_MONEY" | "CRYPTO";
 }
 
 interface WalletListProps {
@@ -28,7 +28,7 @@ export default function WalletList({ wallets }: WalletListProps) {
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => <WalletItem wallet={item} />}
       contentContainerStyle={styles.listContainer}
-      style={{ width: '100%' }}
+      style={{ width: "100%" }}
     />
   );
 }
@@ -39,13 +39,13 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 50,
   },
   emptyText: {
-    fontFamily: 'MoreSugar',
+    fontFamily: "MoreSugar",
     fontSize: 18,
-    color: '#6c757d',
+    color: "#6c757d",
   },
 });

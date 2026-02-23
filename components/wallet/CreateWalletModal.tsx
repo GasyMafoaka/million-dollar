@@ -1,6 +1,14 @@
-import React, { useState } from 'react';
-import { Modal, View, Text, TextInput, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import React, { useState } from "react";
+import {
+  Modal,
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  TouchableOpacity,
+} from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 
 interface CreateWalletModalProps {
   visible: boolean;
@@ -8,19 +16,23 @@ interface CreateWalletModalProps {
   onCreate: (wallet: { name: string; reference: string; type: string }) => void;
 }
 
-const WALLET_TYPES = ['CASH', 'BANK_ACCOUNT', 'MOBILE_MONEY', 'CRYPTO'];
+const WALLET_TYPES = ["CASH", "BANK_ACCOUNT", "MOBILE_MONEY", "CRYPTO"];
 
-export default function CreateWalletModal({ visible, onClose, onCreate }: CreateWalletModalProps) {
-  const [name, setName] = useState('');
-  const [reference, setReference] = useState('');
-  const [type, setType] = useState('CASH');
+export default function CreateWalletModal({
+  visible,
+  onClose,
+  onCreate,
+}: CreateWalletModalProps) {
+  const [name, setName] = useState("");
+  const [reference, setReference] = useState("");
+  const [type, setType] = useState("CASH");
 
   const handleCreate = () => {
     if (name && reference) {
       onCreate({ name, reference, type });
-      setName('');
-      setReference('');
-      setType('CASH');
+      setName("");
+      setReference("");
+      setType("CASH");
       onClose();
     }
   };
@@ -69,15 +81,17 @@ export default function CreateWalletModal({ visible, onClose, onCreate }: Create
                   key={t}
                   style={[
                     styles.typeOption,
-                    type === t && styles.selectedTypeOption
+                    type === t && styles.selectedTypeOption,
                   ]}
                   onPress={() => setType(t)}
                 >
-                  <Text style={[
-                    styles.typeOptionText,
-                    type === t && styles.selectedTypeOptionText
-                  ]}>
-                    {t.replace('_', ' ')}
+                  <Text
+                    style={[
+                      styles.typeOptionText,
+                      type === t && styles.selectedTypeOptionText,
+                    ]}
+                  >
+                    {t.replace("_", " ")}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -96,47 +110,47 @@ export default function CreateWalletModal({ visible, onClose, onCreate }: Create
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
-    minHeight: '60%',
+    minHeight: "60%",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
   },
   modalTitle: {
     fontSize: 24,
-    fontFamily: 'MoreSugar',
-    color: '#264653',
+    fontFamily: "MoreSugar",
+    color: "#264653",
   },
   inputGroup: {
     marginBottom: 20,
   },
   label: {
     fontSize: 16,
-    fontFamily: 'MoreSugar',
-    color: '#264653',
+    fontFamily: "MoreSugar",
+    color: "#264653",
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ced4da',
+    borderColor: "#ced4da",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    fontFamily: 'MoreSugar',
+    fontFamily: "MoreSugar",
   },
   typeSelector: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
   },
   typeOption: {
@@ -144,29 +158,29 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#264653',
+    borderColor: "#264653",
   },
   selectedTypeOption: {
-    backgroundColor: '#264653',
+    backgroundColor: "#264653",
   },
   typeOptionText: {
-    fontFamily: 'MoreSugar',
+    fontFamily: "MoreSugar",
     fontSize: 12,
-    color: '#264653',
+    color: "#264653",
   },
   selectedTypeOptionText: {
-    color: 'white',
+    color: "white",
   },
   createButton: {
-    backgroundColor: '#264653',
+    backgroundColor: "#264653",
     paddingVertical: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
   },
   createButtonText: {
-    color: 'white',
-    fontFamily: 'MoreSugar',
+    color: "white",
+    fontFamily: "MoreSugar",
     fontSize: 18,
   },
 });

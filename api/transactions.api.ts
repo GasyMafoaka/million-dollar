@@ -1,6 +1,5 @@
 import { getToken } from "../auth/auth.store";
-
-const API_URL = "http://localhost:8080";
+import { API_URL } from "./config";
 
 export const transactionsApi = {
   async list(accountId: string, page: number, pageSize: number, filters?: any) {

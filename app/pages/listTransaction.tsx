@@ -30,7 +30,7 @@ export default function TransactionsScreen() {
   };
 
   function setEditingItem(item: Transaction): void {
-    throw new Error("Function not implemented.");
+    console.log("Edit item:", item);
   }
 
   return (

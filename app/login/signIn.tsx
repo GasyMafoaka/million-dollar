@@ -3,12 +3,12 @@ import { useFonts } from "expo-font";
 import { navigate } from "expo-router/build/global-state/routing";
 import React, { useState } from "react";
 import {
-    Image,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 
 export default function SignIp() {

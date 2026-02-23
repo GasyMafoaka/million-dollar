@@ -8,8 +8,11 @@ import { TransactionsProvider } from "../context/listTransactionContext";
 export default function RootLayout() {
   useEffect(() => {
     const isExpoGo = Constants.executionEnvironment === "storeClient";
+    const isNative = Platform.OS !== "web" && !isExpoGo;
 
-    if (Platform.OS !== "web" && !isExpoGo) {
+    if (!isNative) return;
+
+    try {
       const Notifications = require("expo-notifications");
 
       Notifications.setNotificationHandler({
@@ -21,6 +24,8 @@ export default function RootLayout() {
           shouldShowList: true,
         }),
       });
+    } catch (e) {
+      console.log("Notifications not available:", e);
     }
   }, []);
 

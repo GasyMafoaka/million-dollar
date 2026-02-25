@@ -1,6 +1,3 @@
-import React from "react";
-import SignIn from "./login/signIn";
+import AppNavigator from "@/navigation";
 
-export default function Index() {
-  return <SignIn />;
-}
+export default AppNavigator;

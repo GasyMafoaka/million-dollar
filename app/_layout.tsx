@@ -1,4 +1,3 @@
-import { WalletProvider } from "@/context/walletContext";
 import Constants from "expo-constants";
 import { Stack } from "expo-router";
 import React, { useEffect } from "react";
@@ -30,10 +29,8 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <WalletProvider>
-      <TransactionsProvider>
-        <Stack />
-      </TransactionsProvider>
-    </WalletProvider>
+    <TransactionsProvider>
+      <Stack />
+    </TransactionsProvider>
   );
 }

@@ -1,6 +1,3 @@
-import React from "react";
-import { Text } from "react-native";
+import WalletScreen from "@/components/wallet/WalletScreen";
 
-export default function Wallet() {
-  return <Text>Wallet</Text>;
-}
+export default WalletScreen;

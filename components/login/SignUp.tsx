@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/constants/api";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
@@ -26,8 +27,10 @@ export default function SignUp() {
     useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   // const [mail, setMail] = useState("");
+  const [fontsLoaded] = useFonts({
+    MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
+  });
   const color1 = "#264653";
-  const urlBase = "http://localhost:8080";
   const handleSubmit = async () => {
     if (username.length < 4) {
       setShowUsernameAlert(true);
@@ -72,7 +75,41 @@ export default function SignUp() {
                 setShowSuccessAlert(false);
               }, 3000);
             } else {
-              console.log(data.message);
+              if (password !== confirmPassword) {
+                setShowConfirmPasswordAlert(true);
+
+                setTimeout(() => {
+                  setShowConfirmPasswordAlert(false);
+                }, 3000);
+              } else {
+                try {
+                  const response = await fetch(API_BASE_URL + "/auth/sign-up", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      username: username,
+                      password: password,
+                    }),
+                  });
+
+                  const data = await response.json();
+                  console.log(response);
+
+                  if (response.ok) {
+                    setShowSuccessAlert(true);
+
+                    setTimeout(() => {
+                      setShowSuccessAlert(false);
+                    }, 3000);
+                  } else {
+                    console.log(data.message);
+                  }
+                } catch (error) {
+                  console.log(error);
+                }
+              }
             }
           } catch (error) {
             console.log(error);

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/constants/api";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
@@ -25,8 +26,10 @@ export default function SignIn() {
   const [showBadPasswordAlert, setShowBadPasswordAlert] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
+  const [fontsLoaded] = useFonts({
+    MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
+  });
   const color1 = "#264653";
-  const baseUrl = "http://localhost:8080";
 
   const handleSubmit = async () => {
     if (username.length < 4) {
@@ -37,7 +40,7 @@ export default function SignIn() {
       }, 3000);
     } else {
       try {
-        const response = await fetch(baseUrl + "/auth/sign-in", {
+        const response = await fetch(API_BASE_URL + "/auth/sign-in", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

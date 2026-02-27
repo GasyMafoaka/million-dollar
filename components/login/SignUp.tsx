@@ -1,6 +1,5 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { useFonts } from "expo-font";
 import React, { useState } from "react";
 import {
   Image,
@@ -27,9 +26,6 @@ export default function SignUp() {
     useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   // const [mail, setMail] = useState("");
-  const [fontsLoaded] = useFonts({
-    MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
-  });
   const color1 = "#264653";
   const urlBase = "http://localhost:8080";
   const handleSubmit = async () => {

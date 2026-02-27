@@ -11,6 +11,10 @@ import WalletList from "./WalletList";
 import { FontAwesome } from "@expo/vector-icons";
 import CreateWalletModal from "./CreateWalletModal";
 import { getAllWallets, createOneWallet } from "@/api/wallet/index";
+import {
+  offlineGetAllWallets,
+  offlineCreateOneWallet,
+} from "@/api/wallet/offline";
 import { Wallet, CreationWallet } from "@/api/wallet/model";
 
 // Mock accountId as it's not provided by a global state in this context
@@ -22,35 +26,6 @@ export default function WalletScreen() {
   const [error, setError] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const mockData = useCallback(() => {
-    setWallets([
-      {
-        id: "1",
-        name: "Main Cash",
-        description: "Personal Cash",
-        type: "CASH",
-        amount: 500,
-        color: "#2a9d8f",
-      },
-      {
-        id: "2",
-        name: "Savings Account",
-        description: "Bank of America",
-        type: "BANK",
-        amount: 1500,
-        color: "#264653",
-      },
-      {
-        id: "3",
-        name: "Mobile Money",
-        description: "Orange Money",
-        type: "MOBILE_MONEY",
-        amount: 200,
-        color: "#e9c46a",
-      },
-    ]);
-  }, []);
-
   const fetchWallets = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -61,11 +36,12 @@ export default function WalletScreen() {
     } catch (err) {
       console.error("Fetch error:", err);
       setError("Failed to fetch wallets. Displaying offline data.");
-      mockData();
+      const offlineResponse = await offlineGetAllWallets(MOCK_ACCOUNT_ID);
+      setWallets(offlineResponse.values || []);
     } finally {
       setLoading(false);
     }
-  }, [mockData]);
+  }, []);
 
   useEffect(() => {
     fetchWallets();
@@ -78,12 +54,11 @@ export default function WalletScreen() {
       Alert.alert("Success", "Wallet created successfully");
     } catch (err) {
       console.error(err);
-      const mockNewWallet = {
-        ...newWallet,
-        id: Math.random().toString(),
-        amount: 0,
-      } as Wallet;
-      setWallets([...wallets, mockNewWallet]);
+      const createdWallet = await offlineCreateOneWallet(
+        MOCK_ACCOUNT_ID,
+        newWallet,
+      );
+      setWallets([...wallets, createdWallet]);
       Alert.alert(
         "Notice",
         "API currently unavailable. Wallet created locally.",

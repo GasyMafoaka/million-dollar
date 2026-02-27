@@ -9,14 +9,20 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import { CreationWallet } from "@/api/wallet/model";
 
 interface CreateWalletModalProps {
   visible: boolean;
   onClose: () => void;
-  onCreate: (wallet: { name: string; reference: string; type: string }) => void;
+  onCreate: (wallet: CreationWallet) => void;
 }
 
-const WALLET_TYPES = ["CASH", "BANK_ACCOUNT", "MOBILE_MONEY", "CRYPTO"];
+const WALLET_TYPES: Array<CreationWallet["type"]> = [
+  "CASH",
+  "MOBILE_MONEY",
+  "BANK",
+  "DEBT",
+];
 
 export default function CreateWalletModal({
   visible,
@@ -24,14 +30,15 @@ export default function CreateWalletModal({
   onCreate,
 }: CreateWalletModalProps) {
   const [name, setName] = useState("");
-  const [reference, setReference] = useState("");
-  const [type, setType] = useState("CASH");
+  const [description, setDescription] = useState("");
+  const [type, setType] = useState<CreationWallet["type"]>("CASH");
+  const [color, setColor] = useState("#264653");
 
   const handleCreate = () => {
-    if (name && reference) {
-      onCreate({ name, reference, type });
+    if (name && type) {
+      onCreate({ name, description, type, color });
       setName("");
-      setReference("");
+      setDescription("");
       setType("CASH");
       onClose();
     }
@@ -64,12 +71,12 @@ export default function CreateWalletModal({
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Reference</Text>
+            <Text style={styles.label}>Description</Text>
             <TextInput
               style={styles.input}
-              value={reference}
-              onChangeText={setReference}
-              placeholder="e.g. SAV-001"
+              value={description}
+              onChangeText={setDescription}
+              placeholder="e.g. Bank of America"
             />
           </View>
 
@@ -91,7 +98,7 @@ export default function CreateWalletModal({
                       type === t && styles.selectedTypeOptionText,
                     ]}
                   >
-                    {t.replace("_", " ")}
+                    {t?.replace("_", " ")}
                   </Text>
                 </TouchableOpacity>
               ))}

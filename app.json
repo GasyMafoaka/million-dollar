@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "projet2",
-    "slug": "projet2",
+    "name": "Million Dollar",
+    "slug": "Million Dollar",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "projet2",
+    "scheme": "Million Dollar",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

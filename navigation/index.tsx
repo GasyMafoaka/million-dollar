@@ -4,10 +4,11 @@ import MainMenu from "@/screens/MainMenu";
 import Settings from "@/screens/Settings";
 import SignIn from "@/screens/SignIn";
 import SignUp from "@/screens/SignUp";
+import SplashScreen from "@/screens/SplashScreen";
 import Transaction from "@/screens/Transaction";
 import Wallet from "@/screens/Wallet";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Pressable, StyleSheet, Text } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 

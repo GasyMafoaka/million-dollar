@@ -99,7 +99,6 @@ export default function SignUp() {
     logo: {
       width: 200,
       height: 200,
-      borderRadius: "50%",
       marginBottom: 10,
     },
     LogoTittle: {
@@ -127,6 +126,7 @@ export default function SignUp() {
       borderColor: color1,
       padding: 5,
       paddingLeft: 10,
+      paddingRight: 15,
       borderRadius: 10,
       borderWidth: 2,
       marginTop: 20,

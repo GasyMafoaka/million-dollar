@@ -102,7 +102,6 @@ export default function SignIn() {
     logo: {
       width: 200,
       height: 200,
-      borderRadius: "50%",
       marginBottom: 10,
     },
     LogoTittle: {
@@ -130,6 +129,7 @@ export default function SignIn() {
       borderColor: color1,
       padding: 5,
       paddingLeft: 10,
+      paddingRight: 15,
       borderRadius: 10,
       borderWidth: 2,
       marginTop: 25,
@@ -280,7 +280,7 @@ export default function SignIn() {
         )}
       </View>
       <Pressable style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Sign Up</Text>
+        <Text style={styles.buttonText}>Sign In</Text>
       </Pressable>
       <Text style={styles.signIn}>
         New User ?

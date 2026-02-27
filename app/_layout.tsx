@@ -1,5 +1,3 @@
-import AppNavigator from "@/navigation";
-import WalletScreen from "@/screens/Wallet";
 import Constants from "expo-constants";
 import React, { useEffect, useState } from "react";
 import { Platform } from "react-native";
@@ -35,8 +33,7 @@ export default function RootLayout() {
       {!walletId ? (
         <WalletScreen onSelectWallet={setWalletId} />
       ) : (
-        <AppNavigator />
-      )}
+        <AppNavigaton/
     </TransactionsProvider>
   );
 }

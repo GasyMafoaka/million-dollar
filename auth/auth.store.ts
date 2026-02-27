@@ -13,3 +13,11 @@ export async function getToken() {
 export async function clearToken() {
   await AsyncStorage.removeItem(TOKEN_KEY);
 }
+
+export async function saveMockToken() {
+  const fakePayload = btoa(JSON.stringify({ accountId: "account-1" }));
+
+  const fakeToken = `xxx.${fakePayload}.xxx`;
+
+  await saveToken(fakeToken);
+}

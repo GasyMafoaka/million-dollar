@@ -1,3 +1,3 @@
-import AppNavigator from "@/navigation";
+import TransactionsScreen from "@/screens/Transaction";
 
-export default AppNavigator;
+export default TransactionsScreen;

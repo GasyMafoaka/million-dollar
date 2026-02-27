@@ -31,21 +31,37 @@ export const TransactionsProvider = ({
   const [filterType, setFilterType] = useState<"IN" | "OUT" | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [notificationHour, setNotificationHour] = useState(20);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const fetchMore = async () => {
-    if (!accountId || !walletId || !hasMore) return;
+    if (!accountId || !walletId || !hasMore || loadingMore) return;
 
-    const data = await transactionsApi.list(accountId, page, PAGE_SIZE, {
-      type: filterType,
-      walletId,
-    });
+    setLoadingMore(true);
 
-    setList((p) => [...p, ...data]);
-    setHasMore(data.length === PAGE_SIZE);
-    setPage((p) => p + 1);
+    try {
+      const data = await transactionsApi.list(accountId, page, PAGE_SIZE, {
+        type: filterType,
+        walletId,
+      });
+
+      setList((prev) => {
+        const merged = [...prev, ...data];
+
+        const unique = merged.filter(
+          (item, index, self) =>
+            index === self.findIndex((t) => String(t.id) === String(item.id)),
+        );
+
+        return unique;
+      });
+
+      setHasMore(data.length === PAGE_SIZE);
+      setPage((p) => p + 1);
+    } finally {
+      setLoadingMore(false);
+    }
   };
 
-  // Add transaction
   const add = async (data: Omit<Transaction, "id">) => {
     if (!accountId || !walletId) return;
 
@@ -74,10 +90,19 @@ export const TransactionsProvider = ({
 
   useEffect(() => {
     if (!accountId || !walletId) return;
-    setList([]);
-    setPage(1);
-    setHasMore(true);
-    fetchMore();
+
+    const load = async () => {
+      const data = await transactionsApi.list(accountId, 1, PAGE_SIZE, {
+        type: filterType,
+        walletId,
+      });
+
+      setList(data);
+      setHasMore(data.length === PAGE_SIZE);
+      setPage(2);
+    };
+
+    load();
   }, [filterType, accountId, walletId]);
 
   useEffect(() => {
@@ -102,6 +127,7 @@ export const TransactionsProvider = ({
         setFilterType,
         notificationHour,
         setNotificationHour,
+        loadingMore, // optionnel si tu veux afficher un loader
       }}
     >
       {children}

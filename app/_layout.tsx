@@ -1,12 +1,11 @@
-import WalletScreen from "@/screens/Wallet";
 import Constants from "expo-constants";
+import { Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Platform } from "react-native";
-import AppNavigator from ".";
 import { TransactionsProvider } from "../context/listTransactionContext";
 
 export default function RootLayout() {
-  const [walletId, setWalletId] = useState<string | null>(null);
+  const [walletId, setWalletId] = useState<string | null>("wallet-1");
 
   useEffect(() => {
     const isExpoGo = Constants.executionEnvironment === "storeClient";
@@ -32,11 +31,7 @@ export default function RootLayout() {
 
   return (
     <TransactionsProvider walletId={walletId}>
-      {!walletId ? (
-        <WalletScreen onSelectWallet={setWalletId} />
-      ) : (
-        <AppNavigator />
-      )}
+      <Stack />
     </TransactionsProvider>
   );
 }

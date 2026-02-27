@@ -1,4 +1,4 @@
-import { getToken } from "../auth/auth.store";
+/*import { getToken } from "../auth/auth.store";
 import { API_URL } from "./config";
 
 export const transactionsApi = {
@@ -71,3 +71,8 @@ export const transactionsApi = {
     );
   },
 };
+*/
+
+import { transactionsMockApi } from "@/mock/transactions.mock";
+
+export const transactionsApi = transactionsMockApi;

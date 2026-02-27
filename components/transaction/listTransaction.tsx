@@ -1,27 +1,13 @@
-import { FontAwesome } from "@expo/vector-icons";
+import { appStyles, color1 } from "@/styles/appStyles";
 import { useFonts } from "expo-font";
-import React, { useState } from "react";
-import {
-  FlatList,
-  Image,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import React from "react";
+import { FlatList, Image, Pressable, Text, View } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { useTransactions } from "../../context/listTransactionContext";
 
-import { appStyles, color1 } from "@/styles/appStyles";
-
-export default function TransactionsScreen() {
-  const { list, fetchMore, add, remove, setSelectedDate, setFilterType } =
+export default function TransactionsScreen({ navigation }: any) {
+  const { list, fetchMore, remove, selectedDate, setSelectedDate } =
     useTransactions();
-
-  const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState("");
-  const [date, setDate] = useState("");
-  const [type, setType] = useState<"IN" | "OUT">("OUT");
 
   const [fontsLoaded] = useFonts({
     MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
@@ -29,37 +15,37 @@ export default function TransactionsScreen() {
 
   if (!fontsLoaded) return null;
 
-  const submit = async () => {
-    if (!title || !amount || !date) return alert("Champs manquants");
-
-    await add({
-      title,
-      description: "",
-      amount: Number(amount),
-      date,
-      type,
-    });
-
-    setTitle("");
-    setAmount("");
-    setDate("");
-  };
-
   return (
     <View style={appStyles.container}>
       <Image
         source={require("@/assets/images/LogoPF.png")}
         style={appStyles.logo}
       />
+
       <Text style={appStyles.title}>Transactions</Text>
+
+      <Pressable
+        style={appStyles.button}
+        onPress={() => navigation.navigate("TransactionForm")}
+      >
+        <Text style={appStyles.buttonText}>Nouvelle Transaction</Text>
+      </Pressable>
 
       <Calendar
         onDayPress={(d) => setSelectedDate(d.dateString)}
-        markedDates={list.reduce((acc: any, t: { date: string }) => {
-          const d = t.date.split("T")[0];
-          acc[d] = { marked: true };
-          return acc;
-        }, {})}
+        markedDates={{
+          ...list.reduce((acc: any, t: any) => {
+            const d = t.date.split("T")[0];
+            acc[d] = { marked: true };
+            return acc;
+          }, {}),
+          ...(selectedDate && {
+            [selectedDate]: {
+              selected: true,
+              selectedColor: color1,
+            },
+          }),
+        }}
         theme={{
           selectedDayBackgroundColor: color1,
           todayTextColor: color1,
@@ -67,88 +53,41 @@ export default function TransactionsScreen() {
         }}
       />
 
-      <View style={appStyles.filterContainer}>
+      {selectedDate && (
         <Pressable
-          style={[
-            appStyles.filterButton,
-            type === "OUT" && appStyles.filterActive,
-          ]}
-          onPress={() => {
-            setType("OUT");
-            setFilterType("OUT");
-          }}
+          style={[appStyles.filterButton, { marginVertical: 10 }]}
+          onPress={() => setSelectedDate(null)}
         >
-          <Text
-            style={[appStyles.filterText, type === "OUT" && { color: "white" }]}
-          >
-            Dépenses
-          </Text>
+          <Text style={appStyles.filterText}>Afficher tout</Text>
         </Pressable>
-
-        <Pressable
-          style={[
-            appStyles.filterButton,
-            type === "IN" && appStyles.filterActive,
-          ]}
-          onPress={() => {
-            setType("IN");
-            setFilterType("IN");
-          }}
-        >
-          <Text
-            style={[appStyles.filterText, type === "IN" && { color: "white" }]}
-          >
-            Revenus
-          </Text>
-        </Pressable>
-      </View>
-
-      <View style={appStyles.inputContainer}>
-        <FontAwesome name="tag" size={22} color={color1} />
-        <TextInput
-          style={appStyles.textInput}
-          placeholder="Titre"
-          value={title}
-          onChangeText={setTitle}
-        />
-      </View>
-
-      <View style={appStyles.inputContainer}>
-        <FontAwesome name="money" size={22} color={color1} />
-        <TextInput
-          style={appStyles.textInput}
-          placeholder="Montant"
-          keyboardType="numeric"
-          value={amount}
-          onChangeText={setAmount}
-        />
-      </View>
-
-      <View style={appStyles.inputContainer}>
-        <FontAwesome name="calendar" size={22} color={color1} />
-        <TextInput
-          style={appStyles.textInput}
-          placeholder="YYYY-MM-DD"
-          value={date}
-          onChangeText={setDate}
-        />
-      </View>
-
-      <Pressable style={appStyles.button} onPress={submit}>
-        <Text style={appStyles.buttonText}>Ajouter</Text>
-      </Pressable>
+      )}
 
       <FlatList
         data={list}
         keyExtractor={(item) => String(item.id)}
         onEndReached={fetchMore}
+        onEndReachedThreshold={0.4}
+        ListEmptyComponent={
+          <Text style={{ textAlign: "center", marginTop: 20 }}>
+            Aucune transaction
+          </Text>
+        }
         renderItem={({ item }) => (
           <View style={appStyles.card}>
             <Text style={appStyles.cardTitle}>{item.title}</Text>
-            <Text style={appStyles.cardAmount}>{item.amount} Ar</Text>
+            <Text style={appStyles.cardAmount}>
+              {item.type === "OUT" ? "-" : "+"}
+              {item.amount} Ar
+            </Text>
 
             <View style={appStyles.cardActions}>
-              <Pressable>
+              <Pressable
+                onPress={() =>
+                  navigation.navigate("TransactionForm", {
+                    transaction: item,
+                  })
+                }
+              >
                 <Text style={appStyles.edit}>Modifier</Text>
               </Pressable>
 

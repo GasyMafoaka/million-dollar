@@ -1,7 +1,6 @@
 import { API_BASE_URL } from "@/constants/api";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { useFonts } from "expo-font";
 import React, { useState } from "react";
 import {
   Image,
@@ -133,7 +132,6 @@ export default function SignUp() {
     logo: {
       width: 200,
       height: 200,
-      borderRadius: "50%",
       marginBottom: 10,
     },
     LogoTittle: {
@@ -161,6 +159,7 @@ export default function SignUp() {
       borderColor: color1,
       padding: 5,
       paddingLeft: 10,
+      paddingRight: 15,
       borderRadius: 10,
       borderWidth: 2,
       marginTop: 20,

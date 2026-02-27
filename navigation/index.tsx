@@ -5,6 +5,7 @@ import SignIn from "@/screens/SignIn";
 import SignUp from "@/screens/SignUp";
 import Transaction from "@/screens/Transaction";
 import Wallet from "@/screens/Wallet";
+import SplashScreen from "@/screens/SplashScreen";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Pressable, StyleSheet, Text } from 'react-native';
 

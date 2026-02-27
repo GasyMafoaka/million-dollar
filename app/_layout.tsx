@@ -1,10 +1,13 @@
+import AppNavigator from "@/navigation";
+import WalletScreen from "@/screens/Wallet";
 import Constants from "expo-constants";
-import { Stack } from "expo-router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { TransactionsProvider } from "../context/listTransactionContext";
 
 export default function RootLayout() {
+  const [walletId, setWalletId] = useState<string | null>(null);
+
   useEffect(() => {
     const isExpoGo = Constants.executionEnvironment === "storeClient";
     const isNative = Platform.OS !== "web" && !isExpoGo;
@@ -13,7 +16,6 @@ export default function RootLayout() {
 
     try {
       const Notifications = require("expo-notifications");
-
       Notifications.setNotificationHandler({
         handleNotification: async () => ({
           shouldShowAlert: true,
@@ -29,8 +31,12 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <TransactionsProvider>
-      <Stack />
+    <TransactionsProvider walletId={walletId}>
+      {!walletId ? (
+        <WalletScreen onSelectWallet={setWalletId} />
+      ) : (
+        <AppNavigator />
+      )}
     </TransactionsProvider>
   );
 }

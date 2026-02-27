@@ -16,9 +16,14 @@ import {
 const PAGE_SIZE = 10;
 const Ctx = createContext<any>(null);
 
-export const TransactionsProvider = ({ children }: any) => {
+export const TransactionsProvider = ({
+  children,
+  walletId,
+}: {
+  children: React.ReactNode;
+  walletId: string | null;
+}) => {
   const { accountId } = useSession();
-  const walletId = "main-wallet"; // temporaire (peut venir du backend)
 
   const [list, setList] = useState<Transaction[]>([]);
   const [page, setPage] = useState(1);
@@ -28,29 +33,34 @@ export const TransactionsProvider = ({ children }: any) => {
   const [notificationHour, setNotificationHour] = useState(20);
 
   const fetchMore = async () => {
-    if (!accountId || !hasMore) return;
+    if (!accountId || !walletId || !hasMore) return;
+
     const data = await transactionsApi.list(accountId, page, PAGE_SIZE, {
       type: filterType,
+      walletId,
     });
+
     setList((p) => [...p, ...data]);
     setHasMore(data.length === PAGE_SIZE);
     setPage((p) => p + 1);
   };
 
+  // Add transaction
   const add = async (data: Omit<Transaction, "id">) => {
-    if (!accountId) return;
+    if (!accountId || !walletId) return;
+
     const created = await transactionsApi.create(accountId, walletId, data);
     setList((p) => [created, ...p]);
   };
 
   const updateItem = async (id: string, data: Partial<Transaction>) => {
-    if (!accountId) return;
+    if (!accountId || !walletId) return;
     const updated = await transactionsApi.update(accountId, walletId, id, data);
     setList((p) => p.map((t) => (String(t.id) === String(id) ? updated : t)));
   };
 
   const removeItem = async (id: string) => {
-    if (!accountId) return;
+    if (!accountId || !walletId) return;
     await transactionsApi.remove(accountId, walletId, id);
     setList((p) => p.filter((t) => String(t.id) !== String(id)));
   };
@@ -63,12 +73,12 @@ export const TransactionsProvider = ({ children }: any) => {
   }, [list, selectedDate]);
 
   useEffect(() => {
-    if (!accountId) return;
+    if (!accountId || !walletId) return;
     setList([]);
     setPage(1);
     setHasMore(true);
     fetchMore();
-  }, [filterType, accountId]);
+  }, [filterType, accountId, walletId]);
 
   useEffect(() => {
     requestPermission();

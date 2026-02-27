@@ -33,7 +33,8 @@ export default function TransactionList({
 
 const styles = StyleSheet.create({
   listContainer: {
-    paddingVertical: 10,
+    paddingTop: 10,
+    paddingBottom: 100, // Extra padding to avoid overlap with FAB
   },
   emptyContainer: {
     flex: 1,

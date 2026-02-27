@@ -2,6 +2,7 @@ import { API_BASE_URL } from "@/constants/api";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
+import { useFonts } from "expo-font";
 import {
   Image,
   Pressable,

@@ -1,26 +1,23 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import { Wallet } from "@/api/wallet/model";
 
 interface WalletItemProps {
-  wallet: {
-    name: string;
-    reference: string;
-    type: "CASH" | "BANK_ACCOUNT" | "MOBILE_MONEY" | "CRYPTO";
-  };
+  wallet: Wallet;
 }
 
 export default function WalletItem({ wallet }: WalletItemProps) {
-  const getIconName = (type: string) => {
+  const getIconName = (type?: string) => {
     switch (type) {
       case "CASH":
         return "money";
-      case "BANK_ACCOUNT":
+      case "BANK":
         return "bank";
       case "MOBILE_MONEY":
         return "mobile";
-      case "CRYPTO":
-        return "bitcoin";
+      case "DEBT":
+        return "minus-circle";
       default:
         return "credit-card";
     }
@@ -28,19 +25,31 @@ export default function WalletItem({ wallet }: WalletItemProps) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.iconContainer}>
+      <View
+        style={[
+          styles.iconContainer,
+          wallet.color ? { backgroundColor: wallet.color + "20" } : null,
+        ]}
+      >
         <FontAwesome
           name={getIconName(wallet.type) as any}
           size={24}
-          color="#264653"
+          color={wallet.color || "#264653"}
         />
       </View>
       <View style={styles.infoContainer}>
         <Text style={styles.name}>{wallet.name}</Text>
-        <Text style={styles.reference}>{wallet.reference}</Text>
+        <Text style={styles.description}>{wallet.description}</Text>
       </View>
-      <View style={styles.typeContainer}>
-        <Text style={styles.type}>{wallet.type}</Text>
+      <View
+        style={[
+          styles.amountContainer,
+          wallet.color ? { backgroundColor: wallet.color } : null,
+        ]}
+      >
+        <Text style={styles.amount}>
+          {wallet.amount !== undefined ? wallet.amount.toFixed(2) : "0.00"}
+        </Text>
       </View>
     </View>
   );
@@ -79,20 +88,20 @@ const styles = StyleSheet.create({
     fontFamily: "MoreSugar",
     color: "#264653",
   },
-  reference: {
+  description: {
     fontSize: 14,
     fontFamily: "MoreSugar",
     color: "#6c757d",
   },
-  typeContainer: {
+  amountContainer: {
     backgroundColor: "#264653",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 5,
   },
-  type: {
+  amount: {
     color: "white",
-    fontSize: 10,
+    fontSize: 12,
     fontFamily: "MoreSugar",
   },
 });

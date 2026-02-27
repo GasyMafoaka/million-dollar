@@ -1,13 +1,7 @@
 import React from "react";
 import { FlatList, StyleSheet, View, Text } from "react-native";
 import WalletItem from "./WalletItem";
-
-interface Wallet {
-  id: string;
-  name: string;
-  reference: string;
-  type: "CASH" | "BANK_ACCOUNT" | "MOBILE_MONEY" | "CRYPTO";
-}
+import { Wallet } from "@/api/wallet/model";
 
 interface WalletListProps {
   wallets: Wallet[];
@@ -25,7 +19,7 @@ export default function WalletList({ wallets }: WalletListProps) {
   return (
     <FlatList
       data={wallets}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.id || Math.random().toString()}
       renderItem={({ item }) => <WalletItem wallet={item} />}
       contentContainerStyle={styles.listContainer}
       style={{ width: "100%" }}

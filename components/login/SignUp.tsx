@@ -1,6 +1,7 @@
 import { API_BASE_URL } from "@/constants/api";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { useFonts } from "expo-font";
 import React, { useState } from "react";
 import {
   Image,
@@ -54,7 +55,7 @@ export default function SignUp() {
           }, 3000);
         } else {
           try {
-            const response = await fetch(urlBase + "/auth/sign-up", {
+            const response = await fetch(API_BASE_URL + "/auth/sign-up", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -66,7 +67,7 @@ export default function SignUp() {
             });
 
             const data = await response.json();
-            console.log(response);
+            console.log(data);
 
             if (response.ok) {
               setShowSuccessAlert(true);

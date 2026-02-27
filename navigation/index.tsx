@@ -8,6 +8,7 @@ import Wallet from "@/screens/Wallet";
 import WalletTransaction from "@/screens/WalletTransaction";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Pressable, StyleSheet, Text } from "react-native";
+import Settings from "@/screens/Settings";
 
 const Stack = createNativeStackNavigator();
 

@@ -70,10 +70,10 @@ export default function MainMenu() {
       </Pressable>
 
       <Pressable
-      style={styles.button}
-      onPress={() => navigation.navigate("Settings")}
+        style={styles.button}
+        onPress={() => navigation.navigate("Settings")}
       >
-        <Text style={styles.buttonText} >Settings</Text>
+        <Text style={styles.buttonText}>Settings</Text>
       </Pressable>
 
       <Pressable

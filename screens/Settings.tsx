@@ -92,9 +92,7 @@ export default function Settings() {
 
       {/* Currency */}
       <View style={styles.card}>
-        <CustomText style={styles.sectionTitle}>
-          Preferred Currency
-        </CustomText>
+        <CustomText style={styles.sectionTitle}>Preferred Currency</CustomText>
         <Picker
           selectedValue={currency}
           onValueChange={(itemValue) => setCurrency(itemValue)}

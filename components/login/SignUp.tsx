@@ -31,7 +31,7 @@ export default function SignUp() {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   // const [mail, setMail] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [submitButtonColor, setSubmitButtonColor] = useState(color1)
+  const [submitButtonColor, setSubmitButtonColor] = useState(color1);
   const [fontsLoaded] = useFonts({
     MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
   });
@@ -58,7 +58,7 @@ export default function SignUp() {
           }, 3000);
         } else {
           try {
-            setSubmitted(true)
+            setSubmitted(true);
             const response = await fetch(API_BASE_URL + "/auth/sign-up", {
               method: "POST",
               headers: {
@@ -326,12 +326,16 @@ export default function SignUp() {
           </View>
         )}
       </View>
-      {!submitted && (<Pressable style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </Pressable>)}
-      {showSuccessAlert && (<Pressable style={styles.button} onPress={()=>{}}>
-        <Text style={styles.buttonText}>Signed Up</Text>
-      </Pressable>)}
+      {!submitted && (
+        <Pressable style={styles.button} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </Pressable>
+      )}
+      {showSuccessAlert && (
+        <Pressable style={styles.button} onPress={() => {}}>
+          <Text style={styles.buttonText}>Signed Up</Text>
+        </Pressable>
+      )}
       <Text style={styles.signIn}>
         Already have an account ?
         <Text

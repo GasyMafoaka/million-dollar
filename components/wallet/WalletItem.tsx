@@ -1,13 +1,16 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { Wallet } from "@/api/wallet/model";
+import { useNavigation } from "@react-navigation/native";
 
 interface WalletItemProps {
   wallet: Wallet;
 }
 
 export default function WalletItem({ wallet }: WalletItemProps) {
+  const navigation = useNavigation<any>();
+
   const getIconName = (type?: string) => {
     switch (type) {
       case "CASH":
@@ -24,7 +27,10 @@ export default function WalletItem({ wallet }: WalletItemProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <Pressable
+      style={styles.container}
+      onPress={() => navigation.navigate("WalletTransaction", { wallet })}
+    >
       <View
         style={[
           styles.iconContainer,
@@ -51,7 +57,7 @@ export default function WalletItem({ wallet }: WalletItemProps) {
           {wallet.amount !== undefined ? wallet.amount.toFixed(2) : "0.00"}
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

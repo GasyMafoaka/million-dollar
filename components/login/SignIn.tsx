@@ -1,5 +1,9 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+<<<<<<< HEAD
+=======
+import { useFonts } from "expo-font";
+>>>>>>> origin/main
 import React, { useState } from "react";
 import {
   Image,

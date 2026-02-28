@@ -31,7 +31,11 @@ export default function SignUp() {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   // const [mail, setMail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+<<<<<<< HEAD
   const [signedUp, setSignedUp] = useState(false);
+=======
+  const [submitButtonColor, setSubmitButtonColor] = useState(color1);
+>>>>>>> origin/main
   const [fontsLoaded] = useFonts({
     MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
   });
@@ -315,7 +319,11 @@ export default function SignUp() {
           <Text style={styles.buttonText}>Sign Up</Text>
         </Pressable>
       )}
+<<<<<<< HEAD
       {signedUp && (
+=======
+      {showSuccessAlert && (
+>>>>>>> origin/main
         <Pressable style={styles.button} onPress={() => {}}>
           <Text style={styles.buttonText}>Signed Up</Text>
         </Pressable>

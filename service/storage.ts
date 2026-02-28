@@ -1,0 +1,1 @@
+/** this file should implement the local storage logic, allowing to store, get, modify and delete a key: str + content: object */

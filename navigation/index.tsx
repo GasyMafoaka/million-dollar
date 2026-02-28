@@ -11,6 +11,7 @@ import SignUp from "@/screens/SignUp";
 import SplashScreen from "@/screens/SplashScreen";
 import Transaction from "@/screens/Transaction";
 import Wallet from "@/screens/Wallet";
+import WalletTransaction from "@/screens/WalletTransaction";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Pressable, StyleSheet, Text } from "react-native";
 
@@ -65,6 +66,7 @@ export default function AppNavigator() {
       />
       <Stack.Screen name="Transaction" component={Transaction} />
       <Stack.Screen name="Wallet" component={Wallet} />
+      <Stack.Screen name="WalletTransaction" component={WalletTransaction} />
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="SignIn" component={SignIn} />
       <Stack.Screen name="SignUp" component={SignUp} />

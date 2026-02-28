@@ -325,9 +325,16 @@ export default function SignUp() {
           </View>
         )}
       </View>
-      <Pressable style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </Pressable>
+      {!submitted && (
+        <Pressable style={styles.button} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </Pressable>
+      )}
+      {signedUp && (
+        <Pressable style={styles.button} onPress={() => {}}>
+          <Text style={styles.buttonText}>Signed Up</Text>
+        </Pressable>
+      )}
       <Text style={styles.signIn}>
         Already have an account ?
         <Text

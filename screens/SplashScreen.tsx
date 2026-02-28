@@ -15,7 +15,6 @@ const march: CSSAnimationKeyframes = {
   },
 };
 
-
 const SplashScreen = ({ navigation }: any) => {
   const [fontsLoaded] = useFonts({
     MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
@@ -31,19 +30,19 @@ const SplashScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-        <Animated.Image 
-                source={require('@/assets/images/LogoPF-white.png')}
-                style={[
-                  styles.logoWhite,
-                  {
-                    animationName: march,
-                    animationDuration: "2.5s",
-                    animationIterationCount: "infinite",
-                    animationTimingFunction: "ease-in-out",
-                    animationDirection: "alternate",
-                  },
-                ]}
-                />
+      <Animated.Image
+        source={require("@/assets/images/LogoPF-white.png")}
+        style={[
+          styles.logoWhite,
+          {
+            animationName: march,
+            animationDuration: "2.5s",
+            animationIterationCount: "infinite",
+            animationTimingFunction: "ease-in-out",
+            animationDirection: "alternate",
+          },
+        ]}
+      />
       <Text style={styles.title}>Million Dollars</Text>
       <Text style={styles.subtitle}>Gérez vos finances intelligemment</Text>
     </View>

@@ -1,15 +1,16 @@
 {
   "expo": {
-    "name": "projet2",
-    "slug": "projet2",
+    "name": "Million Dollar",
+    "slug": "Million Dollar",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "projet2",
+    "scheme": "Million Dollar",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.MillionDollar"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +20,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.MillionDollar"
     },
     "web": {
       "output": "static",

@@ -1,6 +1,7 @@
 import { API_BASE_URL } from "@/constants/api";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { useFonts } from "expo-font";
 import React, { useState } from "react";
 import {
   Image,
@@ -23,11 +24,17 @@ export default function SignUp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [showUsernameAlert, setShowUsernameAlert] = useState(false);
+  const [userExistAlert, setUserExistAlert] = useState(false);
   const [showPasswordAlert, setShowPasswordAlert] = useState(false);
   const [showConfirmPasswordAlert, setShowConfirmPasswordAlert] =
     useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   // const [mail, setMail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [signedUp, setSignedUp] = useState(false);
+  const [fontsLoaded] = useFonts({
+    MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
+  });
   const handleSubmit = async () => {
     if (username.length < 4) {
       setShowUsernameAlert(true);
@@ -66,8 +73,18 @@ export default function SignUp() {
             const data = await response.json();
             console.log(data);
 
+            if (data.code === 400) {
+              setSubmitted(false);
+              setUserExistAlert(true);
+
+              setTimeout(() => {
+                setUserExistAlert(false);
+              }, 3000);
+            }
+
             if (response.ok) {
               setShowSuccessAlert(true);
+              setSignedUp(true);
 
               setTimeout(() => {
                 setShowSuccessAlert(false);
@@ -222,6 +239,14 @@ export default function SignUp() {
             </Text>
           </View>
         )}
+        {userExistAlert && (
+          <View style={styles.inputAlertContainer}>
+            <FontAwesome name="info-circle" size={15} color="red" />
+            <Text style={styles.inputAlertContainerText}>
+              Your username is already used.
+            </Text>
+          </View>
+        )}
         {/* <View style = {styles.inputContainer}>
                     <FontAwesome name="envelope" size={24} color={color1} />
                     <TextInput 
@@ -285,12 +310,12 @@ export default function SignUp() {
           </View>
         )}
       </View>
-      {!setSubmitted && (
+      {!submitted && (
         <Pressable style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </Pressable>
       )}
-      {showSuccessAlert && (
+      {signedUp && (
         <Pressable style={styles.button} onPress={() => {}}>
           <Text style={styles.buttonText}>Signed Up</Text>
         </Pressable>
@@ -310,7 +335,4 @@ export default function SignUp() {
       )}
     </View>
   );
-}
-function setSubmitted(arg0: boolean) {
-  throw new Error("Function not implemented.");
 }

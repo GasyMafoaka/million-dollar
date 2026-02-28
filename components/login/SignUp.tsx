@@ -15,7 +15,6 @@ import {
 export default function SignUp() {
   const navigation = useNavigation<any>();
   const color1 = "#264653";
-  const color2 = "#0aaa48";
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +31,6 @@ export default function SignUp() {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   // const [mail, setMail] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [submitButtonColor, setSubmitButtonColor] = useState(color1);
   const [signedUp, setSignedUp] = useState(false);
   const [fontsLoaded] = useFonts({
     MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
@@ -173,7 +171,7 @@ export default function SignUp() {
       marginLeft: 10,
     },
     button: {
-      backgroundColor: submitButtonColor,
+      backgroundColor: color1,
       height: 60,
       width: "80%",
       display: "flex",

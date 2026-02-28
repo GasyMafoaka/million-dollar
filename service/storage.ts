@@ -5,7 +5,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
  * @param key - The string key to store the content under.
  * @param content - The object to be stored.
  */
-export const storeData = async (key: string, content: object): Promise<void> => {
+export const storeData = async (
+  key: string,
+  content: object,
+): Promise<void> => {
   try {
     const jsonValue = JSON.stringify(content);
     await AsyncStorage.setItem(key, jsonValue);
@@ -20,7 +23,9 @@ export const storeData = async (key: string, content: object): Promise<void> => 
  * @param key - The string key to retrieve the content from.
  * @returns The parsed object or null if not found.
  */
-export const getData = async <T extends object>(key: string): Promise<T | null> => {
+export const getData = async <T extends object>(
+  key: string,
+): Promise<T | null> => {
   try {
     const jsonValue = await AsyncStorage.getItem(key);
     return jsonValue != null ? JSON.parse(jsonValue) : null;
@@ -36,7 +41,10 @@ export const getData = async <T extends object>(key: string): Promise<T | null> 
  * @param key - The string key of the object to modify.
  * @param content - The object containing the updates to be merged.
  */
-export const modifyData = async (key: string, content: object): Promise<void> => {
+export const modifyData = async (
+  key: string,
+  content: object,
+): Promise<void> => {
   try {
     await AsyncStorage.mergeItem(key, JSON.stringify(content));
   } catch (e) {

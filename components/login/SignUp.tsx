@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/constants/api";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
@@ -12,6 +13,7 @@ import {
 
 export default function SignUp() {
   const navigation = useNavigation<any>();
+  const color1 = "#264653";
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -26,8 +28,6 @@ export default function SignUp() {
     useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   // const [mail, setMail] = useState("");
-  const color1 = "#264653";
-  const urlBase = "http://localhost:8080";
   const handleSubmit = async () => {
     if (username.length < 4) {
       setShowUsernameAlert(true);
@@ -51,7 +51,8 @@ export default function SignUp() {
           }, 3000);
         } else {
           try {
-            const response = await fetch(urlBase + "/auth/sign-up", {
+            setSubmitted(true);
+            const response = await fetch(API_BASE_URL + "/auth/sign-up", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -63,7 +64,7 @@ export default function SignUp() {
             });
 
             const data = await response.json();
-            console.log(response);
+            console.log(data);
 
             if (response.ok) {
               setShowSuccessAlert(true);
@@ -284,9 +285,16 @@ export default function SignUp() {
           </View>
         )}
       </View>
-      <Pressable style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </Pressable>
+      {!setSubmitted && (
+        <Pressable style={styles.button} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </Pressable>
+      )}
+      {showSuccessAlert && (
+        <Pressable style={styles.button} onPress={() => {}}>
+          <Text style={styles.buttonText}>Signed Up</Text>
+        </Pressable>
+      )}
       <Text style={styles.signIn}>
         Already have an account ?
         <Text
@@ -302,4 +310,7 @@ export default function SignUp() {
       )}
     </View>
   );
+}
+function setSubmitted(arg0: boolean) {
+  throw new Error("Function not implemented.");
 }

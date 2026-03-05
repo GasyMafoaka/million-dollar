@@ -22,7 +22,7 @@ type Props = {
 };
 
 export default function SignIn({ route }: Props) {
-  const { redirectScreenName } = route.params;
+  const { redirectScreenName = "MainMenu" } = route.params || {};
   const navigation = useNavigation<any>();
 
   const [username, setUsername] = useState("");
@@ -61,7 +61,7 @@ export default function SignIn({ route }: Props) {
             setShowSuccessAlert(false);
           }, 3000);
 
-          navigation.navigate(redirectScreenName);
+          navigation.replace(redirectScreenName);
         }
       } catch (error: any) {
         console.log(error);

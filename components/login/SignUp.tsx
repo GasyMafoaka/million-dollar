@@ -1,4 +1,4 @@
-import { signUp } from "@/api/account";
+import { signIn, signUp } from "@/api/account";
 import { API_BASE_URL } from "@/constants/api";
 import { session } from "@/service/session";
 import { FontAwesome } from "@expo/vector-icons";
@@ -23,7 +23,7 @@ type Props = {
 };
 
 export default function SignUp({ route }: Props) {
-  const { redirectScreenName } = route.params;
+  const { redirectScreenName = "MainMenu" } = route.params || {};
 
   const navigation = useNavigation<any>();
   const color1 = "#264653";
@@ -76,21 +76,21 @@ export default function SignUp({ route }: Props) {
             console.log(data);
 
             if (data.id) {
-              // Sign-up successful. We might want to auto-login here if the API returned a token,
-              // but SignInResult includes a token while SignUpResult does not according to the model.
-              // For now, let's just show success.
+              // Sign-up successful.
               setShowSuccessAlert(true);
               setSignedUp(true);
+
+              // Auto-login after sign-up
+              const signInData = await signIn({ username, password });
+              if (signInData.account && signInData.token) {
+                await session.setSession(signInData.account, signInData.token);
+              }
 
               setTimeout(() => {
                 setShowSuccessAlert(false);
               }, 3000);
 
-              // If the API doesn't return a token on sign-up, the user might need to sign in manually,
-              // or we could call signIn here. Given the existing code navigates to redirectScreenName,
-              // it assumes the user is "in". Let's check if we can get a token.
-
-              navigation.navigate(redirectScreenName);
+              navigation.replace(redirectScreenName);
             }
           } catch (error: any) {
             console.log(error);

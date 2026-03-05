@@ -71,5 +71,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
     borderRadius: 5,
+    fontFamily: "MoreSugar",
   },
 });

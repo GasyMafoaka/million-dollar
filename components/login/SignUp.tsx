@@ -15,7 +15,6 @@ import {
 export default function SignUp() {
   const navigation = useNavigation<any>();
   const color1 = "#264653";
-  const color2 = "#0aaa48";
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -25,13 +24,14 @@ export default function SignUp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [showUsernameAlert, setShowUsernameAlert] = useState(false);
+  const [userExistAlert, setUserExistAlert] = useState(false);
   const [showPasswordAlert, setShowPasswordAlert] = useState(false);
   const [showConfirmPasswordAlert, setShowConfirmPasswordAlert] =
     useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   // const [mail, setMail] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [submitButtonColor, setSubmitButtonColor] = useState(color1);
+  const [signedUp, setSignedUp] = useState(false);
   const [fontsLoaded] = useFonts({
     MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
   });
@@ -73,48 +73,24 @@ export default function SignUp() {
             const data = await response.json();
             console.log(data);
 
+            if (data.code === 400) {
+              setSubmitted(false);
+              setUserExistAlert(true);
+
+              setTimeout(() => {
+                setUserExistAlert(false);
+              }, 3000);
+            }
+
             if (response.ok) {
               setShowSuccessAlert(true);
+              setSignedUp(true);
 
               setTimeout(() => {
                 setShowSuccessAlert(false);
               }, 3000);
             } else {
-              if (password !== confirmPassword) {
-                setShowConfirmPasswordAlert(true);
-
-                setTimeout(() => {
-                  setShowConfirmPasswordAlert(false);
-                }, 3000);
-              } else {
-                try {
-                  const response = await fetch(API_BASE_URL + "/auth/sign-up", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      username: username,
-                      password: password,
-                    }),
-                  });
-
-                  const data = await response.json();
-                  console.log(response);
-
-                  if (response.ok) {
-                    setShowSuccessAlert(true);
-
-                    setTimeout(() => {
-                      setShowSuccessAlert(false);
-                    }, 3000);
-                  } else {
-                    console.log(data.message);
-                  }
-                } catch (error) {
-                  console.log(error);
-                }
-              }
+              console.log(data.message);
             }
           } catch (error) {
             console.log(error);
@@ -195,7 +171,7 @@ export default function SignUp() {
       marginLeft: 10,
     },
     button: {
-      backgroundColor: submitButtonColor,
+      backgroundColor: color1,
       height: 60,
       width: "80%",
       display: "flex",
@@ -260,6 +236,14 @@ export default function SignUp() {
             <FontAwesome name="info-circle" size={15} color="red" />
             <Text style={styles.inputAlertContainerText}>
               Username must be at least 4 characters long.
+            </Text>
+          </View>
+        )}
+        {userExistAlert && (
+          <View style={styles.inputAlertContainer}>
+            <FontAwesome name="info-circle" size={15} color="red" />
+            <Text style={styles.inputAlertContainerText}>
+              Your username is already used.
             </Text>
           </View>
         )}
@@ -331,7 +315,7 @@ export default function SignUp() {
           <Text style={styles.buttonText}>Sign Up</Text>
         </Pressable>
       )}
-      {showSuccessAlert && (
+      {signedUp && (
         <Pressable style={styles.button} onPress={() => {}}>
           <Text style={styles.buttonText}>Signed Up</Text>
         </Pressable>

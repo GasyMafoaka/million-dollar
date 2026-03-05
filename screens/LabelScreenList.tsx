@@ -1,5 +1,7 @@
+import { session } from "@/service/session";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import React, { useEffect, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -23,9 +25,8 @@ export default function LabelListScreen({ navigation }: Props) {
   const [loading, setLoading] = useState<boolean>(true);
 
   const color1 = "#264653";
-  const accountId = "a1f479d9-44c4-4f9c-a394-23fad918e52e";
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImExZjQ3OWQ5LTQ0YzQtNGY5Yy1hMzk0LTIzZmFkOTE4ZTUyZSIsInVzZXJuYW1lIjoiS2F0c2F0c2FteSIsImlhdCI6MTc3MjczMzIwMiwiZXhwIjoxNzcyNzY5MjAyfQ.0Db9UrIcR2EPA27o6ZNU8KQxo5hao3kVPO9ZAX2eXEI";
+  const accountId = session.getAccount()?.id || "";
+  const token = session.getToken() || "";
 
   const fetchLabels = async () => {
     try {
@@ -38,9 +39,11 @@ export default function LabelListScreen({ navigation }: Props) {
     }
   };
 
-  useEffect(() => {
-    fetchLabels();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchLabels();
+    }, []),
+  );
 
   if (loading) {
     return <ActivityIndicator size="large" />;

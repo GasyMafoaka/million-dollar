@@ -62,8 +62,6 @@ export const updateLabel = async (
   token: string,
   iconRef: string,
 ) => {
-  console.log("Envoi des données:", { name, color, iconRef }); // LOG
-
   const response = await fetch(
     `${BASE_URL}/account/${accountId}/label/${labelId}`,
     {
@@ -76,14 +74,11 @@ export const updateLabel = async (
         name,
         color,
         iconRef,
-        labelId,
+        accountId,
       }),
     },
   );
-
-  console.log("Status:", response.status); // LOG
   const responseData = await response.json();
-  console.log("Réponse backend:", responseData); // LOG
 
   if (!response.ok) {
     throw new Error("Erreur modification label");

@@ -11,7 +11,16 @@ import {
   View,
 } from "react-native";
 
-export default function SignIn() {
+type Props = {
+  route: {
+    params: {
+      redirectScreenName: string;
+    };
+  };
+};
+
+export default function SignIn({ route }: Props) {
+  const { redirectScreenName } = route.params;
   const navigation = useNavigation<any>();
 
   const [username, setUsername] = useState("");
@@ -58,6 +67,8 @@ export default function SignIn() {
           setTimeout(() => {
             setShowSuccessAlert(false);
           }, 3000);
+
+          navigation.navigate(redirectScreenName);
         }
         if (data.code === 404) {
           setShowUserNotFoundAlert(true);
@@ -283,7 +294,11 @@ export default function SignIn() {
         New User ?
         <Text
           style={styles.signInText}
-          onPress={() => navigation.navigate("SignUp")}
+          onPress={() =>
+            navigation.navigate("SignUp", {
+              redirectScreenName: redirectScreenName,
+            })
+          }
         >
           {" "}
           Register Now

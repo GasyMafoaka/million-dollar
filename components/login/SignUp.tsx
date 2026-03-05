@@ -12,7 +12,17 @@ import {
   View,
 } from "react-native";
 
-export default function SignUp() {
+type Props = {
+  route: {
+    params: {
+      redirectScreenName: string;
+    };
+  };
+};
+
+export default function SignUp({ route }: Props) {
+  const { redirectScreenName } = route.params;
+
   const navigation = useNavigation<any>();
   const color1 = "#264653";
 
@@ -35,6 +45,7 @@ export default function SignUp() {
   const [fontsLoaded] = useFonts({
     MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
   });
+
   const handleSubmit = async () => {
     if (username.length < 4) {
       setShowUsernameAlert(true);
@@ -89,6 +100,8 @@ export default function SignUp() {
               setTimeout(() => {
                 setShowSuccessAlert(false);
               }, 3000);
+
+              navigation.navigate(redirectScreenName);
             } else {
               console.log(data.message);
             }
@@ -324,7 +337,11 @@ export default function SignUp() {
         Already have an account ?
         <Text
           style={styles.signInText}
-          onPress={() => navigation.navigate("SignIn")}
+          onPress={() =>
+            navigation.navigate("SignIn", {
+              redirectScreenName: redirectScreenName,
+            })
+          }
         >
           {" "}
           Sign in

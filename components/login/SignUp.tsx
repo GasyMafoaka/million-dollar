@@ -1,4 +1,6 @@
+import { signIn, signUp } from "@/api/account";
 import { API_BASE_URL } from "@/constants/api";
+import { session } from "@/service/session";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useFonts } from "expo-font";
@@ -12,7 +14,17 @@ import {
   View,
 } from "react-native";
 
-export default function SignUp() {
+type Props = {
+  route: {
+    params: {
+      redirectScreenName: string;
+    };
+  };
+};
+
+export default function SignUp({ route }: Props) {
+  const { redirectScreenName = "MainMenu" } = route.params || {};
+
   const navigation = useNavigation<any>();
   const color1 = "#264653";
 
@@ -34,7 +46,6 @@ export default function SignUp() {
   const [fontsLoaded] = useFonts({
     MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
   });
-  const color1 = "#264653";
   const handleSubmit = async () => {
     if (username.length < 4) {
       setShowUsernameAlert(true);
@@ -73,7 +84,19 @@ export default function SignUp() {
             console.log(data);
 
             if (response.ok) {
+            setSubmitted(true);
+            const data = await signUp({ username, password });
+            console.log(data);
+
+            if (data.id) {
+              // Sign-up successful.
               setShowSuccessAlert(true);
+
+              // Auto-login after sign-up
+              const signInData = await signIn({ username, password });
+              if (signInData.account && signInData.token) {
+                await session.setSession(signInData.account, signInData.token);
+              }
 
               setTimeout(() => {
                 setShowSuccessAlert(false);
@@ -114,9 +137,21 @@ export default function SignUp() {
                   console.log(error);
                 }
               }
+
+              navigation.replace(redirectScreenName);
             }
-          } catch (error) {
+          } catch (error: any) {
             console.log(error);
+            setSubmitted(false);
+            if (
+              error.message.includes("400") ||
+              error.message.includes("already used")
+            ) {
+              setUserExistAlert(true);
+              setTimeout(() => {
+                setUserExistAlert(false);
+              }, 3000);
+            }
           }
         }
       }
@@ -339,7 +374,11 @@ export default function SignUp() {
         Already have an account ?
         <Text
           style={styles.signInText}
-          onPress={() => navigation.navigate("SignIn")}
+          onPress={() =>
+            navigation.navigate("SignIn", {
+              redirectScreenName: redirectScreenName,
+            })
+          }
         >
           {" "}
           Sign in

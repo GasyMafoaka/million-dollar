@@ -18,8 +18,8 @@ export type RootStackParamList = {
   Transaction: undefined;
   Wallet: undefined;
   Settings: undefined;
-  SignIn: undefined;
-  SignUp: undefined;
+  SignIn: { redirectScreenName?: keyof RootStackParamList };
+  SignUp: { redirectScreenName?: keyof RootStackParamList };
   LabelList: undefined;
 };
 

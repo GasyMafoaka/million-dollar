@@ -1,4 +1,6 @@
+import { signIn } from "@/api/account";
 import { API_BASE_URL } from "@/constants/api";
+import { session } from "@/service/session";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
@@ -11,7 +13,16 @@ import {
   View,
 } from "react-native";
 
-export default function SignIn() {
+type Props = {
+  route: {
+    params: {
+      redirectScreenName: string;
+    };
+  };
+};
+
+export default function SignIn({ route }: Props) {
+  const { redirectScreenName = "MainMenu" } = route.params || {};
   const navigation = useNavigation<any>();
 
   const [username, setUsername] = useState("");
@@ -38,43 +49,33 @@ export default function SignIn() {
       }, 3000);
     } else {
       try {
-        const response = await fetch(baseUrl + "/auth/sign-in", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: username,
-            password: password,
-          }),
-        });
-
-        const data = await response.json();
+        const data = await signIn({ username, password });
         console.log(data);
 
-        if (response.ok) {
+        if (data.account && data.token) {
+          await session.setSession(data.account, data.token);
+
           setShowSuccessAlert(true);
 
           setTimeout(() => {
             setShowSuccessAlert(false);
           }, 3000);
-        }
-        if (data.code === 404) {
-          setShowUserNotFoundAlert(true);
 
+          navigation.replace(redirectScreenName);
+        }
+      } catch (error: any) {
+        console.log(error);
+        if (error.message.includes("404")) {
+          setShowUserNotFoundAlert(true);
           setTimeout(() => {
             setShowUserNotFoundAlert(false);
           }, 3000);
-        }
-        if (data.message === "Bad password") {
+        } else if (error.message.includes("Bad password")) {
           setShowBadPasswordAlert(true);
-
           setTimeout(() => {
             setShowBadPasswordAlert(false);
           }, 3000);
         }
-      } catch (error) {
-        console.log(error);
       }
       if (password.length < 8) {
         setShowPasswordAlert(true);
@@ -283,7 +284,11 @@ export default function SignIn() {
         New User ?
         <Text
           style={styles.signInText}
-          onPress={() => navigation.navigate("SignUp")}
+          onPress={() =>
+            navigation.navigate("SignUp", {
+              redirectScreenName: redirectScreenName,
+            })
+          }
         >
           {" "}
           Register Now

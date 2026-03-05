@@ -1,6 +1,6 @@
 import { session } from "@/service/session";
 import { useNavigation } from "@react-navigation/native";
-import React from "react";
+import React, { useEffect } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function MainMenu() {
@@ -49,8 +49,15 @@ export default function MainMenu() {
   });
 
   const connectedAccount = session.getAccount();
+
+  useEffect(() => {
+    if (connectedAccount === undefined) {
+      navigation.replace("SignIn", { redirectScreenName: "MainMenu" });
+    }
+  }, [connectedAccount, navigation]);
+
   if (connectedAccount === undefined) {
-    navigation.navigate("SignIn", { redirectScreenName: "MainMenu" });
+    return null;
   }
 
   return (

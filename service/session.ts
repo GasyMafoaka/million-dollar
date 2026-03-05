@@ -1,7 +1,7 @@
 import { SignUpResult } from "@/api/account/model";
 import { getData, storeData, removeData } from "./storage";
 
-const SESSION_KEY = "user_session";
+const SESSION_KEY = "accountSession";
 
 interface SessionData {
   account: SignUpResult;

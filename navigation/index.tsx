@@ -1,5 +1,6 @@
 import * as React from "react";
 // @ts-ignore
+import LabelScreenList from "@/screens/LabelScreenList";
 import MainMenu from "@/screens/MainMenu";
 import Settings from "@/screens/Settings";
 import SignIn from "@/screens/SignIn";
@@ -11,7 +12,17 @@ import WalletTransaction from "@/screens/WalletTransaction";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Pressable, StyleSheet, Text } from "react-native";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
+export type RootStackParamList = {
+  Splash: undefined;
+  MainMenu: undefined;
+  Transaction: undefined;
+  Wallet: undefined;
+  Settings: undefined;
+  SignIn: undefined;
+  SignUp: undefined;
+  LabelList: undefined;
+};
 
 export default function AppNavigator() {
   return (
@@ -53,6 +64,7 @@ export default function AppNavigator() {
       <Stack.Screen name="WalletTransaction" component={WalletTransaction} />
       <Stack.Screen name="SignIn" component={SignIn} />
       <Stack.Screen name="SignUp" component={SignUp} />
+      <Stack.Screen name="LabelList" component={LabelScreenList} />
     </Stack.Navigator>
   );
 }

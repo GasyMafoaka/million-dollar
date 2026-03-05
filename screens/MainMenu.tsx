@@ -96,6 +96,12 @@ export default function MainMenu() {
       >
         <Text style={styles.buttonText}>Label</Text>
       </Pressable>
+      <Pressable
+        style={styles.button}
+        onPress={() => navigation.navigate("Chart")}
+      >
+        <Text style={styles.buttonText}>Charts</Text>
+      </Pressable>
     </View>
   );
 }

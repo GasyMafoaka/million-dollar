@@ -3,15 +3,7 @@ import { CreationTransaction, Transaction } from "./model";
 export const offlineGetAllTransactions = async (
   _accountId: string,
 ): Promise<Transaction[]> => {
-  return [
-    {
-      id: "1",
-      amount: 50,
-      type: "OUT",
-      description: "Groceries",
-      date: new Date().toISOString(),
-    },
-  ];
+  return [];
 };
 
 export const offlineCreateOneTransaction = async (

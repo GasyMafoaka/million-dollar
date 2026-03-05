@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "@/constants/api";
-import { CreationLabel, Label, LabelResponse } from "./label";
+import { Label, LabelResponse } from "./label";
 
 const BASE_URL = API_BASE_URL;
 
@@ -8,7 +8,6 @@ export const getLabels = async (
   token: string,
   page: number = 1,
   pageSize: number = 10,
-  name: string = "FOOD",
 ): Promise<LabelResponse> => {
   const response = await fetch(
     `${BASE_URL}/account/${accountId}/label?page=${page}&pageSize=${pageSize}&name=${name}`,
@@ -30,13 +29,27 @@ export const getLabels = async (
 
 export const createLabel = async (
   accountId: string,
-  data: CreationLabel,
-): Promise<Label> => {
+  name: string,
+  color: string,
+  iconRef: string,
+  token: string,
+) => {
   const response = await fetch(`${BASE_URL}/account/${accountId}/label`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      name: name,
+      color: color,
+      iconRef: iconRef,
+    }),
   });
+
+  if (!response.ok) {
+    throw new Error("Erreur création label");
+  }
 
   return response.json();
 };
@@ -44,18 +57,39 @@ export const createLabel = async (
 export const updateLabel = async (
   accountId: string,
   labelId: string,
-  data: Label,
-): Promise<Label> => {
+  name: string,
+  color: string,
+  token: string,
+  iconRef: string,
+) => {
+  console.log("Envoi des données:", { name, color, iconRef }); // LOG
+
   const response = await fetch(
     `${BASE_URL}/account/${accountId}/label/${labelId}`,
     {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        name,
+        color,
+        iconRef,
+        labelId,
+      }),
     },
   );
 
-  return response.json();
+  console.log("Status:", response.status); // LOG
+  const responseData = await response.json();
+  console.log("Réponse backend:", responseData); // LOG
+
+  if (!response.ok) {
+    throw new Error("Erreur modification label");
+  }
+
+  return responseData;
 };
 
 export const archiveLabel = async (

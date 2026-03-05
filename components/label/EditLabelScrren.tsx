@@ -1,60 +1,62 @@
+import { RootStackParamList } from "@/navigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useState } from "react";
 import { Alert, Button, StyleSheet, TextInput, View } from "react-native";
-import { Label } from "./label";
-import { createLabel } from "./labelService";
+import { updateLabel } from "./labelService";
 
-type RootStackParamList = {
-  LabelList: undefined;
-  EditLabel: { label: Label };
-  CreateLabel: undefined;
-};
+// Utilisez le type global RootStackParamList
+type Props = NativeStackScreenProps<RootStackParamList, "EditLabel">;
 
-type Props = NativeStackScreenProps<RootStackParamList, "CreateLabel">;
+export default function EditLabelScreen({ route, navigation }: Props) {
+  const { label } = route.params;
 
-export default function CreateLabelScreen({ navigation }: Props) {
-  const [name, setName] = useState("");
-  const [color, setColor] = useState("");
-  const [iconref, setIconRef] = useState("");
-
+  const [name, setName] = useState(label.name || "");
+  const [color, setColor] = useState(label.color || "#00ff00");
+  const [iconRef, setIconRef] = useState(label.iconRef || "");
   const accountId = "a1f479d9-44c4-4f9c-a394-23fad918e52e";
   const token =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImExZjQ3OWQ5LTQ0YzQtNGY5Yy1hMzk0LTIzZmFkOTE4ZTUyZSIsInVzZXJuYW1lIjoiS2F0c2F0c2FteSIsImlhdCI6MTc3MjczMzIwMiwiZXhwIjoxNzcyNzY5MjAyfQ.0Db9UrIcR2EPA27o6ZNU8KQxo5hao3kVPO9ZAX2eXEI";
 
-  const handleCreate = async () => {
+  const handleUpdate = async () => {
     try {
-      await createLabel(accountId, name, color, iconref, token);
+      if (!label.id) {
+        Alert.alert("Erreur", "ID du label manquant");
+        return;
+      }
 
-      Alert.alert("Succès", "Label created !");
+      await updateLabel(accountId, label.id, name, color, token, iconRef);
+      Alert.alert("Succès", "Label modifié");
       navigation.goBack();
     } catch (error) {
       console.error(error);
-      Alert.alert("Erreur", "Impossible de créer le label");
+      Alert.alert("Erreur", "Impossible de modifier le label");
     }
   };
 
   return (
     <View style={styles.container}>
       <TextInput
-        placeholder="Name"
+        placeholder="Label name"
         value={name}
         onChangeText={setName}
         style={styles.input}
       />
+
       <TextInput
-        placeholder="color"
+        placeholder="Color (#FF0000)"
         value={color}
         onChangeText={setColor}
         style={styles.input}
       />
+
       <TextInput
-        placeholder="icone reference"
-        value={iconref}
+        placeholder="Icon Ref"
+        value={iconRef}
         onChangeText={setIconRef}
         style={styles.input}
       />
 
-      <Button title="Create label" onPress={handleCreate} />
+      <Button title="Update Label" onPress={handleUpdate} />
     </View>
   );
 }
@@ -69,6 +71,6 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     padding: 10,
     marginBottom: 20,
-    borderRadius: 5,
+    borderRadius: 10,
   },
 });

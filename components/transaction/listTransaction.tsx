@@ -1,11 +1,15 @@
 import { appStyles, color1 } from "@/styles/appStyles";
 import { useFonts } from "expo-font";
+
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { FlatList, Image, Pressable, Text, View } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { useTransactions } from "../../context/listTransactionContext";
 
-export default function TransactionsScreen({ navigation }: any) {
+export default function TransactionsScreen() {
+  const navigation = useNavigation<any>();
+
   const { list, fetchMore, remove, selectedDate, setSelectedDate } =
     useTransactions();
 
@@ -81,13 +85,7 @@ export default function TransactionsScreen({ navigation }: any) {
             </Text>
 
             <View style={appStyles.cardActions}>
-              <Pressable
-                onPress={() =>
-                  navigation.navigate("TransactionForm", {
-                    transaction: item,
-                  })
-                }
-              >
+              <Pressable onPress={() => navigation.navigate("TransactionForm")}>
                 <Text style={appStyles.edit}>Modifier</Text>
               </Pressable>
 

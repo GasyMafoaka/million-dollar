@@ -23,6 +23,24 @@ let transactions: TransactionWithWallet[] = [
     type: "IN",
     walletId: "wallet-1",
   },
+  {
+    id: 3,
+    title: "Salaire",
+    description: "",
+    amount: 800000,
+    date: "2026-02-26T08:00:00",
+    type: "IN",
+    walletId: "wallet-1",
+  },
+  {
+    id: 9,
+    title: "Salaire",
+    description: "",
+    amount: 800000,
+    date: "2026-02-26T08:00:00",
+    type: "IN",
+    walletId: "wallet-1",
+  },
 ];
 
 export const mockDB = {

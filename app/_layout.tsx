@@ -1,5 +1,5 @@
+import AppNavigator from "@/navigation";
 import Constants from "expo-constants";
-import { Stack } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { TransactionsProvider } from "../context/listTransactionContext";
@@ -31,7 +31,7 @@ export default function RootLayout() {
 
   return (
     <TransactionsProvider walletId={walletId}>
-      <Stack />
+      <AppNavigator />
     </TransactionsProvider>
   );
 }

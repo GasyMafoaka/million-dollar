@@ -1,8 +1,8 @@
 import { API_BASE_URL } from "@/constants/api";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
 import { useFonts } from "expo-font";
+import React, { useState } from "react";
 import {
   Image,
   Pressable,
@@ -102,6 +102,7 @@ export default function SignIn() {
     logo: {
       width: 200,
       height: 200,
+      borderRadius: 50,
       marginBottom: 10,
     },
     LogoTittle: {
@@ -280,7 +281,7 @@ export default function SignIn() {
         )}
       </View>
       <Pressable style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Sign In</Text>
+        <Text style={styles.buttonText}>Sign in</Text>
       </Pressable>
       <Text style={styles.signIn}>
         New User ?

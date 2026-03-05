@@ -32,9 +32,9 @@ export const getAllTransactions = async (
   if (params?.sort) query.append("sort", params.sort);
 
   if (accountId == undefined && session.getAccount() == undefined) {
-    throw new Error(`bot accountId and session.getAccount() are undefined`)
+    throw new Error(`bot accountId and session.getAccount() are undefined`);
   }
-  accountId = accountId ? accountId : session.getAccount()?.id
+  accountId = accountId ? accountId : session.getAccount()?.id;
   const response = await fetch(
     `${API_BASE_URL}/account/${accountId}/transaction?${query.toString()}`,
     {
@@ -44,7 +44,9 @@ export const getAllTransactions = async (
     },
   );
   if (!response.ok) {
-    throw new Error(`Failed to fetch transactions with code ${response.status}`);
+    throw new Error(
+      `Failed to fetch transactions with code ${response.status}`,
+    );
   }
   return response.json();
 };
@@ -55,9 +57,9 @@ export const createOneTransaction = async (
   transaction: CreationTransaction,
 ): Promise<Transaction> => {
   if (accountId == undefined && session.getAccount() == undefined) {
-    throw new Error(`bot accountId and session.getAccount() are undefined`)
+    throw new Error(`bot accountId and session.getAccount() are undefined`);
   }
-  accountId = accountId ? accountId : session.getAccount()?.id
+  accountId = accountId ? accountId : session.getAccount()?.id;
   const response = await fetch(
     `${API_BASE_URL}/account/${accountId}/wallet/${walletId}/transaction`,
     {
@@ -70,7 +72,9 @@ export const createOneTransaction = async (
     },
   );
   if (!response.ok) {
-    throw new Error(`Failed to create transaction with code ${response.status}`);
+    throw new Error(
+      `Failed to create transaction with code ${response.status}`,
+    );
   }
   return response.json();
 };
@@ -81,9 +85,9 @@ export const getOneTransaction = async (
   transactionId: string,
 ): Promise<Transaction> => {
   if (accountId == undefined && session.getAccount() == undefined) {
-    throw new Error(`bot accountId and session.getAccount() are undefined`)
+    throw new Error(`bot accountId and session.getAccount() are undefined`);
   }
-  accountId = accountId ? accountId : session.getAccount()?.id
+  accountId = accountId ? accountId : session.getAccount()?.id;
   const response = await fetch(
     `${API_BASE_URL}/account/${accountId}/wallet/${walletId}/transaction/${transactionId}`,
     {
@@ -105,9 +109,9 @@ export const updateOneTransaction = async (
   transaction: Transaction,
 ): Promise<Transaction> => {
   if (accountId == undefined && session.getAccount() == undefined) {
-    throw new Error(`bot accountId and session.getAccount() are undefined`)
+    throw new Error(`bot accountId and session.getAccount() are undefined`);
   }
-  accountId = accountId ? accountId : session.getAccount()?.id
+  accountId = accountId ? accountId : session.getAccount()?.id;
   const response = await fetch(
     `${API_BASE_URL}/account/${accountId}/wallet/${walletId}/transaction/${transactionId}`,
     {
@@ -131,9 +135,9 @@ export const removeOneTransaction = async (
   transactionId: string,
 ): Promise<Transaction> => {
   if (accountId == undefined && session.getAccount() == undefined) {
-    throw new Error(`bot accountId and session.getAccount() are undefined`)
+    throw new Error(`bot accountId and session.getAccount() are undefined`);
   }
-  accountId = accountId ? accountId : session.getAccount()?.id
+  accountId = accountId ? accountId : session.getAccount()?.id;
   const response = await fetch(
     `${API_BASE_URL}/account/${accountId}/wallet/${walletId}/transaction/${transactionId}`,
     {

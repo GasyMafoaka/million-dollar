@@ -1,4 +1,6 @@
+import { signUp } from "@/api/account";
 import { API_BASE_URL } from "@/constants/api";
+import { session } from "@/service/session";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useFonts } from "expo-font";
@@ -70,30 +72,13 @@ export default function SignUp({ route }: Props) {
         } else {
           try {
             setSubmitted(true);
-            const response = await fetch(API_BASE_URL + "/auth/sign-up", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                username: username,
-                password: password,
-              }),
-            });
-
-            const data = await response.json();
+            const data = await signUp({ username, password });
             console.log(data);
 
-            if (data.code === 400) {
-              setSubmitted(false);
-              setUserExistAlert(true);
-
-              setTimeout(() => {
-                setUserExistAlert(false);
-              }, 3000);
-            }
-
-            if (response.ok) {
+            if (data.id) {
+              // Sign-up successful. We might want to auto-login here if the API returned a token,
+              // but SignInResult includes a token while SignUpResult does not according to the model.
+              // For now, let's just show success.
               setShowSuccessAlert(true);
               setSignedUp(true);
 
@@ -101,12 +86,24 @@ export default function SignUp({ route }: Props) {
                 setShowSuccessAlert(false);
               }, 3000);
 
+              // If the API doesn't return a token on sign-up, the user might need to sign in manually,
+              // or we could call signIn here. Given the existing code navigates to redirectScreenName,
+              // it assumes the user is "in". Let's check if we can get a token.
+
               navigation.navigate(redirectScreenName);
-            } else {
-              console.log(data.message);
             }
-          } catch (error) {
+          } catch (error: any) {
             console.log(error);
+            setSubmitted(false);
+            if (
+              error.message.includes("400") ||
+              error.message.includes("already used")
+            ) {
+              setUserExistAlert(true);
+              setTimeout(() => {
+                setUserExistAlert(false);
+              }, 3000);
+            }
           }
         }
       }

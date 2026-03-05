@@ -12,6 +12,7 @@ const getNotificationsModule = () => {
 export const requestPermission = async () => {
   const Notifications = getNotificationsModule();
   if (!Notifications) return;
+
   await Notifications.requestPermissionsAsync();
 };
 
@@ -22,7 +23,10 @@ export const scheduleDailyNotification = async (
   const Notifications = getNotificationsModule();
   if (!Notifications) return;
 
+  if (!list.length) return;
+
   const today = new Date().toISOString().split("T")[0];
+
   const total = list
     .filter((t) => t.type === "OUT" && t.date.startsWith(today))
     .reduce((sum, t) => sum + t.amount, 0);
@@ -34,6 +38,10 @@ export const scheduleDailyNotification = async (
       title: "Résumé des dépenses",
       body: `Total aujourd'hui : ${total} Ar`,
     },
-    trigger: { hour, minute: 0, repeats: true },
+    trigger: {
+      hour,
+      minute: 0,
+      repeats: true,
+    },
   });
 };

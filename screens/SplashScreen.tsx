@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
-import Animated, { CSSAnimationKeyframes } from "react-native-reanimated";
 import { useFonts } from "expo-font";
+import React, { useEffect } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import Animated, { CSSAnimationKeyframes } from "react-native-reanimated";
 
 const march: CSSAnimationKeyframes = {
   "0%": {
@@ -14,7 +14,6 @@ const march: CSSAnimationKeyframes = {
     transform: [{ translateX: 80 }, { rotateZ: "15deg" }],
   },
 };
-
 
 const SplashScreen = ({ navigation }: any) => {
   const [fontsLoaded] = useFonts({
@@ -31,19 +30,32 @@ const SplashScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-        <Animated.Image 
-                source={require('@/assets/images/LogoPF-white.png')}
-                style={[
-                  styles.logoWhite,
-                  {
-                    animationName: march,
-                    animationDuration: "2.5s",
-                    animationIterationCount: "infinite",
-                    animationTimingFunction: "ease-in-out",
-                    animationDirection: "alternate",
-                  },
-                ]}
-                />
+      <Animated.Image
+        source={require("@/assets/images/LogoPF-white.png")}
+        style={[
+          styles.logoWhite,
+          {
+            animationName: march,
+            animationDuration: "2.5s",
+            animationIterationCount: "infinite",
+            animationTimingFunction: "ease-in-out",
+            animationDirection: "alternate",
+          },
+        ]}
+      />
+      <Animated.Image
+        source={require("@/assets/images/LogoPF-white.png")}
+        style={[
+          styles.logoWhite,
+          {
+            animationName: march,
+            animationDuration: "2.5s",
+            animationIterationCount: "infinite",
+            animationTimingFunction: "ease-in-out",
+            animationDirection: "alternate",
+          },
+        ]}
+      />
       <Text style={styles.title}>Million Dollars</Text>
       <Text style={styles.subtitle}>Gérez vos finances intelligemment</Text>
     </View>

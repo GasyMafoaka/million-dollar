@@ -5,15 +5,18 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { transactionsApi } from "../api/transactions.api";
+
+import { transactionsApi } from "@/api/transactions.api";
 import { useSession } from "../auth/useSession";
 import { Transaction } from "../types/Transaction";
+
 import {
   requestPermission,
   scheduleDailyNotification,
 } from "../utils/notifications";
 
 const PAGE_SIZE = 10;
+
 const Ctx = createContext<any>(null);
 
 export const TransactionsProvider = ({
@@ -71,20 +74,26 @@ export const TransactionsProvider = ({
 
   const updateItem = async (id: string, data: Partial<Transaction>) => {
     if (!accountId || !walletId) return;
+
     const updated = await transactionsApi.update(accountId, walletId, id, data);
+
     setList((p) => p.map((t) => (String(t.id) === String(id) ? updated : t)));
   };
 
   const removeItem = async (id: string) => {
     if (!accountId || !walletId) return;
+
     await transactionsApi.remove(accountId, walletId, id);
+
     setList((p) => p.filter((t) => String(t.id) !== String(id)));
   };
 
   const filteredList = useMemo(() => {
     let result = list;
+
     if (selectedDate)
       result = result.filter((t) => t.date.startsWith(selectedDate));
+
     return result;
   }, [list, selectedDate]);
 
@@ -127,7 +136,7 @@ export const TransactionsProvider = ({
         setFilterType,
         notificationHour,
         setNotificationHour,
-        loadingMore, // optionnel si tu veux afficher un loader
+        loadingMore,
       }}
     >
       {children}

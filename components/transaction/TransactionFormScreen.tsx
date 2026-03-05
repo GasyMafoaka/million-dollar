@@ -1,20 +1,32 @@
 import { appStyles, color1 } from "@/styles/appStyles";
 import React, { useEffect, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useTransactions } from "../../context/listTransactionContext";
 
 export default function TransactionFormScreen({ route, navigation }: any) {
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  const showDatePicker = () => setDatePickerVisibility(true);
+  const hideDatePicker = () => setDatePickerVisibility(false);
+
+  const handleConfirm = (selectedDate: Date) => {
+    const formatted = selectedDate.toISOString().split("T")[0];
+    setDate(formatted);
+    hideDatePicker();
+  };
   const { add, update } = useTransactions();
+
   const editingItem = route.params?.transaction;
 
-  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
   const [type, setType] = useState<"IN" | "OUT">("OUT");
 
   useEffect(() => {
     if (editingItem) {
-      setTitle(editingItem.title);
+      setDescription(editingItem.description);
       setAmount(String(editingItem.amount));
       setDate(editingItem.date.split("T")[0]);
       setType(editingItem.type);
@@ -22,24 +34,22 @@ export default function TransactionFormScreen({ route, navigation }: any) {
   }, [editingItem]);
 
   const submit = async () => {
-    if (!title || !amount || !date)
-      return alert("Tous les champs sont obligatoires");
+    if (!description || !amount || !date) {
+      alert("Tous les champs sont obligatoires");
+      return;
+    }
+
+    const data = {
+      description,
+      amount: Number(amount),
+      date,
+      type,
+    };
 
     if (editingItem) {
-      await update(editingItem.id, {
-        title,
-        amount: Number(amount),
-        date,
-        type,
-      });
+      await update(editingItem.id, data);
     } else {
-      await add({
-        title,
-        description: "",
-        amount: Number(amount),
-        date,
-        type,
-      });
+      await add(data);
     }
 
     navigation.goBack();
@@ -49,9 +59,9 @@ export default function TransactionFormScreen({ route, navigation }: any) {
     <View style={appStyles.container}>
       <TextInput
         style={appStyles.textInput}
-        placeholder="Titre"
-        value={title}
-        onChangeText={setTitle}
+        placeholder="Description"
+        value={description}
+        onChangeText={setDescription}
       />
 
       <TextInput
@@ -62,11 +72,15 @@ export default function TransactionFormScreen({ route, navigation }: any) {
         onChangeText={setAmount}
       />
 
-      <TextInput
-        style={appStyles.textInput}
-        placeholder="YYYY-MM-DD"
-        value={date}
-        onChangeText={setDate}
+      <Pressable style={appStyles.textInput} onPress={showDatePicker}>
+        <Text>{date || "Choisir une date"}</Text>
+      </Pressable>
+
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
       />
 
       <View style={{ flexDirection: "row", gap: 10 }}>

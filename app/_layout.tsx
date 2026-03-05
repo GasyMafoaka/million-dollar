@@ -5,7 +5,7 @@ import { Platform } from "react-native";
 import { TransactionsProvider } from "../context/listTransactionContext";
 
 export default function RootLayout() {
-  const [walletId, setWalletId] = useState<string | null>("wallet-1");
+  const [walletId, setWalletId] = useState<string | null>(null);
 
   useEffect(() => {
     const isExpoGo = Constants.executionEnvironment === "storeClient";
@@ -15,6 +15,7 @@ export default function RootLayout() {
 
     try {
       const Notifications = require("expo-notifications");
+
       Notifications.setNotificationHandler({
         handleNotification: async () => ({
           shouldShowAlert: true,

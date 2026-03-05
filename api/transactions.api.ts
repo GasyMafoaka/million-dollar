@@ -1,9 +1,10 @@
-/*import { getToken } from "../auth/auth.store";
+import { getToken } from "../auth/auth.store";
 import { API_URL } from "./config";
 
 export const transactionsApi = {
   async list(accountId: string, page: number, pageSize: number, filters?: any) {
     const token = await getToken();
+
     const params = new URLSearchParams({
       page: String(page),
       pageSize: String(pageSize),
@@ -18,12 +19,17 @@ export const transactionsApi = {
       },
     );
 
-    if (!res.ok) throw new Error("Erreur fetch transactions");
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text);
+    }
+
     return res.json();
   },
 
   async create(accountId: string, walletId: string, data: any) {
     const token = await getToken();
+
     const res = await fetch(
       `${API_URL}/account/${accountId}/wallet/${walletId}/transaction`,
       {
@@ -37,12 +43,15 @@ export const transactionsApi = {
     );
 
     const json = await res.json();
+
     if (!res.ok) throw new Error(json.message);
+
     return json;
   },
 
   async update(accountId: string, walletId: string, id: string, data: any) {
     const token = await getToken();
+
     const res = await fetch(
       `${API_URL}/account/${accountId}/wallet/${walletId}/transaction/${id}`,
       {
@@ -56,23 +65,25 @@ export const transactionsApi = {
     );
 
     const json = await res.json();
+
     if (!res.ok) throw new Error(json.message);
+
     return json;
   },
 
   async remove(accountId: string, walletId: string, id: string) {
     const token = await getToken();
-    await fetch(
+
+    const res = await fetch(
       `${API_URL}/account/${accountId}/wallet/${walletId}/transaction/${id}`,
       {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       },
     );
+
+    if (!res.ok) throw new Error("Erreur suppression");
+
+    return true;
   },
 };
-*/
-
-import { transactionsMockApi } from "@/mock/transactions.mock";
-
-export const transactionsApi = transactionsMockApi;

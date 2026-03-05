@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/constants/api";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
@@ -26,7 +27,7 @@ export default function SignIn() {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   const color1 = "#264653";
-  const baseUrl = "http://localhost:8080";
+  const baseUrl = API_BASE_URL;
 
   const handleSubmit = async () => {
     if (username.length < 4) {

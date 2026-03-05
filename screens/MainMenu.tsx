@@ -89,6 +89,13 @@ export default function MainMenu() {
       >
         <Text style={styles.buttonText}>Sign Up</Text>
       </Pressable>
+
+      <Pressable
+        style={styles.button}
+        onPress={() => navigation.navigate("LabelList")}
+      >
+        <Text style={styles.buttonText}>Label</Text>
+      </Pressable>
     </View>
   );
 }

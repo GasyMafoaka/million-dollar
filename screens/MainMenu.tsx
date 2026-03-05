@@ -1,3 +1,4 @@
+import { session } from "@/service/session";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
@@ -47,6 +48,11 @@ export default function MainMenu() {
     },
   });
 
+  const connectedAccount = session.getAccount();
+  if (connectedAccount === undefined) {
+    navigation.navigate("SignIn", { redirectScreenName: "MainMenu" });
+  }
+
   return (
     <View style={styles.container}>
       <Image
@@ -74,20 +80,6 @@ export default function MainMenu() {
         onPress={() => navigation.navigate("Settings")}
       >
         <Text style={styles.buttonText}>Settings</Text>
-      </Pressable>
-
-      <Pressable
-        style={styles.button}
-        onPress={() => navigation.navigate("SignIn")}
-      >
-        <Text style={styles.buttonText}>Sign In</Text>
-      </Pressable>
-
-      <Pressable
-        style={styles.button}
-        onPress={() => navigation.navigate("SignUp")}
-      >
-        <Text style={styles.buttonText}>Sign Up</Text>
       </Pressable>
 
       <Pressable

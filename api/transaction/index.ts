@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../../constants/api";
+import { session } from "../../service/session";
 import { CreationTransaction, Transaction } from "./model";
 
 export const getAllTransactions = async (
@@ -32,6 +33,11 @@ export const getAllTransactions = async (
 
   const response = await fetch(
     `${API_BASE_URL}/account/${accountId}/transaction?${query.toString()}`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.getToken()}`,
+      },
+    },
   );
   if (!response.ok) {
     throw new Error("Failed to fetch transactions");
@@ -50,6 +56,7 @@ export const createOneTransaction = async (
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${session.getToken()}`,
       },
       body: JSON.stringify(transaction),
     },
@@ -67,6 +74,11 @@ export const getOneTransaction = async (
 ): Promise<Transaction> => {
   const response = await fetch(
     `${API_BASE_URL}/account/${accountId}/wallet/${walletId}/transaction/${transactionId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.getToken()}`,
+      },
+    },
   );
   if (!response.ok) {
     throw new Error("Failed to fetch transaction");
@@ -86,6 +98,7 @@ export const updateOneTransaction = async (
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${session.getToken()}`,
       },
       body: JSON.stringify(transaction),
     },
@@ -105,6 +118,9 @@ export const removeOneTransaction = async (
     `${API_BASE_URL}/account/${accountId}/wallet/${walletId}/transaction/${transactionId}`,
     {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${session.getToken()}`,
+      },
     },
   );
   if (!response.ok) {

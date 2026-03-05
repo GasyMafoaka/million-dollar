@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../../constants/api";
+import { session } from "../../service/session";
 import {
   CreationWallet,
   UpdateWallet,
@@ -23,6 +24,11 @@ export const getAllWallets = async (
 
   const response = await fetch(
     `${API_BASE_URL}/account/${accountId}/wallet?${query.toString()}`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.getToken()}`,
+      },
+    },
   );
   if (!response.ok) {
     throw new Error("Failed to fetch wallets");
@@ -38,6 +44,7 @@ export const createOneWallet = async (
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${session.getToken()}`,
     },
     body: JSON.stringify(wallet),
   });
@@ -53,6 +60,11 @@ export const getOneWallet = async (
 ): Promise<Wallet> => {
   const response = await fetch(
     `${API_BASE_URL}/account/${accountId}/wallet/${walletId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${session.getToken()}`,
+      },
+    },
   );
   if (!response.ok) {
     throw new Error("Failed to fetch wallet");
@@ -71,6 +83,7 @@ export const updateOneWallet = async (
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${session.getToken()}`,
       },
       body: JSON.stringify(wallet),
     },
@@ -89,6 +102,9 @@ export const archiveOneWallet = async (
     `${API_BASE_URL}/account/${accountId}/wallet/${walletId}/archive`,
     {
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.getToken()}`,
+      },
     },
   );
   if (!response.ok) {
@@ -108,6 +124,7 @@ export const updateOneWalletAutomaticIncome = async (
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${session.getToken()}`,
       },
       body: JSON.stringify(automaticIncome),
     },

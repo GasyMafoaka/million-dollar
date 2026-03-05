@@ -105,9 +105,7 @@ export default function Settings() {
         <View
           style={[
             styles.feedbackContainer,
-            feedback.type === "success"
-              ? styles.success
-              : styles.error,
+            feedback.type === "success" ? styles.success : styles.error,
           ]}
         >
           <CustomText style={styles.feedbackText}>
@@ -177,9 +175,7 @@ export default function Settings() {
 
       {/* Currency */}
       <View style={styles.card}>
-        <CustomText style={styles.sectionTitle}>
-          Preferred Currency
-        </CustomText>
+        <CustomText style={styles.sectionTitle}>Preferred Currency</CustomText>
         <Picker
           selectedValue={currency}
           onValueChange={(itemValue) => setCurrency(itemValue)}
@@ -206,9 +202,7 @@ export default function Settings() {
       {/* Save Button */}
       <View style={{ marginTop: 20, marginBottom: 40 }}>
         <Pressable style={styles.saveButton} onPress={handleSave}>
-          <CustomText style={styles.saveButtonText}>
-            Save Settings
-          </CustomText>
+          <CustomText style={styles.saveButtonText}>Save Settings</CustomText>
         </Pressable>
       </View>
     </ScrollView>

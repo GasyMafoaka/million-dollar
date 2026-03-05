@@ -2,11 +2,20 @@ import { RootStackParamList } from "@/navigation";
 import { session } from "@/service/session";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useState } from "react";
-import { Alert, Button, StyleSheet, TextInput, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { updateLabel } from "./labelService";
 
 // Utilisez le type global RootStackParamList
 type Props = NativeStackScreenProps<RootStackParamList, "EditLabel">;
+
+const color1 = "#264653";
 
 export default function EditLabelScreen({ route, navigation }: Props) {
   const { label } = route.params;
@@ -36,6 +45,16 @@ export default function EditLabelScreen({ route, navigation }: Props) {
 
   return (
     <View style={styles.container}>
+      <h1
+        style={{
+          fontFamily: "MoreSugar ",
+          textAlign: "center",
+          fontSize: 40,
+          paddingBottom: 10,
+        }}
+      >
+        Update Label
+      </h1>
       <TextInput
         placeholder="Label name"
         value={name}
@@ -57,7 +76,27 @@ export default function EditLabelScreen({ route, navigation }: Props) {
         style={styles.input}
       />
 
-      <Button title="Update Label" onPress={handleUpdate} />
+      <Pressable
+        style={{
+          backgroundColor: color1,
+          padding: 20,
+          marginTop: 20,
+          borderRadius: 15,
+          width: "75%",
+        }}
+        onPress={handleUpdate}
+      >
+        <Text
+          style={{
+            color: "white",
+            fontFamily: "MoreSugar",
+            fontSize: 25,
+            textAlign: "center",
+          }}
+        >
+          Update
+        </Text>
+      </Pressable>
     </View>
   );
 }
@@ -65,13 +104,18 @@ export default function EditLabelScreen({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    display: "flex",
     padding: 20,
+    alignItems: "center",
   },
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
+    borderWidth: 2,
+    borderColor: color1,
+    padding: 15,
     marginBottom: 20,
     borderRadius: 10,
+    fontFamily: "MoreSugar",
+    fontSize: 16,
+    width: "90%",
   },
 });

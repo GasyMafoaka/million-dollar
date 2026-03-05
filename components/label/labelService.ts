@@ -1,13 +1,13 @@
 import { API_BASE_URL } from "@/constants/api";
-import { Label, LabelResponse } from "./label";
+import { LabelResponse } from "./label";
 
 const BASE_URL = API_BASE_URL;
 
 export const getLabels = async (
   accountId: string,
   token: string,
-  page: number = 1,
-  pageSize: number = 10,
+  page: number,
+  pageSize: number,
 ): Promise<LabelResponse> => {
   const response = await fetch(
     `${BASE_URL}/account/${accountId}/label?page=${page}&pageSize=${pageSize}&name=${name}`,
@@ -88,15 +88,24 @@ export const updateLabel = async (
 };
 
 export const archiveLabel = async (
-  accountId: string,
   labelId: string,
-): Promise<Label> => {
+  token: string,
+  accountId: string,
+) => {
   const response = await fetch(
     `${BASE_URL}/account/${accountId}/label/${labelId}/archive`,
     {
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
     },
   );
+
+  if (!response.ok) {
+    throw new Error("Erreur archivage label");
+  }
 
   return response.json();
 };

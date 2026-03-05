@@ -1,3 +1,4 @@
+import { session } from "@/service/session";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useState } from "react";
 import { Alert, Button, StyleSheet, TextInput, View } from "react-native";
@@ -17,9 +18,9 @@ export default function CreateLabelScreen({ navigation }: Props) {
   const [color, setColor] = useState("");
   const [iconref, setIconRef] = useState("");
 
-  const accountId = "a1f479d9-44c4-4f9c-a394-23fad918e52e";
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImExZjQ3OWQ5LTQ0YzQtNGY5Yy1hMzk0LTIzZmFkOTE4ZTUyZSIsInVzZXJuYW1lIjoiS2F0c2F0c2FteSIsImlhdCI6MTc3MjczMzIwMiwiZXhwIjoxNzcyNzY5MjAyfQ.0Db9UrIcR2EPA27o6ZNU8KQxo5hao3kVPO9ZAX2eXEI";
+  const accountId = session.getAccount()?.id || "";
+
+  const token = session.getToken() || "";
 
   const handleCreate = async () => {
     try {

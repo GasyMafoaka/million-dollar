@@ -7,7 +7,7 @@ export interface LabelAutomaticIncome {
 export interface CreationLabel {
   name?: string;
   color?: string;
-  iconref?: string;
+  iconRef?: string;
 }
 
 export interface Label extends CreationLabel {
@@ -25,4 +25,12 @@ export interface PaginationResult {
 export interface LabelListResponse {
   pagination?: PaginationResult;
   values?: Label[];
+}
+
+export interface NavigationLabel {
+  id: string;
+  name?: string;
+  color?: string;
+  iconRef?: string;
+  accountId?: string;
 }

@@ -1,5 +1,8 @@
 import * as React from "react";
 // @ts-ignore
+import EditLabelScreen from "@/components/label/EditLabelScrren";
+import CreateLabelScreen from "@/components/label/labelCreation";
+import { Label } from "@/components/label/labelModel";
 import LabelScreenList from "@/screens/LabelScreenList";
 import MainMenu from "@/screens/MainMenu";
 import Settings from "@/screens/Settings";
@@ -24,6 +27,8 @@ export type RootStackParamList = {
   SignUp: undefined;
   LabelList: undefined;
   Goal: undefined;
+  CreateLabel: undefined;
+  EditLabel: { label: Label };
 };
 
 export default function AppNavigator() {
@@ -68,6 +73,8 @@ export default function AppNavigator() {
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="LabelList" component={LabelScreenList} />
       <Stack.Screen name="Goal" component={GoalsScreen} />
+      <Stack.Screen name="CreateLabel" component={CreateLabelScreen} />
+      <Stack.Screen name="EditLabel" component={EditLabelScreen} />
     </Stack.Navigator>
   );
 }

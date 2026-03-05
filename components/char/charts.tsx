@@ -26,8 +26,7 @@ export default function Charts() {
           backgroundGradientTo: "#ffffff",
           decimalPlaces: 0,
           color: (opacity = 1) => `rgba(42, 157, 143, ${opacity})`,
-          labelColor: (opacity = 1) =>
-            `rgba(38, 70, 83, ${opacity})`,
+          labelColor: (opacity = 1) => `rgba(38, 70, 83, ${opacity})`,
         }}
         style={{
           borderRadius: 16,

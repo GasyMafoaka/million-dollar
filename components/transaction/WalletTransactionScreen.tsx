@@ -71,7 +71,7 @@ export default function WalletTransactionScreen({
   const handleCreateTransaction = async (
     newTransaction: CreationTransaction,
   ) => {
-    const account = await session.getAccount();
+    const account = session.getAccount();
     const accountId = account?.id;
 
     if (!accountId) {
@@ -86,7 +86,7 @@ export default function WalletTransactionScreen({
         newTransaction,
       );
 
-      setTransactions(prev => [{ ...newTransaction, ...created }, ...prev]);
+      setTransactions((prev) => [{ ...newTransaction, ...created }, ...prev]);
 
       Alert.alert("Success", "Transaction added successfully");
     } catch (err) {
@@ -98,7 +98,7 @@ export default function WalletTransactionScreen({
         newTransaction,
       );
 
-      setTransactions(prev => [created, ...prev]);
+      setTransactions((prev) => [created, ...prev]);
 
       Alert.alert(
         "Notice",

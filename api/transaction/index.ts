@@ -56,8 +56,7 @@ export const createOneTransaction = async (
   walletId: string,
   transaction: CreationTransaction,
 ): Promise<Transaction> => {
-
-  const account = accountId ? { id: accountId } : await session.getAccount();
+  const account = accountId ? { id: accountId } : session.getAccount();
   const resolvedAccountId = account?.id;
 
   if (!resolvedAccountId) {

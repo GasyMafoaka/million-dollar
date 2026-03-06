@@ -69,6 +69,7 @@ export default function AppNavigator() {
       <Stack.Screen name="Transaction" component={Transaction} />
       <Stack.Screen name="Wallet" component={Wallet} />
       <Stack.Screen name="WalletTransaction" component={WalletTransaction} />
+      <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="SignIn" component={SignIn} />
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="LabelList" component={LabelScreenList} />

@@ -32,6 +32,7 @@ export default function SignUp({ route }: Props) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [showUsernameAlert, setShowUsernameAlert] = useState(false);
+  const [userExistAlert, setUserExistAlert] = useState(false);
   const [showPasswordAlert, setShowPasswordAlert] = useState(false);
   const [showConfirmPasswordAlert, setShowConfirmPasswordAlert] =
     useState(false);
@@ -65,18 +66,8 @@ export default function SignUp({ route }: Props) {
           }, 3000);
         } else {
           try {
-            const response = await fetch(API_BASE_URL + "/auth/sign-up", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                username: username,
-                password: password,
-              }),
-            });
-
-            const data = await response.json();
+            setSubmitted(true);
+            const data = await signUp({ username, password });
             console.log(data);
 
             if (response.ok) {
@@ -87,6 +78,13 @@ export default function SignUp({ route }: Props) {
             if (data.id) {
               // Sign-up successful.
               setShowSuccessAlert(true);
+              setSignedUp(true);
+
+              // Auto-login after sign-up
+              const signInData = await signIn({ username, password });
+              if (signInData.account && signInData.token) {
+                await session.setSession(signInData.account, signInData.token);
+              }
 
               // Auto-login after sign-up
               const signInData = await signIn({ username, password });
@@ -97,9 +95,6 @@ export default function SignUp({ route }: Props) {
               setTimeout(() => {
                 setShowSuccessAlert(false);
               }, 3000);
-            } else {
-              if (password !== confirmPassword) {
-                setShowConfirmPasswordAlert(true);
 
                 setTimeout(() => {
                   setShowConfirmPasswordAlert(false);
@@ -290,6 +285,14 @@ export default function SignUp({ route }: Props) {
             <FontAwesome name="info-circle" size={15} color="red" />
             <Text style={styles.inputAlertContainerText}>
               Username must be at least 4 characters long.
+            </Text>
+          </View>
+        )}
+        {userExistAlert && (
+          <View style={styles.inputAlertContainer}>
+            <FontAwesome name="info-circle" size={15} color="red" />
+            <Text style={styles.inputAlertContainerText}>
+              Your username is already used.
             </Text>
           </View>
         )}

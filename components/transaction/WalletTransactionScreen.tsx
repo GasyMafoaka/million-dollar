@@ -83,7 +83,7 @@ export default function WalletTransactionScreen({
         wallet.id!,
         newTransaction,
       );
-      setTransactions([created, ...transactions]);
+      setTransactions([{ ...newTransaction, ...created }, ...transactions]);
       Alert.alert("Success", "Transaction added successfully");
     } catch (err) {
       console.error(err);

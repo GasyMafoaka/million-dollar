@@ -16,9 +16,7 @@ import {
   offlineCreateOneWallet,
 } from "@/api/wallet/offline";
 import { Wallet, CreationWallet } from "@/api/wallet/model";
-
-// Mock accountId as it's not provided by a global state in this context
-const MOCK_ACCOUNT_ID = "00000000-0000-0000-0000-000000000000";
+import { session } from "@/service/session";
 
 export default function WalletScreen() {
   const [wallets, setWallets] = useState<Wallet[]>([]);
@@ -30,13 +28,20 @@ export default function WalletScreen() {
     setLoading(true);
     setError(null);
 
+    const accountId = session.getAccount()?.id;
+    if (!accountId) {
+      setError("No account found. Please sign in.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await getAllWallets(MOCK_ACCOUNT_ID);
+      const response = await getAllWallets(accountId);
       setWallets(response.values || []);
     } catch (err) {
       console.error("Fetch error:", err);
       setError("Failed to fetch wallets. Displaying offline data.");
-      const offlineResponse = await offlineGetAllWallets(MOCK_ACCOUNT_ID);
+      const offlineResponse = await offlineGetAllWallets(accountId);
       setWallets(offlineResponse.values || []);
     } finally {
       setLoading(false);
@@ -48,16 +53,19 @@ export default function WalletScreen() {
   }, [fetchWallets]);
 
   const handleCreateWallet = async (newWallet: CreationWallet) => {
+    const accountId = session.getAccount()?.id;
+    if (!accountId) {
+      Alert.alert("Error", "No account found. Please sign in.");
+      return;
+    }
+
     try {
-      const createdWallet = await createOneWallet(MOCK_ACCOUNT_ID, newWallet);
+      const createdWallet = await createOneWallet(accountId, newWallet);
       setWallets([...wallets, createdWallet]);
       Alert.alert("Success", "Wallet created successfully");
     } catch (err) {
       console.error(err);
-      const createdWallet = await offlineCreateOneWallet(
-        MOCK_ACCOUNT_ID,
-        newWallet,
-      );
+      const createdWallet = await offlineCreateOneWallet(accountId, newWallet);
       setWallets([...wallets, createdWallet]);
       Alert.alert(
         "Notice",

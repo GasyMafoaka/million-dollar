@@ -1,4 +1,6 @@
-import { API_BASE_URL } from "@/constants/api";
+import { signIn, signUp } from "@/api/account";
+import { RootStackParamList } from "@/navigation";
+import { session } from "@/service/session";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useFonts } from "expo-font";
@@ -12,7 +14,13 @@ import {
   View,
 } from "react-native";
 
-export default function SignUp() {
+import { NativeStackScreenProps } from "react-native-screens/lib/typescript/native-stack/types";
+
+type Props = NativeStackScreenProps<RootStackParamList, "SignUp">;
+
+export default function SignUp({ route }: Props) {
+  const { redirectScreenName = "MainMenu" } = route.params || {};
+
   const navigation = useNavigation<any>();
   const color1 = "#264653";
 
@@ -35,6 +43,7 @@ export default function SignUp() {
   const [fontsLoaded] = useFonts({
     MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
   });
+
   const handleSubmit = async () => {
     if (username.length < 4) {
       setShowUsernameAlert(true);
@@ -59,41 +68,38 @@ export default function SignUp() {
         } else {
           try {
             setSubmitted(true);
-            const response = await fetch(API_BASE_URL + "/auth/sign-up", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                username: username,
-                password: password,
-              }),
-            });
-
-            const data = await response.json();
+            const data = await signUp({ username, password });
             console.log(data);
 
-            if (data.code === 400) {
-              setSubmitted(false);
-              setUserExistAlert(true);
-
-              setTimeout(() => {
-                setUserExistAlert(false);
-              }, 3000);
-            }
-
-            if (response.ok) {
+            if (data.id) {
+              // Sign-up successful.
               setShowSuccessAlert(true);
               setSignedUp(true);
+
+              // Auto-login after sign-up
+              const signInData = await signIn({ username, password });
+              if (signInData.account && signInData.token) {
+                await session.setSession(signInData.account, signInData.token);
+              }
 
               setTimeout(() => {
                 setShowSuccessAlert(false);
               }, 3000);
-            } else {
-              console.log(data.message);
+
+              navigation.replace(redirectScreenName);
             }
-          } catch (error) {
+          } catch (error: any) {
             console.log(error);
+            setSubmitted(false);
+            if (
+              error.message.includes("400") ||
+              error.message.includes("already used")
+            ) {
+              setUserExistAlert(true);
+              setTimeout(() => {
+                setUserExistAlert(false);
+              }, 3000);
+            }
           }
         }
       }
@@ -324,7 +330,11 @@ export default function SignUp() {
         Already have an account ?
         <Text
           style={styles.signInText}
-          onPress={() => navigation.navigate("SignIn")}
+          onPress={() =>
+            navigation.navigate("SignIn", {
+              redirectScreenName: redirectScreenName,
+            })
+          }
         >
           {" "}
           Sign in

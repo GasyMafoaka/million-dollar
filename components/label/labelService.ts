@@ -1,14 +1,13 @@
 import { API_BASE_URL } from "@/constants/api";
-import { CreationLabel, Label, LabelResponse } from "./label";
+import { LabelResponse } from "./label";
 
 const BASE_URL = API_BASE_URL;
 
 export const getLabels = async (
   accountId: string,
   token: string,
-  page: number = 1,
-  pageSize: number = 10,
-  name: string = "FOOD",
+  page: number,
+  pageSize: number,
 ): Promise<LabelResponse> => {
   const response = await fetch(
     `${BASE_URL}/account/${accountId}/label?page=${page}&pageSize=${pageSize}&name=${name}`,
@@ -30,13 +29,27 @@ export const getLabels = async (
 
 export const createLabel = async (
   accountId: string,
-  data: CreationLabel,
-): Promise<Label> => {
+  name: string,
+  color: string,
+  iconRef: string,
+  token: string,
+) => {
   const response = await fetch(`${BASE_URL}/account/${accountId}/label`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      name: name,
+      color: color,
+      iconRef: iconRef,
+    }),
   });
+
+  if (!response.ok) {
+    throw new Error("Erreur création label");
+  }
 
   return response.json();
 };
@@ -44,30 +57,55 @@ export const createLabel = async (
 export const updateLabel = async (
   accountId: string,
   labelId: string,
-  data: Label,
-): Promise<Label> => {
+  name: string,
+  color: string,
+  token: string,
+  iconRef: string,
+) => {
   const response = await fetch(
     `${BASE_URL}/account/${accountId}/label/${labelId}`,
     {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        name,
+        color,
+        iconRef,
+        accountId,
+      }),
     },
   );
+  const responseData = await response.json();
 
-  return response.json();
+  if (!response.ok) {
+    throw new Error("Erreur modification label");
+  }
+
+  return responseData;
 };
 
 export const archiveLabel = async (
-  accountId: string,
   labelId: string,
-): Promise<Label> => {
+  token: string,
+  accountId: string,
+) => {
   const response = await fetch(
     `${BASE_URL}/account/${accountId}/label/${labelId}/archive`,
     {
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
     },
   );
+
+  if (!response.ok) {
+    throw new Error("Erreur archivage label");
+  }
 
   return response.json();
 };

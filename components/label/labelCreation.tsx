@@ -1,48 +1,76 @@
+import { session } from "@/service/session";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useState } from "react";
-import { Button, TextInput, View } from "react-native";
+import { Alert, Button, StyleSheet, TextInput, View } from "react-native";
+import { Label } from "./label";
 import { createLabel } from "./labelService";
 
 type RootStackParamList = {
+  LabelList: undefined;
+  EditLabel: { label: Label };
   CreateLabel: undefined;
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, "CreateLabel">;
 
 export default function CreateLabelScreen({ navigation }: Props) {
-  const [name, setName] = useState<string>("");
-  const [color, setColor] = useState<string>("#00ff00");
-  const [iconRef, setIconRef] = useState<string>("");
+  const [name, setName] = useState("");
+  const [color, setColor] = useState("");
+  const [iconref, setIconRef] = useState("");
 
-  const accountId = "TON_ACCOUNT_ID";
+  const accountId = session.getAccount()?.id || "";
+
+  const token = session.getToken() || "";
 
   const handleCreate = async () => {
-    await createLabel(accountId, {
-      name,
-      color,
-      iconRef,
-    });
+    try {
+      await createLabel(accountId, name, color, iconref, token);
 
-    navigation.goBack();
+      Alert.alert("Succès", "Label created !");
+      navigation.goBack();
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erreur", "Impossible de créer le label");
+    }
   };
 
   return (
-    <View style={{ padding: 20 }}>
+    <View style={styles.container}>
       <TextInput
-        placeholder="Nom"
+        placeholder="Name"
         value={name}
         onChangeText={setName}
-        style={{ borderWidth: 1, marginBottom: 10 }}
+        style={styles.input}
       />
-
       <TextInput
-        placeholder="Couleur (#xxxxxx)"
+        placeholder="color"
         value={color}
         onChangeText={setColor}
-        style={{ borderWidth: 1, marginBottom: 10 }}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="icone reference"
+        value={iconref}
+        onChangeText={setIconRef}
+        style={styles.input}
       />
 
-      <Button title="Créer" onPress={handleCreate} />
+      <Button title="Create label" onPress={handleCreate} />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    marginBottom: 20,
+    borderRadius: 5,
+    fontFamily: "MoreSugar",
+  },
+});

@@ -95,7 +95,7 @@ export default function LabelListScreen({ navigation }: Props) {
         Labels Lists
       </h1>
       <FlatList
-        style={{ paddingTop: 10 }}
+        style={{ paddingTop: 30 }}
         data={labels}
         keyExtractor={(item) => item.id || Math.random().toString()}
         renderItem={({ item }) => (
@@ -240,7 +240,6 @@ export default function LabelListScreen({ navigation }: Props) {
         <Text style={{ color: "white", fontSize: 30 }}>+</Text>
       </TouchableOpacity>
 
-      {/* MESSAGE ARCHIVE */}
       {archivedMess && (
         <Text
           style={{

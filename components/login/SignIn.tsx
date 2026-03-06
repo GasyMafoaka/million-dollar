@@ -1,5 +1,6 @@
 import { signIn } from "@/api/account";
 import { API_BASE_URL } from "@/constants/api";
+import { RootStackParamList } from "@/navigation";
 import { session } from "@/service/session";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -13,13 +14,9 @@ import {
   View,
 } from "react-native";
 
-type Props = {
-  route: {
-    params: {
-      redirectScreenName: string;
-    };
-  };
-};
+import { NativeStackScreenProps } from "react-native-screens/lib/typescript/native-stack/types";
+
+type Props = NativeStackScreenProps<RootStackParamList, "SignIn">;
 
 export default function SignIn({ route }: Props) {
   const { redirectScreenName = "MainMenu" } = route.params || {};

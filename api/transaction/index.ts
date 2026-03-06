@@ -68,7 +68,7 @@ export const createOneTransaction = async (
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.getToken()}`,
       },
-      body: JSON.stringify(transaction),
+      body: JSON.stringify({ ...transaction, walletId, accountId }),
     },
   );
   if (!response.ok) {

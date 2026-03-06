@@ -1,11 +1,14 @@
 import CustomText from "@/components/CustomText";
 import { Goal } from "@/components/goal/goalModel";
 import { getGoals } from "@/components/goal/goalService";
+import { session } from "@/service/session";
 import { useEffect, useState } from "react";
 import { FlatList, View } from "react-native";
 
 export default function GoalsScreen() {
   const [goals, setGoals] = useState<Goal[]>([]);
+
+  const accountId = session.getAccount()?.id || "";
 
   useEffect(() => {
     loadGoals();
@@ -13,7 +16,7 @@ export default function GoalsScreen() {
 
   const loadGoals = async () => {
     try {
-      const data = await getGoals("5e878c60-5f00-4939-a0ee-038b1e4b0305");
+      const data = await getGoals(accountId);
       setGoals(data);
     } catch (error) {
       console.error(error);

@@ -1,32 +1,30 @@
-import React, { useEffect, useState, useCallback } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  Pressable,
-  Alert,
-} from "react-native";
-import TransactionList from "./TransactionList";
-import { FontAwesome } from "@expo/vector-icons";
-import CreateTransactionModal from "./CreateTransactionModal";
-import {
-  getAllTransactions,
   createOneTransaction,
+  getAllTransactions,
 } from "@/api/transaction/index";
+import { CreationTransaction, Transaction } from "@/api/transaction/model";
 import {
-  offlineGetAllTransactions,
   offlineCreateOneTransaction,
+  offlineGetAllTransactions,
 } from "@/api/transaction/offline";
-import { Transaction, CreationTransaction } from "@/api/transaction/model";
 import { Wallet } from "@/api/wallet/model";
+import { session } from "@/service/session";
+import { FontAwesome } from "@expo/vector-icons";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import CreateTransactionModal from "./CreateTransactionModal";
+import TransactionList from "./TransactionList";
 
 interface WalletTransactionScreenProps {
   wallet: Wallet;
 }
-
-// Mock accountId as it's not provided by a global state in this context
-const MOCK_ACCOUNT_ID = "00000000-0000-0000-0000-000000000000";
 
 export default function WalletTransactionScreen({
   wallet,
@@ -40,15 +38,22 @@ export default function WalletTransactionScreen({
     setLoading(true);
     setError(null);
 
+    const accountId = session.getAccount()?.id;
+    if (!accountId) {
+      setError("No account found. Please sign in.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const response = await getAllTransactions(MOCK_ACCOUNT_ID, {
+      const response = await getAllTransactions(accountId, {
         walletId: wallet.id,
       });
       setTransactions(response || []);
     } catch (err) {
       console.error("Fetch error:", err);
       setError("Failed to fetch transactions. Displaying offline data.");
-      const offlineResponse = await offlineGetAllTransactions(MOCK_ACCOUNT_ID);
+      const offlineResponse = await offlineGetAllTransactions(accountId);
       // Filter offline data by walletId
       const filtered = (offlineResponse || []).filter(
         (t) => t.walletId === wallet.id,
@@ -66,22 +71,35 @@ export default function WalletTransactionScreen({
   const handleCreateTransaction = async (
     newTransaction: CreationTransaction,
   ) => {
+    const account = session.getAccount();
+    const accountId = account?.id;
+
+    if (!accountId) {
+      Alert.alert("Error", "No account found. Please sign in.");
+      return;
+    }
+
     try {
       const created = await createOneTransaction(
-        MOCK_ACCOUNT_ID,
+        accountId,
         wallet.id!,
         newTransaction,
       );
-      setTransactions([created, ...transactions]);
+
+      setTransactions((prev) => [{ ...newTransaction, ...created }, ...prev]);
+
       Alert.alert("Success", "Transaction added successfully");
     } catch (err) {
       console.error(err);
+
       const created = await offlineCreateOneTransaction(
-        MOCK_ACCOUNT_ID,
+        accountId,
         wallet.id!,
         newTransaction,
       );
-      setTransactions([created, ...transactions]);
+
+      setTransactions((prev) => [created, ...prev]);
+
       Alert.alert(
         "Notice",
         "API currently unavailable. Transaction added locally.",

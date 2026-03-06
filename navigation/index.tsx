@@ -29,6 +29,7 @@ export type RootStackParamList = {
   Goal: undefined;
   CreateLabel: undefined;
   EditLabel: { label: Label };
+  WalletTransaction: undefined;
 };
 
 export default function AppNavigator() {

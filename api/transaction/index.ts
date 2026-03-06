@@ -56,26 +56,36 @@ export const createOneTransaction = async (
   walletId: string,
   transaction: CreationTransaction,
 ): Promise<Transaction> => {
-  if (accountId == undefined && session.getAccount() == undefined) {
-    throw new Error(`bot accountId and session.getAccount() are undefined`);
+
+  const account = accountId ? { id: accountId } : await session.getAccount();
+  const resolvedAccountId = account?.id;
+
+  if (!resolvedAccountId) {
+    throw new Error("Both accountId and session account are undefined");
   }
-  accountId = accountId ? accountId : session.getAccount()?.id;
+
   const response = await fetch(
-    `${API_BASE_URL}/account/${accountId}/wallet/${walletId}/transaction`,
+    `${API_BASE_URL}/account/${resolvedAccountId}/wallet/${walletId}/transaction`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.getToken()}`,
       },
-      body: JSON.stringify({ ...transaction, walletId, accountId }),
+      body: JSON.stringify({
+        ...transaction,
+        walletId,
+        accountId: resolvedAccountId,
+      }),
     },
   );
+
   if (!response.ok) {
     throw new Error(
       `Failed to create transaction with code ${response.status}`,
     );
   }
+
   return response.json();
 };
 

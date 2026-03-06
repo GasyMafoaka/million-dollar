@@ -1,23 +1,14 @@
+import { useTransactions } from "@/context/listTransactionContext";
 import { appStyles, color1 } from "@/styles/appStyles";
-import { useFonts } from "expo-font";
-
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { FlatList, Image, Pressable, Text, View } from "react-native";
 import { Calendar } from "react-native-calendars";
-import { useTransactions } from "../../context/listTransactionContext";
 
 export default function TransactionsScreen() {
   const navigation = useNavigation<any>();
-
   const { list, fetchMore, remove, selectedDate, setSelectedDate } =
     useTransactions();
-
-  const [fontsLoaded] = useFonts({
-    MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
-  });
-
-  if (!fontsLoaded) return null;
 
   return (
     <View style={appStyles.container}>
@@ -25,7 +16,6 @@ export default function TransactionsScreen() {
         source={require("@/assets/images/LogoPF.png")}
         style={appStyles.logo}
       />
-
       <Text style={appStyles.title}>Transactions</Text>
 
       <Pressable
@@ -39,15 +29,13 @@ export default function TransactionsScreen() {
         onDayPress={(d) => setSelectedDate(d.dateString)}
         markedDates={{
           ...list.reduce((acc: any, t: any) => {
+            if (!t.date) return acc;
             const d = t.date.split("T")[0];
             acc[d] = { marked: true };
             return acc;
           }, {}),
           ...(selectedDate && {
-            [selectedDate]: {
-              selected: true,
-              selectedColor: color1,
-            },
+            [selectedDate]: { selected: true, selectedColor: color1 },
           }),
         }}
         theme={{
@@ -68,7 +56,7 @@ export default function TransactionsScreen() {
 
       <FlatList
         data={list}
-        keyExtractor={(item) => String(item.id)}
+        keyExtractor={(item) => item.id}
         onEndReached={fetchMore}
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
@@ -78,18 +66,20 @@ export default function TransactionsScreen() {
         }
         renderItem={({ item }) => (
           <View style={appStyles.card}>
-            <Text style={appStyles.cardTitle}>{item.title}</Text>
+            <Text style={appStyles.cardTitle}>{item.description}</Text>
             <Text style={appStyles.cardAmount}>
               {item.type === "OUT" ? "-" : "+"}
               {item.amount} Ar
             </Text>
-
             <View style={appStyles.cardActions}>
-              <Pressable onPress={() => navigation.navigate("TransactionForm")}>
+              <Pressable
+                onPress={() =>
+                  navigation.navigate("TransactionForm", { transaction: item })
+                }
+              >
                 <Text style={appStyles.edit}>Modifier</Text>
               </Pressable>
-
-              <Pressable onPress={() => remove(String(item.id))}>
+              <Pressable onPress={() => remove(item.id)}>
                 <Text style={appStyles.delete}>Supprimer</Text>
               </Pressable>
             </View>

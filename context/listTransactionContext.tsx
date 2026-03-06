@@ -1,3 +1,4 @@
+import { transactionsApi } from "@/api/transactions.api";
 import React, {
   createContext,
   useContext,
@@ -5,11 +6,8 @@ import React, {
   useMemo,
   useState,
 } from "react";
-
-import { transactionsApi } from "@/api/transactions.api";
 import { useSession } from "../auth/useSession";
-import { Transaction } from "../types/Transaction";
-
+import { CreationTransaction, Transaction } from "../types/Transaction";
 import {
   requestPermission,
   scheduleDailyNotification,
@@ -17,7 +15,24 @@ import {
 
 const PAGE_SIZE = 10;
 
-const Ctx = createContext<any>(null);
+type FilterType = "IN" | "OUT" | null;
+
+interface TransactionsContextType {
+  list: Transaction[];
+  fetchMore: () => Promise<void>;
+  add: (data: CreationTransaction) => Promise<void>;
+  update: (id: string, data: Partial<Transaction>) => Promise<void>;
+  remove: (id: string) => Promise<void>;
+  selectedDate: string | null;
+  setSelectedDate: (date: string | null) => void;
+  filterType: FilterType;
+  setFilterType: (type: FilterType) => void;
+  notificationHour: number;
+  setNotificationHour: (hour: number) => void;
+  loadingMore: boolean;
+}
+
+const TransactionsContext = createContext<TransactionsContextType | null>(null);
 
 export const TransactionsProvider = ({
   children,
@@ -31,7 +46,7 @@ export const TransactionsProvider = ({
   const [list, setList] = useState<Transaction[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [filterType, setFilterType] = useState<"IN" | "OUT" | null>(null);
+  const [filterType, setFilterType] = useState<FilterType>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [notificationHour, setNotificationHour] = useState(20);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -49,66 +64,59 @@ export const TransactionsProvider = ({
 
       setList((prev) => {
         const merged = [...prev, ...data];
-
-        const unique = merged.filter(
+        return merged.filter(
           (item, index, self) =>
-            index === self.findIndex((t) => String(t.id) === String(item.id)),
+            index === self.findIndex((t) => t.id === item.id),
         );
-
-        return unique;
       });
 
       setHasMore(data.length === PAGE_SIZE);
       setPage((p) => p + 1);
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoadingMore(false);
     }
   };
 
-  const add = async (data: Omit<Transaction, "id">) => {
+  const add = async (data: CreationTransaction) => {
     if (!accountId || !walletId) return;
-
     const created = await transactionsApi.create(accountId, walletId, data);
-    setList((p) => [created, ...p]);
+    setList((prev) => [created, ...prev]);
   };
 
-  const updateItem = async (id: string, data: Partial<Transaction>) => {
+  const update = async (id: string, data: Partial<Transaction>) => {
     if (!accountId || !walletId) return;
-
     const updated = await transactionsApi.update(accountId, walletId, id, data);
-
-    setList((p) => p.map((t) => (String(t.id) === String(id) ? updated : t)));
+    setList((prev) => prev.map((t) => (t.id === id ? updated : t)));
   };
 
-  const removeItem = async (id: string) => {
+  const remove = async (id: string) => {
     if (!accountId || !walletId) return;
-
     await transactionsApi.remove(accountId, walletId, id);
-
-    setList((p) => p.filter((t) => String(t.id) !== String(id)));
+    setList((prev) => prev.filter((t) => t.id !== id));
   };
 
   const filteredList = useMemo(() => {
-    let result = list;
-
-    if (selectedDate)
-      result = result.filter((t) => t.date.startsWith(selectedDate));
-
-    return result;
+    if (!selectedDate) return list;
+    return list.filter((t) => t.date?.startsWith(selectedDate));
   }, [list, selectedDate]);
 
   useEffect(() => {
     if (!accountId || !walletId) return;
 
     const load = async () => {
-      const data = await transactionsApi.list(accountId, 1, PAGE_SIZE, {
-        type: filterType,
-        walletId,
-      });
-
-      setList(data);
-      setHasMore(data.length === PAGE_SIZE);
-      setPage(2);
+      try {
+        const data = await transactionsApi.list(accountId, 1, PAGE_SIZE, {
+          type: filterType,
+          walletId,
+        });
+        setList(data);
+        setHasMore(data.length === PAGE_SIZE);
+        setPage(2);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     load();
@@ -123,13 +131,13 @@ export const TransactionsProvider = ({
   }, [list, notificationHour]);
 
   return (
-    <Ctx.Provider
+    <TransactionsContext.Provider
       value={{
         list: filteredList,
         fetchMore,
         add,
-        update: updateItem,
-        remove: removeItem,
+        update,
+        remove,
         selectedDate,
         setSelectedDate,
         filterType,
@@ -140,8 +148,13 @@ export const TransactionsProvider = ({
       }}
     >
       {children}
-    </Ctx.Provider>
+    </TransactionsContext.Provider>
   );
 };
 
-export const useTransactions = () => useContext(Ctx);
+export const useTransactions = () => {
+  const context = useContext(TransactionsContext);
+  if (!context)
+    throw new Error("useTransactions must be used inside TransactionsProvider");
+  return context;
+};

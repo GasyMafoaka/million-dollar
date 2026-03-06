@@ -6,30 +6,33 @@ import { TransactionsProvider } from "../context/listTransactionContext";
 
 export default function RootLayout() {
   const [walletId, setWalletId] = useState<string | null>(null);
-
   useEffect(() => {
-    const isExpoGo = Constants.executionEnvironment === "storeClient";
-    const isNative = Platform.OS !== "web" && !isExpoGo;
+    const initNotifications = async () => {
+      const isExpoGo = Constants.executionEnvironment === "storeClient";
+      const isNative = Platform.OS !== "web" && !isExpoGo;
+      if (!isNative) return;
 
-    if (!isNative) return;
+      try {
+        const Notifications = require("expo-notifications");
+        const { status } = await Notifications.requestPermissionsAsync();
+        if (status !== "granted") return;
 
-    try {
-      const Notifications = require("expo-notifications");
+        Notifications.setNotificationHandler({
+          handleNotification: async () => ({
+            shouldShowAlert: true,
+            shouldPlaySound: true,
+            shouldSetBadge: false,
+            shouldShowBanner: true,
+            shouldShowList: true,
+          }),
+        });
+      } catch (e) {
+        console.log("Notifications not available:", e);
+      }
+    };
 
-      Notifications.setNotificationHandler({
-        handleNotification: async () => ({
-          shouldShowAlert: true,
-          shouldPlaySound: true,
-          shouldSetBadge: false,
-          shouldShowBanner: true,
-          shouldShowList: true,
-        }),
-      });
-    } catch (e) {
-      console.log("Notifications not available:", e);
-    }
+    initNotifications();
   }, []);
-
   return (
     <TransactionsProvider walletId={walletId}>
       <AppNavigator />

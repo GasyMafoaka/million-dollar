@@ -1,10 +1,12 @@
+import { API_BASE_URL } from "@/constants/api";
 import { getToken } from "../auth/auth.store";
-import { API_URL } from "./config";
 
-export async function apiFetch(url: string, options?: RequestInit) {
+export async function apiFetch<T>(
+  endpoint: string,
+  options?: RequestInit,
+): Promise<T> {
   const token = await getToken();
-
-  const res = await fetch(`${API_URL}${url}`, {
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
     headers: {
       "Content-Type": "application/json",
       Authorization: token ? `Bearer ${token}` : "",
@@ -18,5 +20,5 @@ export async function apiFetch(url: string, options?: RequestInit) {
     throw new Error(text || "API error");
   }
 
-  return res.json();
+  return res.json() as Promise<T>;
 }

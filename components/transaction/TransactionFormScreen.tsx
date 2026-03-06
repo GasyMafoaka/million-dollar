@@ -1,22 +1,10 @@
+import { useTransactions } from "@/context/listTransactionContext";
 import { appStyles, color1 } from "@/styles/appStyles";
 import React, { useEffect, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { useTransactions } from "../../context/listTransactionContext";
+import { Alert, Pressable, Text, TextInput, View } from "react-native";
 
 export default function TransactionFormScreen({ route, navigation }: any) {
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-
-  const showDatePicker = () => setDatePickerVisibility(true);
-  const hideDatePicker = () => setDatePickerVisibility(false);
-
-  const handleConfirm = (selectedDate: Date) => {
-    const formatted = selectedDate.toISOString().split("T")[0];
-    setDate(formatted);
-    hideDatePicker();
-  };
   const { add, update } = useTransactions();
-
   const editingItem = route.params?.transaction;
 
   const [description, setDescription] = useState("");
@@ -35,24 +23,25 @@ export default function TransactionFormScreen({ route, navigation }: any) {
 
   const submit = async () => {
     if (!description || !amount || !date) {
-      alert("Tous les champs sont obligatoires");
+      Alert.alert("Erreur", "Tous les champs sont obligatoires");
       return;
     }
 
-    const data = {
-      description,
-      amount: Number(amount),
-      date,
-      type,
-    };
-
-    if (editingItem) {
-      await update(editingItem.id, data);
-    } else {
-      await add(data);
+    if (isNaN(Number(amount))) {
+      Alert.alert("Erreur", "Le montant doit être un nombre");
+      return;
     }
 
-    navigation.goBack();
+    const data = { description, amount: Number(amount), date, type };
+
+    try {
+      if (editingItem?.id) await update(editingItem.id, data);
+      else await add(data);
+
+      navigation.goBack();
+    } catch {
+      Alert.alert("Erreur", "Impossible d'enregistrer la transaction");
+    }
   };
 
   return (
@@ -63,7 +52,6 @@ export default function TransactionFormScreen({ route, navigation }: any) {
         value={description}
         onChangeText={setDescription}
       />
-
       <TextInput
         style={appStyles.textInput}
         placeholder="Montant"
@@ -71,16 +59,11 @@ export default function TransactionFormScreen({ route, navigation }: any) {
         value={amount}
         onChangeText={setAmount}
       />
-
-      <Pressable style={appStyles.textInput} onPress={showDatePicker}>
-        <Text>{date || "Choisir une date"}</Text>
-      </Pressable>
-
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
+      <TextInput
+        style={appStyles.textInput}
+        placeholder="Date (YYYY-MM-DD)"
+        value={date}
+        onChangeText={setDate}
       />
 
       <View style={{ flexDirection: "row", gap: 10 }}>
@@ -93,7 +76,6 @@ export default function TransactionFormScreen({ route, navigation }: any) {
         >
           <Text style={appStyles.buttonText}>Entrée</Text>
         </Pressable>
-
         <Pressable
           style={[
             appStyles.button,

@@ -1,4 +1,5 @@
 import { signIn, signUp } from "@/api/account";
+import { API_BASE_URL } from "@/constants/api";
 import { RootStackParamList } from "@/navigation";
 import { session } from "@/service/session";
 import { FontAwesome } from "@expo/vector-icons";
@@ -79,12 +80,6 @@ export default function SignUp({ route }: Props) {
               // Sign-up successful.
               setShowSuccessAlert(true);
               setSignedUp(true);
-
-              // Auto-login after sign-up
-              const signInData = await signIn({ username, password });
-              if (signInData.account && signInData.token) {
-                await session.setSession(signInData.account, signInData.token);
-              }
 
               // Auto-login after sign-up
               const signInData = await signIn({ username, password });

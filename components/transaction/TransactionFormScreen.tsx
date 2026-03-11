@@ -1,3 +1,5 @@
+import { Label, labelsApi } from "@/api/label.api";
+import { useSession } from "@/auth/useSession";
 import { useTransactions } from "@/context/listTransactionContext";
 import { appStyles, color1 } from "@/styles/appStyles";
 import React, { useEffect, useState } from "react";
@@ -5,6 +7,8 @@ import { Alert, Pressable, Text, TextInput, View } from "react-native";
 
 export default function TransactionFormScreen({ route, navigation }: any) {
   const { add, update } = useTransactions();
+  const { accountId } = useSession();
+
   const editingItem = route.params?.transaction;
 
   const [description, setDescription] = useState("");
@@ -12,27 +16,60 @@ export default function TransactionFormScreen({ route, navigation }: any) {
   const [date, setDate] = useState("");
   const [type, setType] = useState<"IN" | "OUT">("OUT");
 
+  const [labels, setLabels] = useState<Label[]>([]);
+  const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+
   useEffect(() => {
     if (editingItem) {
       setDescription(editingItem.description);
       setAmount(String(editingItem.amount));
       setDate(editingItem.date.split("T")[0]);
       setType(editingItem.type);
+
+      setSelectedLabels(editingItem.labels?.map((l: any) => l.id) || []);
     }
   }, [editingItem]);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!accountId) return;
+
+      const data = await labelsApi.list(accountId);
+
+      setLabels(data);
+    };
+
+    load();
+  }, [accountId]);
+
+  const toggleLabel = (id: string) => {
+    setSelectedLabels((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((l) => l !== id);
+      }
+
+      return [...prev, id];
+    });
+  };
 
   const submit = async () => {
     if (!description || !amount || !date) {
       Alert.alert("Erreur", "Tous les champs sont obligatoires");
+
       return;
     }
 
-    if (isNaN(Number(amount))) {
-      Alert.alert("Erreur", "Le montant doit être un nombre");
-      return;
-    }
+    const data = {
+      description,
 
-    const data = { description, amount: Number(amount), date, type };
+      amount: Number(amount),
+
+      date,
+
+      type,
+
+      labels: selectedLabels.map((id) => ({ id })),
+    };
 
     try {
       if (editingItem?.id) await update(editingItem.id, data);
@@ -40,7 +77,7 @@ export default function TransactionFormScreen({ route, navigation }: any) {
 
       navigation.goBack();
     } catch {
-      Alert.alert("Erreur", "Impossible d'enregistrer la transaction");
+      Alert.alert("Erreur", "Impossible d'enregistrer");
     }
   };
 
@@ -52,6 +89,7 @@ export default function TransactionFormScreen({ route, navigation }: any) {
         value={description}
         onChangeText={setDescription}
       />
+
       <TextInput
         style={appStyles.textInput}
         placeholder="Montant"
@@ -59,6 +97,7 @@ export default function TransactionFormScreen({ route, navigation }: any) {
         value={amount}
         onChangeText={setAmount}
       />
+
       <TextInput
         style={appStyles.textInput}
         placeholder="Date (YYYY-MM-DD)"
@@ -66,7 +105,32 @@ export default function TransactionFormScreen({ route, navigation }: any) {
         onChangeText={setDate}
       />
 
-      <View style={{ flexDirection: "row", gap: 10 }}>
+      <Text style={{ marginTop: 10 }}>Labels</Text>
+
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+        {labels.map((label) => {
+          const selected = selectedLabels.includes(label.id);
+
+          return (
+            <Pressable
+              key={label.id}
+              onPress={() => toggleLabel(label.id)}
+              style={{
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                borderRadius: 20,
+                backgroundColor: selected ? color1 : "#eee",
+              }}
+            >
+              <Text style={{ color: selected ? "white" : "#333" }}>
+                {label.name}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <View style={{ flexDirection: "row", gap: 10, marginTop: 20 }}>
         <Pressable
           style={[
             appStyles.button,
@@ -76,6 +140,7 @@ export default function TransactionFormScreen({ route, navigation }: any) {
         >
           <Text style={appStyles.buttonText}>Entrée</Text>
         </Pressable>
+
         <Pressable
           style={[
             appStyles.button,

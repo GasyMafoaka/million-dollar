@@ -1,4 +1,4 @@
-import { Label } from "@/api/label/model";
+import { Label } from "@/api/label.api";
 
 export interface Transaction {
   id: string;
@@ -16,5 +16,5 @@ export type CreationTransaction = {
   amount: number;
   type: "IN" | "OUT";
   date: string;
-  labels?: Label[];
+  labels?: { id: string }[];
 };

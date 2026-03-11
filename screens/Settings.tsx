@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useFonts } from "expo-font";
 import {
   View,
@@ -10,6 +10,18 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import CustomText from "@/components/CustomText";
+import { getData, storeData } from "@/service/storage";
+
+const SETTINGS_KEY = "app_settings";
+
+type AppSettings = {
+  pushNotifications: boolean;
+  recurrence: string;
+  daysCount: string;
+  currency: string;
+  passwordlessLogin: boolean;
+  subscription: string;
+};
 
 export default function Settings() {
   const [pushNotifications, setPushNotifications] = useState(false);
@@ -19,17 +31,88 @@ export default function Settings() {
   const [passwordlessLogin, setPasswordlessLogin] = useState(false);
   const [subscription, setSubscription] = useState("Free");
 
+  const [feedback, setFeedback] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+
   const [fontsLoaded] = useFonts({
     MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const savedSettings = await getData<AppSettings>(SETTINGS_KEY);
+
+        if (savedSettings) {
+          setPushNotifications(savedSettings.pushNotifications);
+          setRecurrence(savedSettings.recurrence);
+          setDaysCount(savedSettings.daysCount);
+          setCurrency(savedSettings.currency);
+          setPasswordlessLogin(savedSettings.passwordlessLogin);
+          setSubscription(savedSettings.subscription);
+        }
+      } catch (error) {
+        console.error("Error loading settings:", error);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  const handleSave = async () => {
+    const settings: AppSettings = {
+      pushNotifications,
+      recurrence,
+      daysCount,
+      currency,
+      passwordlessLogin,
+      subscription,
+    };
+
+    try {
+      await storeData(SETTINGS_KEY, settings);
+
+      setFeedback({
+        message: "Settings saved successfully!",
+        type: "success",
+      });
+
+      setTimeout(() => {
+        setFeedback(null);
+      }, 3000);
+    } catch (error) {
+      setFeedback({
+        message: "Error saving settings.",
+        type: "error",
+      });
+
+      setTimeout(() => {
+        setFeedback(null);
+      }, 3000);
+    }
+  };
+
+  if (!fontsLoaded) return null;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <CustomText style={styles.title}>Settings</CustomText>
+
+      {/* Toast Message */}
+      {feedback && (
+        <View
+          style={[
+            styles.feedbackContainer,
+            feedback.type === "success" ? styles.success : styles.error,
+          ]}
+        >
+          <CustomText style={styles.feedbackText}>
+            {feedback.message}
+          </CustomText>
+        </View>
+      )}
 
       {/* Push Notifications */}
       <View style={styles.card}>
@@ -115,6 +198,13 @@ export default function Settings() {
           />
         </View>
       </View>
+
+      {/* Save Button */}
+      <View style={{ marginTop: 20, marginBottom: 40 }}>
+        <Pressable style={styles.saveButton} onPress={handleSave}>
+          <CustomText style={styles.saveButtonText}>Save Settings</CustomText>
+        </Pressable>
+      </View>
     </ScrollView>
   );
 }
@@ -124,12 +214,14 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#F5F7FA",
   },
+
   title: {
     fontSize: 32,
     textAlign: "center",
     marginBottom: 30,
     color: "#264653",
   },
+
   card: {
     backgroundColor: "white",
     padding: 15,
@@ -137,24 +229,29 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     elevation: 3,
   },
+
   sectionTitle: {
     fontSize: 18,
     marginBottom: 10,
   },
+
   label: {
     fontSize: 16,
   },
+
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
+
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     padding: 10,
     borderRadius: 8,
   },
+
   premiumButton: {
     backgroundColor: "#264653",
     padding: 12,
@@ -162,8 +259,41 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
+
   buttonText: {
     color: "white",
+    fontSize: 16,
+  },
+
+  saveButton: {
+    backgroundColor: "#2A9D8F",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+
+  saveButtonText: {
+    color: "white",
+    fontSize: 18,
+  },
+
+  feedbackContainer: {
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+
+  success: {
+    backgroundColor: "#2ECC71",
+  },
+
+  error: {
+    backgroundColor: "#E74C3C",
+  },
+
+  feedbackText: {
+    color: "white",
+    textAlign: "center",
     fontSize: 16,
   },
 });

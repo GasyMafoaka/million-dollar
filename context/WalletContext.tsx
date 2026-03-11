@@ -19,8 +19,10 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
 export function useSelectedWallet() {
   const context = useContext(WalletContext);
-  if (context === undefined) {
-    throw new Error("useSelectedWallet must be used within a WalletProvider");
+
+  if (!context) {
+    throw new Error("useSelectedWallet must be used inside WalletProvider");
   }
+
   return context;
 }

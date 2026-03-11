@@ -1,7 +1,7 @@
 import { useTransactions } from "@/context/listTransactionContext";
 import { appStyles, color1 } from "@/styles/appStyles";
 import { useNavigation } from "@react-navigation/native";
-import React from "react";
+import React, { useState } from "react";
 import { FlatList, Image, Pressable, Text, View } from "react-native";
 import { Calendar } from "react-native-calendars";
 
@@ -10,12 +10,15 @@ export default function TransactionsScreen() {
   const { list, fetchMore, remove, selectedDate, setSelectedDate } =
     useTransactions();
 
+  const [showCalendar, setShowCalendar] = useState(false);
+
   return (
     <View style={appStyles.container}>
       <Image
         source={require("@/assets/images/LogoPF.png")}
         style={appStyles.logo}
       />
+
       <Text style={appStyles.title}>Transactions</Text>
 
       <Pressable
@@ -25,25 +28,36 @@ export default function TransactionsScreen() {
         <Text style={appStyles.buttonText}>Nouvelle Transaction</Text>
       </Pressable>
 
-      <Calendar
-        onDayPress={(d) => setSelectedDate(d.dateString)}
-        markedDates={{
-          ...list.reduce((acc: any, t: any) => {
-            if (!t.date) return acc;
-            const d = t.date.split("T")[0];
-            acc[d] = { marked: true };
-            return acc;
-          }, {}),
-          ...(selectedDate && {
-            [selectedDate]: { selected: true, selectedColor: color1 },
-          }),
-        }}
-        theme={{
-          selectedDayBackgroundColor: color1,
-          todayTextColor: color1,
-          arrowColor: color1,
-        }}
-      />
+      <Pressable
+        style={[appStyles.button, { marginTop: 10 }]}
+        onPress={() => setShowCalendar(!showCalendar)}
+      >
+        <Text style={appStyles.buttonText}>
+          {showCalendar ? "Hide Date" : "Show Date"}
+        </Text>
+      </Pressable>
+
+      {showCalendar && (
+        <Calendar
+          onDayPress={(d) => setSelectedDate(d.dateString)}
+          markedDates={{
+            ...list.reduce((acc: any, t: any) => {
+              if (!t.date) return acc;
+              const d = t.date.split("T")[0];
+              acc[d] = { marked: true };
+              return acc;
+            }, {}),
+            ...(selectedDate && {
+              [selectedDate]: { selected: true, selectedColor: color1 },
+            }),
+          }}
+          theme={{
+            selectedDayBackgroundColor: color1,
+            todayTextColor: color1,
+            arrowColor: color1,
+          }}
+        />
+      )}
 
       {selectedDate && (
         <Pressable
@@ -67,10 +81,12 @@ export default function TransactionsScreen() {
         renderItem={({ item }) => (
           <View style={appStyles.card}>
             <Text style={appStyles.cardTitle}>{item.description}</Text>
+
             <Text style={appStyles.cardAmount}>
               {item.type === "OUT" ? "-" : "+"}
               {item.amount} Ar
             </Text>
+
             <View style={appStyles.cardActions}>
               <Pressable
                 onPress={() =>
@@ -79,6 +95,7 @@ export default function TransactionsScreen() {
               >
                 <Text style={appStyles.edit}>Modifier</Text>
               </Pressable>
+
               <Pressable onPress={() => remove(item.id)}>
                 <Text style={appStyles.delete}>Supprimer</Text>
               </Pressable>

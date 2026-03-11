@@ -1,6 +1,10 @@
 import * as React from "react";
 // @ts-ignore
+import EditLabelScreen from "@/components/label/EditLabelScrren";
+import CreateLabelScreen from "@/components/label/labelCreation";
+import { Label } from "@/components/label/labelModel";
 import TransactionFormScreen from "@/components/transaction/TransactionFormScreen";
+import LabelScreenList from "@/screens/LabelScreenList";
 import MainMenu from "@/screens/MainMenu";
 import Settings from "@/screens/Settings";
 import SignIn from "@/screens/SignIn";
@@ -12,7 +16,19 @@ import Wallet from "@/screens/Wallet";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Pressable, StyleSheet, Text } from "react-native";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
+export type RootStackParamList = {
+  Splash: undefined;
+  MainMenu: undefined;
+  Transaction: undefined;
+  Wallet: undefined;
+  Settings: undefined;
+  SignIn: { redirectScreenName?: keyof RootStackParamList };
+  SignUp: { redirectScreenName?: keyof RootStackParamList };
+  LabelList: undefined;
+  CreateLabel: undefined;
+  EditLabel: { label: Label };
+};
 
 export default function AppNavigator() {
   return (
@@ -55,6 +71,9 @@ export default function AppNavigator() {
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="SignIn" component={SignIn} />
       <Stack.Screen name="SignUp" component={SignUp} />
+      <Stack.Screen name="LabelList" component={LabelScreenList} />
+      <Stack.Screen name="CreateLabel" component={CreateLabelScreen} />
+      <Stack.Screen name="EditLabel" component={EditLabelScreen} />
     </Stack.Navigator>
   );
 }

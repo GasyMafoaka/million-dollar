@@ -81,7 +81,11 @@ export const TransactionsProvider = ({
 
   const add = async (data: CreationTransaction) => {
     if (!accountId || !walletId) return;
+
     const created = await transactionsApi.create(accountId, walletId, data);
+
+    if (!created) return;
+
     setList((prev) => [created, ...prev]);
   };
 

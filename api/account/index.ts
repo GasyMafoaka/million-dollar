@@ -12,7 +12,10 @@ export const signUp = async (
     body: JSON.stringify(credentials),
   });
   if (!response.ok) {
-    throw new Error("Failed to sign up");
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.message || `Failed to sign up: ${response.status}`,
+    );
   }
   return response.json();
 };
@@ -28,7 +31,10 @@ export const signIn = async (
     body: JSON.stringify(credentials),
   });
   if (!response.ok) {
-    throw new Error("Failed to sign in");
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.message || `Failed to sign in: ${response.status}`,
+    );
   }
   return response.json();
 };

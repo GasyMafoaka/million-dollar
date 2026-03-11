@@ -1,5 +1,4 @@
 import { signIn } from "@/api/account";
-import { API_BASE_URL } from "@/constants/api";
 import { RootStackParamList } from "@/navigation";
 import { session } from "@/service/session";
 import { FontAwesome } from "@expo/vector-icons";
@@ -35,7 +34,6 @@ export default function SignIn({ route }: Props) {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   const color1 = "#264653";
-  const baseUrl = API_BASE_URL;
 
   const handleSubmit = async () => {
     if (username.length < 4) {
@@ -47,7 +45,6 @@ export default function SignIn({ route }: Props) {
     } else {
       try {
         const data = await signIn({ username, password });
-        console.log(data);
 
         if (data.account && data.token) {
           await session.setSession(data.account, data.token);

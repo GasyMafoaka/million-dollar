@@ -21,12 +21,13 @@ const SplashScreen = ({ navigation }: any) => {
   });
 
   useEffect(() => {
+    if (!fontsLoaded) return;
     const timer = setTimeout(() => {
       navigation.replace("MainMenu");
     }, 7000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [fontsLoaded, navigation]);
 
   return (
     <View style={styles.container}>

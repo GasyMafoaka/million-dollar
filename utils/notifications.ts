@@ -1,4 +1,5 @@
 import Constants from "expo-constants";
+import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import { Transaction } from "../types/Transaction";
 
@@ -6,7 +7,7 @@ const isExpoGo = Constants.executionEnvironment === "storeClient";
 
 const getNotificationsModule = () => {
   if (Platform.OS === "web" || isExpoGo) return null;
-  return require("expo-notifications");
+  return Notifications;
 };
 
 export const requestPermission = async () => {

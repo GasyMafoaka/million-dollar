@@ -43,7 +43,7 @@ export default function TransactionFormScreen({ route, navigation }: any) {
     if (editingItem.walletId) {
       setSelectedWalletId(editingItem.walletId);
     }
-  }, [editingItem]);
+  }, [editingItem, setSelectedWalletId]);
 
   /*
   ------------------------

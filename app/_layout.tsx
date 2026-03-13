@@ -1,8 +1,10 @@
+import MoreSugar from "@/assets/fonts/MoreSugar-Thin.ttf";
 import { useSelectedWallet, WalletProvider } from "@/context/WalletContext";
 import AppNavigator from "@/navigation";
 import { session } from "@/service/session";
 import Constants from "expo-constants";
 import { useFonts } from "expo-font";
+import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useState } from "react";
 import { Platform } from "react-native";
@@ -21,8 +23,8 @@ function AppWithWallet() {
 }
 
 export default function RootLayout() {
-  const [fontsLoaded, fontError] = useFonts({
-    MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
+  const [fontsLoaded] = useFonts({
+    MoreSugar,
   });
 
   const [sessionInitialized, setSessionInitialized] = useState(false);
@@ -43,8 +45,6 @@ export default function RootLayout() {
       if (!isNative) return;
 
       try {
-        const Notifications = require("expo-notifications");
-
         const { status } = await Notifications.requestPermissionsAsync();
 
         if (status !== "granted") return;
@@ -67,12 +67,12 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if ((fontsLoaded || fontError) && sessionInitialized) {
+    if (fontsLoaded && sessionInitialized) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontError, sessionInitialized]);
+  }, [fontsLoaded, sessionInitialized]);
 
-  if ((!fontsLoaded && !fontError) || !sessionInitialized) {
+  if (!fontsLoaded || !sessionInitialized) {
     return null;
   }
 

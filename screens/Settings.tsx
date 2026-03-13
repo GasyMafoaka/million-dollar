@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
+import CustomText from "@/components/CustomText";
+import { getData, storeData } from "@/service/storage";
+import { Picker } from "@react-native-picker/picker";
 import { useFonts } from "expo-font";
+import React, { useEffect, useState } from "react";
 import {
-  View,
+  Pressable,
+  ScrollView,
   StyleSheet,
   Switch,
   TextInput,
-  Pressable,
-  ScrollView,
+  View,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import CustomText from "@/components/CustomText";
-import { getData, storeData } from "@/service/storage";
 
 const SETTINGS_KEY = "app_settings";
 
@@ -83,6 +83,8 @@ export default function Settings() {
         setFeedback(null);
       }, 3000);
     } catch (error) {
+      console.error(error);
+
       setFeedback({
         message: "Error saving settings.",
         type: "error",

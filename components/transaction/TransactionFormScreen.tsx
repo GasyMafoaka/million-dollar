@@ -1,6 +1,8 @@
 import { Label, labelsApi } from "@/api/label.api";
+import { Wallet, walletsApi } from "@/api/wallets.api";
 import { useSession } from "@/auth/useSession";
 import { useTransactions } from "@/context/listTransactionContext";
+import { useSelectedWallet } from "@/context/WalletContext";
 import { appStyles, color1 } from "@/styles/appStyles";
 import React, { useEffect, useState } from "react";
 import { Alert, Pressable, Text, TextInput, View } from "react-native";
@@ -8,6 +10,7 @@ import { Alert, Pressable, Text, TextInput, View } from "react-native";
 export default function TransactionFormScreen({ route, navigation }: any) {
   const { add, update } = useTransactions();
   const { accountId } = useSession();
+  const { selectedWalletId, setSelectedWalletId } = useSelectedWallet();
 
   const editingItem = route.params?.transaction;
 
@@ -17,21 +20,39 @@ export default function TransactionFormScreen({ route, navigation }: any) {
   const [type, setType] = useState<"IN" | "OUT">("OUT");
 
   const [labels, setLabels] = useState<Label[]>([]);
+  const [wallets, setWallets] = useState<Wallet[]>([]);
+
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
 
-  useEffect(() => {
-    if (editingItem) {
-      setDescription(editingItem.description);
-      setAmount(String(editingItem.amount));
-      setDate(editingItem.date.split("T")[0]);
-      setType(editingItem.type);
+  /*
+  ------------------------
+  Charger transaction edit
+  ------------------------
+  */
 
-      setSelectedLabels(editingItem.labels?.map((l: any) => l.id) || []);
+  useEffect(() => {
+    if (!editingItem) return;
+
+    setDescription(editingItem.description);
+    setAmount(String(editingItem.amount));
+    setDate(editingItem.date.split("T")[0]);
+    setType(editingItem.type);
+
+    setSelectedLabels(editingItem.labels?.map((l: any) => l.id) || []);
+
+    if (editingItem.walletId) {
+      setSelectedWalletId(editingItem.walletId);
     }
   }, [editingItem]);
 
+  /*
+  ------------------------
+  Charger labels
+  ------------------------
+  */
+
   useEffect(() => {
-    const load = async () => {
+    const loadLabels = async () => {
       if (!accountId) return;
 
       const data = await labelsApi.list(accountId);
@@ -39,8 +60,32 @@ export default function TransactionFormScreen({ route, navigation }: any) {
       setLabels(data);
     };
 
-    load();
+    loadLabels();
   }, [accountId]);
+
+  /*
+  ------------------------
+  Charger wallets
+  ------------------------
+  */
+
+  useEffect(() => {
+    const loadWallets = async () => {
+      if (!accountId) return;
+
+      const data = await walletsApi.list(accountId);
+
+      setWallets(data);
+    };
+
+    loadWallets();
+  }, [accountId]);
+
+  /*
+  ------------------------
+  Toggle label
+  ------------------------
+  */
 
   const toggleLabel = (id: string) => {
     setSelectedLabels((prev) => {
@@ -52,34 +97,54 @@ export default function TransactionFormScreen({ route, navigation }: any) {
     });
   };
 
+  /*
+  ------------------------
+  Submit
+  ------------------------
+  */
+
   const submit = async () => {
+    if (!selectedWalletId) {
+      Alert.alert("Erreur", "Veuillez sélectionner un wallet");
+      return;
+    }
+
+    if (!selectedLabels.length) {
+      Alert.alert("Erreur", "Veuillez sélectionner au moins un label");
+      return;
+    }
+
     if (!description || !amount || !date) {
       Alert.alert("Erreur", "Tous les champs sont obligatoires");
-
       return;
     }
 
     const data = {
       description,
-
       amount: Number(amount),
-
       date,
-
       type,
-
       labels: selectedLabels.map((id) => ({ id })),
     };
 
     try {
-      if (editingItem?.id) await update(editingItem.id, data);
-      else await add(data);
+      if (editingItem?.id) {
+        await update(editingItem.id, data);
+      } else {
+        await add(data);
+      }
 
       navigation.goBack();
     } catch {
       Alert.alert("Erreur", "Impossible d'enregistrer");
     }
   };
+
+  /*
+  ------------------------
+  UI
+  ------------------------
+  */
 
   return (
     <View style={appStyles.container}>
@@ -105,7 +170,36 @@ export default function TransactionFormScreen({ route, navigation }: any) {
         onChangeText={setDate}
       />
 
-      <Text style={{ marginTop: 10 }}>Labels</Text>
+      {/* WALLET */}
+
+      <Text style={{ marginTop: 15 }}>Wallet</Text>
+
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+        {wallets.map((wallet) => {
+          const selected = selectedWalletId === wallet.id;
+
+          return (
+            <Pressable
+              key={wallet.id}
+              onPress={() => setSelectedWalletId(wallet.id)}
+              style={{
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                borderRadius: 20,
+                backgroundColor: selected ? color1 : "#eee",
+              }}
+            >
+              <Text style={{ color: selected ? "white" : "#333" }}>
+                {wallet.name}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      {/* LABELS */}
+
+      <Text style={{ marginTop: 15 }}>Labels</Text>
 
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
         {labels.map((label) => {
@@ -130,6 +224,8 @@ export default function TransactionFormScreen({ route, navigation }: any) {
         })}
       </View>
 
+      {/* TYPE */}
+
       <View style={{ flexDirection: "row", gap: 10, marginTop: 20 }}>
         <Pressable
           style={[
@@ -151,6 +247,8 @@ export default function TransactionFormScreen({ route, navigation }: any) {
           <Text style={appStyles.buttonText}>Sortie</Text>
         </Pressable>
       </View>
+
+      {/* SUBMIT */}
 
       <Pressable style={appStyles.button} onPress={submit}>
         <Text style={appStyles.buttonText}>

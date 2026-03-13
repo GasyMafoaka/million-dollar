@@ -19,7 +19,7 @@ export default function MainMenu() {
     logo: {
       width: 200,
       height: 200,
-      borderRadius: 100, // Fixed: borderRadius must be a number if it's not a percentage in some versions, but 50% also works
+      borderRadius: 100,
       marginBottom: 10,
     },
     LogoTittle: {

@@ -3,11 +3,13 @@ import * as React from "react";
 import EditLabelScreen from "@/components/label/EditLabelScrren";
 import CreateLabelScreen from "@/components/label/labelCreation";
 import { Label } from "@/components/label/labelModel";
+import TransactionFormScreen from "@/components/transaction/TransactionFormScreen";
 import LabelScreenList from "@/screens/LabelScreenList";
 import MainMenu from "@/screens/MainMenu";
 import Settings from "@/screens/Settings";
 import SignIn from "@/screens/SignIn";
 import SignUp from "@/screens/SignUp";
+
 import SplashScreen from "@/screens/SplashScreen";
 import Transaction from "@/screens/Transaction";
 import Wallet from "@/screens/Wallet";
@@ -64,6 +66,7 @@ export default function AppNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="Transaction" component={Transaction} />
+      <Stack.Screen name="TransactionForm" component={TransactionFormScreen} />
       <Stack.Screen name="Wallet" component={Wallet} />
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="SignIn" component={SignIn} />

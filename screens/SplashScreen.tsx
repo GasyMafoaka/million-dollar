@@ -21,15 +21,29 @@ const SplashScreen = ({ navigation }: any) => {
   });
 
   useEffect(() => {
+    if (!fontsLoaded) return;
     const timer = setTimeout(() => {
       navigation.replace("MainMenu");
     }, 7000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [fontsLoaded, navigation]);
 
   return (
     <View style={styles.container}>
+      <Animated.Image
+        source={require("@/assets/images/LogoPF-white.png")}
+        style={[
+          styles.logoWhite,
+          {
+            animationName: march,
+            animationDuration: "2.5s",
+            animationIterationCount: "infinite",
+            animationTimingFunction: "ease-in-out",
+            animationDirection: "alternate",
+          },
+        ]}
+      />
       <Animated.Image
         source={require("@/assets/images/LogoPF-white.png")}
         style={[

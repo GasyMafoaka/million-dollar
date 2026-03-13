@@ -1,7 +1,7 @@
-import React from "react";
-import { FlatList, StyleSheet, View, Text } from "react-native";
-import WalletItem from "./WalletItem";
 import { Wallet } from "@/api/wallet/model";
+import React from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import WalletItem from "./WalletItem";
 
 interface WalletListProps {
   wallets: Wallet[];

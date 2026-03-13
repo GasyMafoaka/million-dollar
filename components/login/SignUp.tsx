@@ -3,7 +3,6 @@ import { RootStackParamList } from "@/navigation";
 import { session } from "@/service/session";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { useFonts } from "expo-font";
 import React, { useState } from "react";
 import {
   Image,
@@ -40,9 +39,9 @@ export default function SignUp({ route }: Props) {
   // const [mail, setMail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [signedUp, setSignedUp] = useState(false);
-  const [fontsLoaded] = useFonts({
-    MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
-  });
+  // const [fontsLoaded] = useFonts({
+  //MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
+  //});
 
   const handleSubmit = async () => {
     if (username.length < 4) {
@@ -119,6 +118,7 @@ export default function SignUp({ route }: Props) {
     logo: {
       width: 200,
       height: 200,
+      borderRadius: 50,
       marginBottom: 10,
     },
     LogoTittle: {

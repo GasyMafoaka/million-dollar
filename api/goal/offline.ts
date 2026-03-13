@@ -1,4 +1,4 @@
-import { CreationGoal, Goal, GoalListResponse } from "./model";
+import { CreationGoal, GoalListResponse } from "./model";
 
 export const offlineGetAllGoals = async (
   _accountId: string,

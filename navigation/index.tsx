@@ -14,7 +14,9 @@ import Wallet from "@/screens/Wallet";
 import WalletTransaction from "@/screens/WalletTransaction";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Pressable, StyleSheet, Text } from "react-native";
+import CreateGoalScreen from "@/components/goal/CreateGoalScreen";
 import GoalsScreen from "@/screens/GoalsScreen";
+import { createGoal } from "@/components/goal/goalService";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 export type RootStackParamList = {
@@ -28,6 +30,7 @@ export type RootStackParamList = {
   LabelList: undefined;
   Goal: undefined;
   CreateLabel: undefined;
+  CreateGoal: undefined;
   EditLabel: { label: Label };
   WalletTransaction: undefined;
 };
@@ -75,6 +78,7 @@ export default function AppNavigator() {
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="LabelList" component={LabelScreenList} />
       <Stack.Screen name="Goal" component={GoalsScreen} />
+      <Stack.Screen name="CreateGoal" component={CreateGoalScreen} />
       <Stack.Screen name="CreateLabel" component={CreateLabelScreen} />
       <Stack.Screen name="EditLabel" component={EditLabelScreen} />
     </Stack.Navigator>

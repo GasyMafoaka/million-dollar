@@ -90,14 +90,19 @@ export const TransactionsProvider = ({
   };
 
   const update = async (id: string, data: Partial<Transaction>) => {
-    if (!accountId || !walletId) return;
-    const updated = await transactionsApi.update(accountId, walletId, id, data);
+    const updated = await transactionsApi.update(
+      accountId!,
+      walletId!,
+      id,
+      data,
+    );
+    if (!updated) return;
     setList((prev) => prev.map((t) => (t.id === id ? updated : t)));
   };
 
   const remove = async (id: string) => {
-    if (!accountId || !walletId) return;
-    await transactionsApi.remove(accountId, walletId, id);
+    const success = await transactionsApi.remove(accountId!, walletId!, id);
+    if (!success) return;
     setList((prev) => prev.filter((t) => t.id !== id));
   };
 

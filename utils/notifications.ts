@@ -22,9 +22,7 @@ export const scheduleDailyNotification = async (
   hour: number,
 ) => {
   const Notifications = getNotificationsModule();
-  if (!Notifications) return;
-
-  if (!list.length) return;
+  if (!Notifications || list.length === 0) return;
 
   const today = new Date().toISOString().split("T")[0];
 

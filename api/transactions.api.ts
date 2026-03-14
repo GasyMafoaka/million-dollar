@@ -26,7 +26,8 @@ export const transactionsApi = {
       );
 
       if (!res.ok) throw new Error("Erreur récupération transactions");
-      return res.json();
+      const data = await res.json();
+      return data.values ?? [];
     } catch (err) {
       console.error("API list transactions error:", err);
       return [];

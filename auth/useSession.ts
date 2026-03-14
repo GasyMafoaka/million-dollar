@@ -11,9 +11,12 @@ export function useSession() {
 
       if (!token) return;
 
-      const payload = decodeJWT(token);
-
-      setAccountId(payload.accountId);
+      try {
+        const payload = decodeJWT(token);
+        setAccountId(payload.accountId);
+      } catch {
+        setAccountId(null);
+      }
     };
 
     load();

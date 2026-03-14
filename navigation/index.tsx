@@ -10,6 +10,8 @@ import Settings from "@/screens/Settings";
 import SignIn from "@/screens/SignIn";
 import SignUp from "@/screens/SignUp";
 
+import SelectLabelsScreen from "@/components/transaction/SelectLabelsScreen";
+import SelectWalletScreen from "@/components/transaction/SelectWalletScreen";
 import SplashScreen from "@/screens/SplashScreen";
 import Transaction from "@/screens/Transaction";
 import Wallet from "@/screens/Wallet";
@@ -67,6 +69,8 @@ export default function AppNavigator() {
       />
       <Stack.Screen name="Transaction" component={Transaction} />
       <Stack.Screen name="TransactionForm" component={TransactionFormScreen} />
+      <Stack.Screen name="SelectWallet" component={SelectWalletScreen} />
+      <Stack.Screen name="SelectLabels" component={SelectLabelsScreen} />
       <Stack.Screen name="Wallet" component={Wallet} />
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="SignIn" component={SignIn} />

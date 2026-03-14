@@ -1,5 +1,4 @@
 import { Label, labelsApi } from "@/api/label.api";
-import { Wallet, walletsApi } from "@/api/wallets.api";
 import { useSession } from "@/auth/useSession";
 import { useTransactions } from "@/context/listTransactionContext";
 import { useSelectedWallet } from "@/context/WalletContext";
@@ -10,9 +9,10 @@ import { Alert, Pressable, Text, TextInput, View } from "react-native";
 export default function TransactionFormScreen({ route, navigation }: any) {
   const { add, update } = useTransactions();
   const { accountId } = useSession();
-  const { selectedWalletId, setSelectedWalletId } = useSelectedWallet();
+  const { selectedWalletId } = useSelectedWallet();
 
   const editingItem = route.params?.transaction;
+  const returnedLabels = route.params?.selectedLabels;
 
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -20,14 +20,42 @@ export default function TransactionFormScreen({ route, navigation }: any) {
   const [type, setType] = useState<"IN" | "OUT">("OUT");
 
   const [labels, setLabels] = useState<Label[]>([]);
-  const [wallets, setWallets] = useState<Wallet[]>([]);
-
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
 
   /*
-  ------------------------
-  Charger transaction edit
-  ------------------------
+  ----------------
+  charger labels
+  ----------------
+  */
+
+  useEffect(() => {
+    const load = async () => {
+      if (!accountId) return;
+
+      const data = await labelsApi.list(accountId);
+
+      setLabels(data);
+    };
+
+    load();
+  }, [accountId]);
+
+  /*
+  ----------------
+  retour labels screen
+  ----------------
+  */
+
+  useEffect(() => {
+    if (returnedLabels) {
+      setSelectedLabels(returnedLabels);
+    }
+  }, [returnedLabels]);
+
+  /*
+  ----------------
+  edit transaction
+  ----------------
   */
 
   useEffect(() => {
@@ -39,78 +67,17 @@ export default function TransactionFormScreen({ route, navigation }: any) {
     setType(editingItem.type);
 
     setSelectedLabels(editingItem.labels?.map((l: any) => l.id) || []);
-
-    if (editingItem.walletId) {
-      setSelectedWalletId(editingItem.walletId);
-    }
-  }, [editingItem, setSelectedWalletId]);
+  }, [editingItem]);
 
   /*
-  ------------------------
-  Charger labels
-  ------------------------
-  */
-
-  useEffect(() => {
-    const loadLabels = async () => {
-      if (!accountId) return;
-
-      const data = await labelsApi.list(accountId);
-
-      setLabels(data);
-    };
-
-    loadLabels();
-  }, [accountId]);
-
-  /*
-  ------------------------
-  Charger wallets
-  ------------------------
-  */
-
-  useEffect(() => {
-    const loadWallets = async () => {
-      if (!accountId) return;
-
-      const data = await walletsApi.list(accountId);
-
-      setWallets(data);
-    };
-
-    loadWallets();
-  }, [accountId]);
-
-  /*
-  ------------------------
-  Toggle label
-  ------------------------
-  */
-
-  const toggleLabel = (id: string) => {
-    setSelectedLabels((prev) => {
-      if (prev.includes(id)) {
-        return prev.filter((l) => l !== id);
-      }
-
-      return [...prev, id];
-    });
-  };
-
-  /*
-  ------------------------
-  Submit
-  ------------------------
+  ----------------
+  submit
+  ----------------
   */
 
   const submit = async () => {
     if (!selectedWalletId) {
-      Alert.alert("Erreur", "Veuillez sélectionner un wallet");
-      return;
-    }
-
-    if (!selectedLabels.length) {
-      Alert.alert("Erreur", "Veuillez sélectionner au moins un label");
+      Alert.alert("Erreur", "Sélectionner un wallet");
       return;
     }
 
@@ -122,8 +89,8 @@ export default function TransactionFormScreen({ route, navigation }: any) {
     const data = {
       description,
       amount: Number(amount),
-      date,
       type,
+      date: new Date(date).toISOString(),
       labels: selectedLabels.map((id) => ({ id })),
     };
 
@@ -139,12 +106,6 @@ export default function TransactionFormScreen({ route, navigation }: any) {
       Alert.alert("Erreur", "Impossible d'enregistrer");
     }
   };
-
-  /*
-  ------------------------
-  UI
-  ------------------------
-  */
 
   return (
     <View style={appStyles.container}>
@@ -165,66 +126,36 @@ export default function TransactionFormScreen({ route, navigation }: any) {
 
       <TextInput
         style={appStyles.textInput}
-        placeholder="Date (YYYY-MM-DD)"
+        placeholder="Date YYYY-MM-DD"
         value={date}
         onChangeText={setDate}
       />
 
-      {/* WALLET */}
+      {/* wallet */}
 
-      <Text style={{ marginTop: 15 }}>Wallet</Text>
+      <Pressable
+        style={appStyles.textInput}
+        onPress={() => navigation.navigate("SelectWallet")}
+      >
+        <Text>
+          {selectedWalletId ? "Wallet sélectionné" : "Choisir un wallet"}
+        </Text>
+      </Pressable>
 
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-        {wallets.map((wallet) => {
-          const selected = selectedWalletId === wallet.id;
+      {/* labels */}
 
-          return (
-            <Pressable
-              key={wallet.id}
-              onPress={() => setSelectedWalletId(wallet.id)}
-              style={{
-                paddingHorizontal: 12,
-                paddingVertical: 6,
-                borderRadius: 20,
-                backgroundColor: selected ? color1 : "#eee",
-              }}
-            >
-              <Text style={{ color: selected ? "white" : "#333" }}>
-                {wallet.name}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+      <Pressable
+        style={appStyles.textInput}
+        onPress={() => navigation.navigate("SelectLabels")}
+      >
+        <Text>
+          {selectedLabels.length
+            ? `${selectedLabels.length} labels`
+            : "Choisir labels"}
+        </Text>
+      </Pressable>
 
-      {/* LABELS */}
-
-      <Text style={{ marginTop: 15 }}>Labels</Text>
-
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-        {labels.map((label) => {
-          const selected = selectedLabels.includes(label.id);
-
-          return (
-            <Pressable
-              key={label.id}
-              onPress={() => toggleLabel(label.id)}
-              style={{
-                paddingHorizontal: 12,
-                paddingVertical: 6,
-                borderRadius: 20,
-                backgroundColor: selected ? color1 : "#eee",
-              }}
-            >
-              <Text style={{ color: selected ? "white" : "#333" }}>
-                {label.name}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      {/* TYPE */}
+      {/* type */}
 
       <View style={{ flexDirection: "row", gap: 10, marginTop: 20 }}>
         <Pressable
@@ -247,8 +178,6 @@ export default function TransactionFormScreen({ route, navigation }: any) {
           <Text style={appStyles.buttonText}>Sortie</Text>
         </Pressable>
       </View>
-
-      {/* SUBMIT */}
 
       <Pressable style={appStyles.button} onPress={submit}>
         <Text style={appStyles.buttonText}>

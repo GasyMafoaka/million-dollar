@@ -1,4 +1,4 @@
-import { archiveGoal, getGoals } from "@/components/goal/goalService";
+import { getGoals } from "@/components/goal/goalService";
 import { session } from "@/service/session";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "expo-router";
@@ -11,12 +11,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Goal } from "../api/goal";
-import { RootStackParamList } from "../navigation/index";
+import { Goal } from "../../api/goal";
+import { RootStackParamList } from "../../navigation/index";
 
 type Props = NativeStackScreenProps<RootStackParamList, "GoalListScreen">;
 
-export default function GoalListScreen({ navigation }: Props) {
+export default function GoalListScreen({ navigation, route }: Props) {
+  // On récupère le walletId passé depuis WalletScreen
+  const { walletId } = route.params;
+
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [successMess, setSuccessMess] = useState(false);
@@ -33,33 +36,28 @@ export default function GoalListScreen({ navigation }: Props) {
   const fetchGoals = async () => {
     try {
       setLoading(true);
-      const data = await getGoals(accountId, token, page, pageSize);
+      const data = await getGoals(
+        accountId,
+        token,
+        page,
+        pageSize,
+        walletId || "",
+      );
 
       const values = data.values || [];
       setGoals(values);
       setHasNextPage(data.hasNext);
     } catch (error) {
-      console.error("Erreur lors de la récupération des objectifs:", error);
+      console.error("Error while fetching goals:", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleArchive = async (id: string) => {
-    try {
-      await archiveGoal(id, token, accountId);
-      setGoals((prev) => prev.filter((goal) => goal.id !== id));
-      setSuccessMess(true);
-      setTimeout(() => setSuccessMess(false), 3000);
-    } catch (error) {
-      console.error("Erreur lors de l'archivage:", error);
     }
   };
 
   useFocusEffect(
     React.useCallback(() => {
       fetchGoals();
-    }, [page]),
+    }, [page, walletId]),
   );
 
   if (loading && page === 1) {
@@ -80,10 +78,10 @@ export default function GoalListScreen({ navigation }: Props) {
         keyExtractor={(item) => item.id || Math.random().toString()}
         renderItem={({ item }) => (
           <View style={styles.goalRow}>
-            {/* CARTE DE L'OBJECTIF */}
+            {/* GOAL CARD */}
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("EditGoal", { goal: item });
+                navigation.navigate("GoalDetail", { goal: item });
               }}
               style={[styles.goalCard, { backgroundColor: color1 }]}
             >
@@ -91,20 +89,12 @@ export default function GoalListScreen({ navigation }: Props) {
                 <Text
                   style={[styles.goalName, { color: item.color || "#ffffff" }]}
                 >
-                  {item.name || "Sans nom"}
+                  {item.name || "Unnamed"}
                 </Text>
                 <Text style={styles.goalAmount}>
                   {item.amount ? item.amount.toLocaleString() : "0"} MGA
                 </Text>
               </View>
-            </TouchableOpacity>
-
-            {/* BOUTON ARCHIVE */}
-            <TouchableOpacity
-              onPress={() => item.id && handleArchive(item.id)}
-              style={styles.archiveButton}
-            >
-              <Text style={styles.archiveButtonText}>Archive</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -141,12 +131,16 @@ export default function GoalListScreen({ navigation }: Props) {
           <Text style={styles.pageButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
+
       <TouchableOpacity
-        onPress={() => navigation.navigate("CreateGoal")}
+        onPress={() =>
+          navigation.navigate("CreateGoal", { walletId: walletId })
+        }
         style={[styles.fab, { backgroundColor: color1 }]}
       >
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
+
       {successMess && (
         <View style={styles.toast}>
           <Text style={styles.toastText}>Operation Successful</Text>
@@ -186,7 +180,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   cardContent: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
   },

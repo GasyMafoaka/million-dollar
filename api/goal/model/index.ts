@@ -5,12 +5,12 @@ export interface CreationGoal {
   walletId: string;
   startingDate: string;
   endingDate: string;
-  color?: string;
   iconRef?: string;
 }
 
 export interface Goal extends CreationGoal {
   id: string;
+  color: string;
 }
 
 export interface PaginationResult {

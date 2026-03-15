@@ -1,8 +1,8 @@
 import { API_BASE_URL } from "@/constants/api";
 import {
-    CreationGoal,
-    Goal,
-    PaginationResult,
+  CreationGoal,
+  Goal,
+  PaginationResult,
 } from "../../api/goal/model/index";
 
 const BASE_URL = API_BASE_URL;
@@ -12,20 +12,24 @@ export const getGoals = async (
   token: string,
   page: number,
   pageSize: number,
+  walletId?: string,
 ): Promise<PaginationResult> => {
-  const response = await fetch(
-    `${BASE_URL}/account/${accountId}/goal?page=${page}&pageSize=${pageSize}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+  let url = `${BASE_URL}/account/${accountId}/goal?page=${page}&pageSize=${pageSize}`;
+  if (walletId && walletId.trim() !== "") {
+    url += `&walletId=${walletId}`;
+  }
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
-  );
+  });
 
   if (!response.ok) {
-    throw new Error("Erreur récupération objectifs");
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || "Error fetching goals");
   }
 
   return response.json();
@@ -50,7 +54,7 @@ export const createGoal = async (
   );
 
   if (!response.ok) {
-    throw new Error("Erreur création objectif");
+    throw new Error("Error creating goal");
   }
 
   return response.json();
@@ -58,11 +62,12 @@ export const createGoal = async (
 
 export const archiveGoal = async (
   goalId: string,
+  walletId: string,
   token: string,
   accountId: string,
 ) => {
   const response = await fetch(
-    `${BASE_URL}/account/${accountId}/goal/${goalId}/archive`,
+    `${BASE_URL}/account/${accountId}/wallet/${walletId}/goal/${goalId}/archive`,
     {
       method: "POST",
       headers: {
@@ -73,7 +78,7 @@ export const archiveGoal = async (
   );
 
   if (!response.ok) {
-    throw new Error("Erreur archivage objectif");
+    throw new Error("Error archiving goal");
   }
 
   return response.json();
@@ -101,7 +106,7 @@ export const updateGoal = async (
   const responseData = await response.json();
 
   if (!response.ok) {
-    throw new Error("Erreur modification objectif");
+    throw new Error("Error updating goal");
   }
 
   return responseData;

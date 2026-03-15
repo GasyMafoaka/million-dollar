@@ -1,5 +1,4 @@
 import { API_BASE_URL } from "../../constants/api";
-import { session } from "../../service/session";
 import { CreationGoal, Goal, GoalListResponse } from "./model";
 
 export const getAllGoals = async (
@@ -35,11 +34,6 @@ export const getAllGoals = async (
 
   const response = await fetch(
     `${API_BASE_URL}/account/${accountId}/goal?${query.toString()}`,
-    {
-      headers: {
-        Authorization: `Bearer ${session.getToken()}`,
-      },
-    },
   );
   if (!response.ok) {
     throw new Error("Failed to fetch goals");
@@ -58,7 +52,6 @@ export const createOneGoal = async (
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.getToken()}`,
       },
       body: JSON.stringify(goal),
     },
@@ -76,11 +69,6 @@ export const getOneGoal = async (
 ): Promise<Goal> => {
   const response = await fetch(
     `${API_BASE_URL}/account/${accountId}/wallet/${walletId}/goal/${goalId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${session.getToken()}`,
-      },
-    },
   );
   if (!response.ok) {
     throw new Error("Failed to fetch goal");
@@ -100,7 +88,6 @@ export const updateOneGoal = async (
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.getToken()}`,
       },
       body: JSON.stringify(goal),
     },
@@ -120,9 +107,6 @@ export const archiveOneGoal = async (
     `${API_BASE_URL}/account/${accountId}/wallet/${walletId}/goal/${goalId}/archive`,
     {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${session.getToken()}`,
-      },
     },
   );
   if (!response.ok) {

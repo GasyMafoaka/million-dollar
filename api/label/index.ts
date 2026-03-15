@@ -1,5 +1,4 @@
 import { API_BASE_URL } from "../../constants/api";
-import { session } from "../../service/session";
 import { CreationLabel, Label, LabelListResponse } from "./model";
 
 export const getAllLabels = async (
@@ -17,11 +16,6 @@ export const getAllLabels = async (
 
   const response = await fetch(
     `${API_BASE_URL}/account/${accountId}/label?${query.toString()}`,
-    {
-      headers: {
-        Authorization: `Bearer ${session.getToken()}`,
-      },
-    },
   );
   if (!response.ok) {
     throw new Error("Failed to fetch labels");
@@ -37,7 +31,6 @@ export const createOneLabel = async (
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${session.getToken()}`,
     },
     body: JSON.stringify(label),
   });
@@ -53,11 +46,6 @@ export const getOneLabel = async (
 ): Promise<Label> => {
   const response = await fetch(
     `${API_BASE_URL}/account/${accountId}/label/${labelId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${session.getToken()}`,
-      },
-    },
   );
   if (!response.ok) {
     throw new Error("Failed to fetch label");
@@ -76,7 +64,6 @@ export const updateOneLabel = async (
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session.getToken()}`,
       },
       body: JSON.stringify(label),
     },
@@ -95,9 +82,6 @@ export const archiveOneLabel = async (
     `${API_BASE_URL}/account/${accountId}/label/${labelId}/archive`,
     {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${session.getToken()}`,
-      },
     },
   );
   if (!response.ok) {

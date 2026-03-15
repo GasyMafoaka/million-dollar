@@ -1,25 +1,8 @@
-import { getData, storeData } from "../../service/storage";
 import { CreationWallet, Wallet, WalletListResponse } from "./model";
 
-const WALLET_KEY_PREFIX = "offline_wallets_";
-
 export const offlineGetAllWallets = async (
-  accountId: string,
+  _accountId: string,
 ): Promise<WalletListResponse> => {
-  const wallets = await getData<Wallet[]>(`${WALLET_KEY_PREFIX}${accountId}`);
-
-  if (!wallets) {
-    return {
-      pagination: {
-        totalPage: 1,
-        page: 1,
-        hasNext: false,
-        hasPrev: false,
-      },
-      values: [],
-    };
-  }
-
   return {
     pagination: {
       totalPage: 1,
@@ -27,25 +10,43 @@ export const offlineGetAllWallets = async (
       hasNext: false,
       hasPrev: false,
     },
-    values: wallets,
+    values: [
+      {
+        id: "1",
+        name: "Main Cash (Offline)",
+        description: "Personal Cash",
+        type: "CASH",
+        amount: 500,
+        color: "#2a9d8f",
+      },
+      {
+        id: "2",
+        name: "Savings Account (Offline)",
+        description: "Bank of America",
+        type: "BANK",
+        amount: 1500,
+        color: "#264653",
+      },
+      {
+        id: "3",
+        name: "Mobile Money (Offline)",
+        description: "Orange Money",
+        type: "MOBILE_MONEY",
+        amount: 200,
+        color: "#e9c46a",
+      },
+    ],
   };
 };
 
 export const offlineCreateOneWallet = async (
-  accountId: string,
+  _accountId: string,
   wallet: CreationWallet,
 ): Promise<Wallet> => {
-  const response = await offlineGetAllWallets(accountId);
-  const wallets = response.values;
-
-  const newWallet: Wallet = {
+  return {
     ...wallet,
     id: Math.random().toString(),
     amount: 0,
     isActive: true,
   };
-
-  await storeData(`${WALLET_KEY_PREFIX}${accountId}`, [...wallets, newWallet]);
-
-  return newWallet;
 };

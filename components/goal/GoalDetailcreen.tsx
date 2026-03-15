@@ -29,8 +29,7 @@ export default function GoalDetailsScreen({ route, navigation }: Props) {
   const formatDate = (dateString: string) => {
     if (!dateString) return "Not defined";
     const date = new Date(dateString);
-    // Utilisation du format anglais (US ou GB selon votre préférence)
-    return date.toLocaleDateString("en-US");
+    return date.toLocaleDateString("en-GB");
   };
 
   return (

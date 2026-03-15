@@ -95,6 +95,12 @@ export default function MainMenu() {
       >
         <Text style={styles.buttonText}>Label</Text>
       </Pressable>
+      <Pressable
+        style={styles.button}
+        onPress={() => navigation.navigate("GoalWalletList")}
+      >
+        <Text style={styles.buttonText}>Goal</Text>
+      </Pressable>
     </View>
   );
 }

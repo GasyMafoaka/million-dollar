@@ -79,6 +79,7 @@ export default function EditLabelScreen({ route, navigation }: Props) {
         onChangeText={setName}
         style={styles.input}
       />
+      Text
       {showNameAlert && (
         <View style={styles.inputAlertContainer}>
           <FontAwesome name="info-circle" size={15} color="red" />
@@ -87,21 +88,18 @@ export default function EditLabelScreen({ route, navigation }: Props) {
           </Text>
         </View>
       )}
-
       <TextInput
         placeholder="Color (#FF0000)"
         value={color}
         onChangeText={setColor}
         style={styles.input}
       />
-
       <TextInput
         placeholder="Icon Ref"
         value={iconRef}
         onChangeText={setIconRef}
         style={styles.input}
       />
-
       <Pressable
         style={{
           backgroundColor: color1,

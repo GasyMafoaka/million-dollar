@@ -2,11 +2,11 @@ import {
   createOneTransaction,
   getAllTransactions,
 } from "@/api/transaction/index";
+import { CreationTransaction, Transaction } from "@/api/transaction/model";
 import {
   offlineCreateOneTransaction,
   offlineGetAllTransactions,
 } from "@/api/transaction/offline";
-import { CreationTransaction, Transaction } from "@/api/transaction/model";
 import { Wallet } from "@/api/wallet/model";
 import { session } from "@/service/session";
 import { FontAwesome } from "@expo/vector-icons";
@@ -85,12 +85,6 @@ export default function WalletTransactionScreen({
         wallet.id!,
         newTransaction,
       );
-
-      // Persist locally even if online call succeeds to ensure it stays on refresh
-      await offlineCreateOneTransaction(accountId, wallet.id!, {
-        ...newTransaction,
-        ...created,
-      });
 
       setTransactions((prev) => [{ ...newTransaction, ...created }, ...prev]);
 

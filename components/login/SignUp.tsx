@@ -1,4 +1,5 @@
 import { signIn, signUp } from "@/api/account";
+import { API_BASE_URL } from "@/constants/api";
 import { RootStackParamList } from "@/navigation";
 import { session } from "@/service/session";
 import { FontAwesome } from "@expo/vector-icons";
@@ -43,7 +44,6 @@ export default function SignUp({ route }: Props) {
   const [fontsLoaded] = useFonts({
     MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
   });
-
   const handleSubmit = async () => {
     if (username.length < 4) {
       setShowUsernameAlert(true);
@@ -71,20 +71,61 @@ export default function SignUp({ route }: Props) {
             const data = await signUp({ username, password });
             console.log(data);
 
-            if (data.id) {
-              // Sign-up successful.
-              setShowSuccessAlert(true);
-              setSignedUp(true);
+            if (response.ok) {
+              setSubmitted(true);
+              const data = await signUp({ username, password });
+              console.log(data);
 
-              // Auto-login after sign-up
-              const signInData = await signIn({ username, password });
-              if (signInData.account && signInData.token) {
-                await session.setSession(signInData.account, signInData.token);
+              if (data.id) {
+                // Sign-up successful.
+                setShowSuccessAlert(true);
+                setSignedUp(true);
+
+                // Auto-login after sign-up
+                const signInData = await signIn({ username, password });
+                if (signInData.account && signInData.token) {
+                  await session.setSession(
+                    signInData.account,
+                    signInData.token,
+                  );
+                }
+
+                setTimeout(() => {
+                  setShowSuccessAlert(false);
+                }, 3000);
+
+                setTimeout(() => {
+                  setShowConfirmPasswordAlert(false);
+                }, 3000);
+              } else {
+                try {
+                  const response = await fetch(API_BASE_URL + "/auth/sign-up", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      username: username,
+                      password: password,
+                    }),
+                  });
+
+                  const data = await response.json();
+                  console.log(response);
+
+                  if (response.ok) {
+                    setShowSuccessAlert(true);
+
+                    setTimeout(() => {
+                      setShowSuccessAlert(false);
+                    }, 3000);
+                  } else {
+                    console.log(data.message);
+                  }
+                } catch (error) {
+                  console.log(error);
+                }
               }
-
-              setTimeout(() => {
-                setShowSuccessAlert(false);
-              }, 3000);
 
               navigation.replace(redirectScreenName);
             }

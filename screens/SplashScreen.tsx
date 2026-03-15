@@ -1,3 +1,4 @@
+import { session } from "@/service/session";
 import { useFonts } from "expo-font";
 import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -21,14 +22,24 @@ const SplashScreen = ({ navigation }: any) => {
   });
 
   useEffect(() => {
-    if (!fontsLoaded) return;
-    const timer = setTimeout(() => {
-      navigation.replace("MainMenu");
-    }, 7000);
+    const checkSession = async () => {
+      if (!fontsLoaded) return;
 
-    return () => clearTimeout(timer);
-  }, [fontsLoaded, navigation]);
+      await session.init();
 
+      const token = session.getToken();
+
+      setTimeout(() => {
+        if (token) {
+          navigation.replace("MainMenu");
+        } else {
+          navigation.replace("SignIn");
+        }
+      }, 2000);
+    };
+
+    checkSession();
+  }, [fontsLoaded]);
   return (
     <View style={styles.container}>
       <Animated.Image

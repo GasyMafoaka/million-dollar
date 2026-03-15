@@ -14,7 +14,13 @@ export default function SelectWalletScreen({ navigation }: any) {
   useEffect(() => {
     const load = async () => {
       if (!accountId) return;
+
+      console.log("ACCOUNT ID =", accountId);
+
       const data = await walletsApi.list(accountId);
+
+      console.log("WALLETS FROM API =", data);
+
       setWallets(data);
     };
 
@@ -22,6 +28,7 @@ export default function SelectWalletScreen({ navigation }: any) {
   }, [accountId]);
 
   const selectWallet = (wallet: Wallet) => {
+    console.log("WALLET SELECTED =", wallet);
     setSelectedWalletId(wallet.id);
     navigation.goBack();
   };

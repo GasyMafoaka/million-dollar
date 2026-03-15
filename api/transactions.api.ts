@@ -1,5 +1,6 @@
 import { API_BASE_URL } from "@/constants/api";
-import { getToken } from "../auth/auth.store";
+
+import { session } from "@/service/session";
 import { CreationTransaction, Transaction } from "../types/Transaction";
 
 export const transactionsApi = {
@@ -10,7 +11,7 @@ export const transactionsApi = {
     filters?: any,
   ): Promise<Transaction[]> {
     try {
-      const token = await getToken();
+      const token = await session.getToken();
       const params = new URLSearchParams({
         page: String(page),
         pageSize: String(pageSize),
@@ -25,8 +26,12 @@ export const transactionsApi = {
         },
       );
 
+      console.log("ACCOUNT ID USED =", accountId);
+      console.log("WALLET ID USED =", filters?.walletId);
+
       if (!res.ok) throw new Error("Erreur récupération transactions");
       const data = await res.json();
+      console.log("Transactions API =", data);
       return data.values ?? [];
     } catch (err) {
       console.error("API list transactions error:", err);
@@ -40,7 +45,7 @@ export const transactionsApi = {
     id: string,
   ): Promise<Transaction | null> {
     try {
-      const token = await getToken();
+      const token = await session.getToken();
       const res = await fetch(
         `${API_BASE_URL}/account/${accountId}/wallet/${walletId}/transaction/${id}`,
         {
@@ -61,7 +66,7 @@ export const transactionsApi = {
     data: CreationTransaction,
   ): Promise<Transaction | null> {
     try {
-      const token = await getToken();
+      const token = await session.getToken();
       const res = await fetch(
         `${API_BASE_URL}/account/${accountId}/wallet/${walletId}/transaction`,
         {
@@ -88,7 +93,7 @@ export const transactionsApi = {
     data: Partial<Transaction>,
   ): Promise<Transaction | null> {
     try {
-      const token = await getToken();
+      const token = await session.getToken();
       const res = await fetch(
         `${API_BASE_URL}/account/${accountId}/wallet/${walletId}/transaction/${id}`,
         {
@@ -114,7 +119,7 @@ export const transactionsApi = {
     id: string,
   ): Promise<boolean> {
     try {
-      const token = await getToken();
+      const token = await session.getToken();
       const res = await fetch(
         `${API_BASE_URL}/account/${accountId}/wallet/${walletId}/transaction/${id}`,
         {

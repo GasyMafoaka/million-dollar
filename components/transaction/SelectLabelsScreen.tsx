@@ -10,24 +10,18 @@ import {
   View,
 } from "react-native";
 import { Label } from "../label/label";
-import { archiveLabel, getLabels } from "../label/labelService";
+import { getLabels } from "../label/labelService";
 
 type RootStackParamList = {
   LabelList: undefined;
-  EditLabel: { label?: Label };
-  CreateLabel: undefined;
+  TransactionForm: { selectedLabels: string[] };
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, "LabelList">;
 
 export default function LabelListScreen({ navigation }: Props) {
   const [labels, setLabels] = useState<Label[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [archivedMess, setArchivedMess] = useState(false);
-
-  const [page, setPage] = useState(1);
-  const [pageSize] = useState(10);
-  const [hasNextPage, setHasNextPage] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const color1 = "#264653";
 
@@ -36,35 +30,14 @@ export default function LabelListScreen({ navigation }: Props) {
 
   const fetchLabels = React.useCallback(async () => {
     try {
-      const data = await getLabels(accountId, token, page, pageSize);
-
-      const values = data.values || [];
-
-      setLabels(values);
-
-      setHasNextPage(values.length === pageSize);
-    } catch (error) {
-      console.error(error);
+      const data = await getLabels(accountId, token, 1, 50);
+      setLabels(data.values || []);
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
-  }, [accountId, token, page, pageSize]);
-
-  const handleArchive = async (id: string) => {
-    try {
-      await archiveLabel(id, token, accountId);
-
-      setLabels((prev) => prev.filter((label) => label.id !== id));
-
-      setArchivedMess(true);
-
-      setTimeout(() => {
-        setArchivedMess(false);
-      }, 3000);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  }, [accountId, token]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -76,187 +49,50 @@ export default function LabelListScreen({ navigation }: Props) {
     return <ActivityIndicator size="large" />;
   }
 
+  const handleSelect = (id: string) => {
+    navigation.navigate("TransactionForm", { selectedLabels: [id] });
+  };
+
   return (
-    <View
-      style={{
-        flex: 1,
-        padding: 20,
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
+    <View style={{ flex: 1, padding: 20 }}>
       <Text
         style={{
-          fontFamily: "MoreSugar ",
+          fontSize: 35,
           textAlign: "center",
-          fontSize: 40,
+          fontFamily: "MoreSugar",
         }}
       >
-        Labels Lists
+        Select Label
       </Text>
+
       <FlatList
-        style={{ paddingTop: 30 }}
+        style={{ marginTop: 30 }}
         data={labels}
-        keyExtractor={(item) => item.id || Math.random().toString()}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View
+          <TouchableOpacity
+            onPress={() => handleSelect(item.id)}
             style={{
-              flexDirection: "row",
+              padding: 18,
+              backgroundColor: color1,
               marginBottom: 10,
+              borderRadius: 10,
               alignItems: "center",
-              marginTop: 5,
             }}
           >
-            {/* LABEL */}
-            <TouchableOpacity
-              onPress={() => {
-                if (item.id) {
-                  navigation.navigate("EditLabel", { label: item });
-                } else {
-                  console.warn("Label sans ID");
-                }
-              }}
-              style={{
-                flex: 1,
-                padding: 15,
-                backgroundColor: color1,
-                borderRadius: 10,
-                alignItems: "center",
-              }}
-            >
-              <Text
-                style={{
-                  color: item.color || "#ffffff",
-                  fontWeight: "bold",
-                  fontSize: 17,
-                  fontFamily: "MoreSugar",
-                }}
-              >
-                {item.name || "Sans nom"}
-              </Text>
-            </TouchableOpacity>
-
-            {/* BOUTON ARCHIVE */}
-            <TouchableOpacity
-              onPress={() => {
-                if (item.id) {
-                  handleArchive(item.id);
-                }
-              }}
-              style={{
-                marginLeft: 10,
-                backgroundColor: "#e63946",
-                padding: 15,
-                borderRadius: 10,
-              }}
-            >
-              <Text
-                style={{
-                  color: "white",
-                  fontWeight: "bold",
-                  fontFamily: "MoreSugar",
-                }}
-              >
-                Archive
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
-        ListEmptyComponent={
-          <View style={{ alignItems: "center", marginTop: 50 }}>
             <Text
-              style={{ fontSize: 18, color: color1, fontFamily: "MoreSugar" }}
+              style={{
+                color: item.color || "white",
+                fontSize: 18,
+                fontWeight: "bold",
+                fontFamily: "MoreSugar",
+              }}
             >
-              Aucun label disponible
+              {item.name}
             </Text>
-          </View>
-        }
+          </TouchableOpacity>
+        )}
       />
-
-      {/* PAGINATION */}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          marginTop: 15,
-        }}
-      >
-        {/* PREVIOUS */}
-        <TouchableOpacity
-          disabled={page === 1}
-          onPress={() => setPage(page - 1)}
-          style={{
-            padding: 10,
-            marginHorizontal: 10,
-            backgroundColor: page === 1 ? "#ccc" : color1,
-            borderRadius: 8,
-          }}
-        >
-          <Text style={{ color: "white", fontFamily: "MoreSugar" }}>
-            Previous
-          </Text>
-        </TouchableOpacity>
-
-        <Text
-          style={{
-            alignSelf: "center",
-            fontSize: 16,
-            fontFamily: "MoreSugar",
-          }}
-        >
-          Page {page}
-        </Text>
-
-        {/* NEXT */}
-        <TouchableOpacity
-          disabled={!hasNextPage}
-          onPress={() => setPage(page + 1)}
-          style={{
-            padding: 10,
-            marginHorizontal: 10,
-            backgroundColor: !hasNextPage ? "#ccc" : color1,
-            borderRadius: 8,
-          }}
-        >
-          <Text style={{ color: "white", fontFamily: "MoreSugar" }}>Next</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* BOUTON CREATE */}
-      <TouchableOpacity
-        onPress={() => navigation.navigate("CreateLabel")}
-        style={{
-          position: "absolute",
-          bottom: 30,
-          right: 30,
-          backgroundColor: color1,
-          width: 60,
-          height: 60,
-          borderRadius: 30,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Text style={{ color: "white", fontSize: 30 }}>+</Text>
-      </TouchableOpacity>
-
-      {archivedMess && (
-        <Text
-          style={{
-            position: "absolute",
-            bottom: 40,
-            alignSelf: "center",
-            backgroundColor: "green",
-            padding: 15,
-            color: "white",
-            fontFamily: "MoreSugar",
-            fontSize: 18,
-            borderRadius: 15,
-          }}
-        >
-          Archived with success
-        </Text>
-      )}
     </View>
   );
 }

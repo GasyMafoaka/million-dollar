@@ -18,6 +18,8 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const load = async () => {
       const saved = await AsyncStorage.getItem(STORAGE_KEY);
+
+      console.log("Saved wallet =", saved);
       if (saved) setSelectedWalletIdState(saved);
     };
 
@@ -25,6 +27,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setSelectedWalletId = async (id: string | null) => {
+    console.log("Wallet selected =", id);
     setSelectedWalletIdState(id);
 
     if (id) {

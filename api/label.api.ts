@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "@/constants/api";
-import { getToken } from "../auth/auth.store";
+import { session } from "@/service/session";
 
 export interface Label {
   id: string;
@@ -8,7 +8,7 @@ export interface Label {
 
 export const labelsApi = {
   async list(accountId: string): Promise<Label[]> {
-    const token = await getToken();
+    const token = await session.getToken();
 
     const res = await fetch(
       `${API_BASE_URL}/account/${accountId}/label?page=1&pageSize=100`,
@@ -23,6 +23,7 @@ export const labelsApi = {
 
     const data = await res.json();
 
+    console.log("Labels API =", data);
     return data.values;
   },
 };

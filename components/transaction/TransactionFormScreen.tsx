@@ -32,9 +32,12 @@ export default function TransactionFormScreen({ route, navigation }: any) {
     const load = async () => {
       if (!accountId) return;
 
-      const data = await labelsApi.list(accountId);
-
-      setLabels(data);
+      try {
+        const data = await labelsApi.list(accountId);
+        setLabels(data || []);
+      } catch (e) {
+        console.log("Erreur chargement labels", e);
+      }
     };
 
     load();
@@ -47,7 +50,7 @@ export default function TransactionFormScreen({ route, navigation }: any) {
   */
 
   useEffect(() => {
-    if (returnedLabels) {
+    if (returnedLabels && Array.isArray(returnedLabels)) {
       setSelectedLabels(returnedLabels);
     }
   }, [returnedLabels]);
@@ -63,10 +66,12 @@ export default function TransactionFormScreen({ route, navigation }: any) {
 
     setDescription(editingItem.description);
     setAmount(String(editingItem.amount));
-    setDate(editingItem.date.split("T")[0]);
+    setDate(editingItem.date?.split("T")[0]);
     setType(editingItem.type);
 
-    setSelectedLabels(editingItem.labels?.map((l: any) => l.id) || []);
+    if (editingItem.labels) {
+      setSelectedLabels(editingItem.labels.map((l: any) => l.id));
+    }
   }, [editingItem]);
 
   /*
@@ -102,10 +107,22 @@ export default function TransactionFormScreen({ route, navigation }: any) {
       }
 
       navigation.goBack();
-    } catch {
+    } catch (e) {
+      console.log(e);
       Alert.alert("Erreur", "Impossible d'enregistrer");
     }
   };
+
+  /*
+  ----------------
+  afficher noms labels
+  ----------------
+  */
+
+  const selectedLabelNames = labels
+    .filter((l) => selectedLabels.includes(l.id))
+    .map((l) => l.name)
+    .join(", ");
 
   return (
     <View style={appStyles.container}>
@@ -138,7 +155,9 @@ export default function TransactionFormScreen({ route, navigation }: any) {
         onPress={() => navigation.navigate("SelectWallet")}
       >
         <Text>
-          {selectedWalletId ? "Wallet sélectionné" : "Choisir un wallet"}
+          {selectedWalletId
+            ? `Wallet: ${selectedWalletId}`
+            : "Choisir un wallet"}
         </Text>
       </Pressable>
 
@@ -146,12 +165,14 @@ export default function TransactionFormScreen({ route, navigation }: any) {
 
       <Pressable
         style={appStyles.textInput}
-        onPress={() => navigation.navigate("SelectLabels")}
+        onPress={() =>
+          navigation.navigate("SelectLabels", {
+            selectedLabels,
+          })
+        }
       >
         <Text>
-          {selectedLabels.length
-            ? `${selectedLabels.length} labels`
-            : "Choisir labels"}
+          {selectedLabels.length ? selectedLabelNames : "Choisir labels"}
         </Text>
       </Pressable>
 

@@ -7,11 +7,21 @@ import { FlatList, TouchableOpacity, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "@/navigation";
 import { NativeStackScreenProps} from "@react-navigation/native-stack";
+import { archiveGoal } from "@/components/goal/goalService";
 
 type props = NativeStackScreenProps<RootStackParamList, "Goal">;
 
 export default function GoalsScreen({ navigation }: props) {
   const [goals, setGoals] = useState<Goal[]>([]);
+
+  const handleDelete = async (goalId: string, walletId: string) => {
+  try {
+    await archiveGoal(accountId, walletId, goalId, token);
+    loadGoals(); // recharge la liste
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   const accountId = session.getAccount()?.id || "";
   const token = session.getToken() || "";
@@ -40,6 +50,28 @@ export default function GoalsScreen({ navigation }: props) {
           <View style={{ padding: 15 }}>
             <CustomText>{item.name}</CustomText>
             <CustomText>{item.amount}</CustomText>
+
+            <TouchableOpacity
+            onPress={() => handleDelete(item.id!, item.walletId!)}
+            style={{
+              backgroundColor: "red",
+              padding: 8,
+              marginTop: 5,
+              borderRadius: 5,
+            }}
+            >
+              <CustomText style={{ color: "white" }}>Delete</CustomText>
+            </TouchableOpacity>
+            <TouchableOpacity
+            onPress={() => navigation.navigate("EditGoal", { goal: item })}
+            style={{
+              backgroundColor: "#264653",
+              padding: 8,
+              marginTop: 5,
+              borderRadius: 5,
+            }}>
+              <CustomText style={{ color: "white" }}>Edit</CustomText>
+            </TouchableOpacity>
           </View>
         )}
       />

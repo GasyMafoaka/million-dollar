@@ -120,7 +120,7 @@ export default function CreateGoalScreen({ navigation }: Props) {
 
       <TextInput
         placeholder="Color"
-        value={color}
+        value={color.toLowerCase()}
         onChangeText={setColor}
         style={styles.input}
       />

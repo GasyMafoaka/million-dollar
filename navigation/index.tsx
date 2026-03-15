@@ -16,6 +16,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Pressable, StyleSheet, Text } from "react-native";
 import CreateGoalScreen from "@/components/goal/CreateGoalScreen";
 import GoalsScreen from "@/screens/GoalsScreen";
+import EditGoalScreen from "@/components/goal/EditGoalScreen"
 import { createGoal } from "@/components/goal/goalService";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -31,6 +32,7 @@ export type RootStackParamList = {
   Goal: undefined;
   CreateLabel: undefined;
   CreateGoal: undefined;
+  EditGoal: undefined;
   EditLabel: { label: Label };
   WalletTransaction: undefined;
 };
@@ -79,6 +81,7 @@ export default function AppNavigator() {
       <Stack.Screen name="LabelList" component={LabelScreenList} />
       <Stack.Screen name="Goal" component={GoalsScreen} />
       <Stack.Screen name="CreateGoal" component={CreateGoalScreen} />
+      <Stack.Screen name="EditGoal" component={EditGoalScreen} />
       <Stack.Screen name="CreateLabel" component={CreateLabelScreen} />
       <Stack.Screen name="EditLabel" component={EditLabelScreen} />
     </Stack.Navigator>

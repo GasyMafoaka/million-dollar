@@ -6,16 +6,13 @@ import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { updateLabel } from "./labelService";
 
-// Utilisez le type global RootStackParamList
 type Props = NativeStackScreenProps<RootStackParamList, "EditLabel">;
-
-const color1 = "#264653";
 
 export default function EditLabelScreen({ route, navigation }: Props) {
   const { label } = route.params;
 
   const [name, setName] = useState(label.name || "");
-  const [color, setColor] = useState(label.color || "#00ff00");
+  const [color, setColor] = useState(label.color || "#264653");
   const [iconRef, setIconRef] = useState(label.iconRef || "");
   const [updateLabelMess, setUpdateLabelMess] = useState(false);
   const [showNameAlert, setshowNameAlert] = useState(false);
@@ -63,82 +60,54 @@ export default function EditLabelScreen({ route, navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <h1
-        style={{
-          fontFamily: "MoreSugar ",
-          textAlign: "center",
-          fontSize: 40,
-          paddingBottom: 50,
-        }}
-      >
-        Update Label
-      </h1>
-      <TextInput
-        placeholder="Label name"
-        value={name}
-        onChangeText={setName}
-        style={styles.input}
-      />
-      {showNameAlert && (
-        <View style={styles.inputAlertContainer}>
-          <FontAwesome name="info-circle" size={15} color="red" />
-          <Text style={styles.inputAlertContainerText}>
-            Label with name = {name} is already exist.
-          </Text>
-        </View>
-      )}
+      <Text style={styles.title}>Update Label</Text>
 
-      <TextInput
-        placeholder="Color (#FF0000)"
-        value={color}
-        onChangeText={setColor}
-        style={styles.input}
-      />
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Label Name</Text>
+        <TextInput
+          placeholder="Label name"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+        />
+        {showNameAlert && (
+          <View style={styles.inputAlertContainer}>
+            <FontAwesome name="info-circle" size={15} color="#e63946" />
+            <Text style={styles.inputAlertContainerText}>
+              Label with name = {name} already exists.
+            </Text>
+          </View>
+        )}
+      </View>
 
-      <TextInput
-        placeholder="Icon Ref"
-        value={iconRef}
-        onChangeText={setIconRef}
-        style={styles.input}
-      />
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Color (Hex)</Text>
+        <TextInput
+          placeholder="Color (#FF0000)"
+          value={color}
+          onChangeText={setColor}
+          style={styles.input}
+        />
+      </View>
 
-      <Pressable
-        style={{
-          backgroundColor: color1,
-          padding: 20,
-          marginTop: 30,
-          borderRadius: 15,
-          width: "75%",
-        }}
-        onPress={handleUpdate}
-      >
-        <Text
-          style={{
-            color: "white",
-            fontFamily: "MoreSugar",
-            fontSize: 25,
-            textAlign: "center",
-          }}
-        >
-          Update
-        </Text>
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Icon Reference</Text>
+        <TextInput
+          placeholder="Icon Ref"
+          value={iconRef}
+          onChangeText={setIconRef}
+          style={styles.input}
+        />
+      </View>
+
+      <Pressable style={styles.updateButton} onPress={handleUpdate}>
+        <Text style={styles.updateButtonText}>Update Label</Text>
       </Pressable>
+
       {updateLabelMess && (
-        <Text
-          style={{
-            position: "absolute",
-            bottom: 80,
-            alignSelf: "center",
-            backgroundColor: "green",
-            padding: 20,
-            color: "white",
-            fontFamily: "MoreSugar",
-            fontSize: 20,
-            borderRadius: 15,
-          }}
-        >
-          Updated Succesfully
-        </Text>
+        <View style={styles.successToast}>
+          <Text style={styles.successToastText}>Updated Successfully</Text>
+        </View>
       )}
     </View>
   );
@@ -147,32 +116,75 @@ export default function EditLabelScreen({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    display: "flex",
-    padding: 20,
+    backgroundColor: "white",
     alignItems: "center",
+    width: "100%",
+    padding: 20,
+  },
+  title: {
+    fontSize: 30,
+    fontFamily: "MoreSugar",
+    color: "#264653",
+    marginBottom: 30,
+  },
+  inputGroup: {
+    width: "90%",
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontFamily: "MoreSugar",
+    color: "#264653",
+    marginBottom: 8,
   },
   input: {
-    borderWidth: 2,
-    borderColor: color1,
-    padding: 15,
-    marginTop: 20,
-    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ced4da",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
     fontFamily: "MoreSugar",
-    fontSize: 20,
-    width: "90%",
   },
   inputAlertContainer: {
-    display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginTop: 2,
+    marginTop: 5,
   },
   inputAlertContainerText: {
-    color: "red",
+    color: "#e63946",
     fontFamily: "MoreSugar",
-    fontSize: 15,
-    marginLeft: 10,
-    textAlign: "center",
+    fontSize: 12,
+    marginLeft: 5,
+  },
+  updateButton: {
+    backgroundColor: "#264653",
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 20,
+    width: "90%",
+  },
+  updateButtonText: {
+    color: "white",
+    fontFamily: "MoreSugar",
+    fontSize: 18,
+  },
+  successToast: {
+    position: "absolute",
+    bottom: 50,
+    backgroundColor: "#2a9d8f",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  successToastText: {
+    color: "white",
+    fontFamily: "MoreSugar",
+    fontSize: 16,
   },
 });

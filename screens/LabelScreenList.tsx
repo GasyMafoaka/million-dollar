@@ -1,10 +1,12 @@
 import { session } from "@/service/session";
+import { FontAwesome } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFocusEffect } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -29,12 +31,10 @@ export default function LabelListScreen({ navigation }: Props) {
   const [pageSize] = useState(10);
   const [hasNextPage, setHasNextPage] = useState(true);
 
-  const color1 = "#264653";
-
   const accountId = session.getAccount()?.id || "";
   const token = session.getToken() || "";
 
-  const fetchLabels = async () => {
+  const fetchLabels = React.useCallback(async () => {
     try {
       const data = await getLabels(accountId, token, page, pageSize);
 
@@ -48,7 +48,7 @@ export default function LabelListScreen({ navigation }: Props) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [accountId, token, page, pageSize]);
 
   const handleArchive = async (id: string) => {
     try {
@@ -69,44 +69,29 @@ export default function LabelListScreen({ navigation }: Props) {
   useFocusEffect(
     React.useCallback(() => {
       fetchLabels();
-    }, [page]),
+    }, [fetchLabels]),
   );
 
   if (loading) {
-    return <ActivityIndicator size="large" />;
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator
+          size="large"
+          color="#264653"
+          style={{ marginTop: 50 }}
+        />
+      </View>
+    );
   }
 
   return (
-    <View
-      style={{
-        flex: 1,
-        padding: 20,
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
-      <h1
-        style={{
-          fontFamily: "MoreSugar ",
-          textAlign: "center",
-          fontSize: 40,
-        }}
-      >
-        Labels Lists
-      </h1>
+    <View style={styles.container}>
+      <Text style={styles.title}>Labels Lists</Text>
       <FlatList
-        style={{ paddingTop: 30 }}
         data={labels}
         keyExtractor={(item) => item.id || Math.random().toString()}
         renderItem={({ item }) => (
-          <View
-            style={{
-              flexDirection: "row",
-              marginBottom: 10,
-              alignItems: "center",
-              marginTop: 5,
-            }}
-          >
+          <View style={styles.itemContainer}>
             {/* LABEL */}
             <TouchableOpacity
               onPress={() => {
@@ -116,24 +101,23 @@ export default function LabelListScreen({ navigation }: Props) {
                   console.warn("Label sans ID");
                 }
               }}
-              style={{
-                flex: 1,
-                padding: 15,
-                backgroundColor: color1,
-                borderRadius: 10,
-                alignItems: "center",
-              }}
+              style={styles.labelInfo}
             >
-              <Text
-                style={{
-                  color: item.color || "#ffffff",
-                  fontWeight: "bold",
-                  fontSize: 17,
-                  fontFamily: "MoreSugar",
-                }}
+              <View
+                style={[
+                  styles.iconContainer,
+                  item.color ? { backgroundColor: item.color + "20" } : null,
+                ]}
               >
-                {item.name || "Sans nom"}
-              </Text>
+                <FontAwesome
+                  name="tag"
+                  size={24}
+                  color={item.color || "#264653"}
+                />
+              </View>
+              <View style={styles.infoTextContainer}>
+                <Text style={styles.labelName}>{item.name || "Sans nom"}</Text>
+              </View>
             </TouchableOpacity>
 
             {/* BOUTON ARCHIVE */}
@@ -143,120 +127,207 @@ export default function LabelListScreen({ navigation }: Props) {
                   handleArchive(item.id);
                 }
               }}
-              style={{
-                marginLeft: 10,
-                backgroundColor: "#e63946",
-                padding: 15,
-                borderRadius: 10,
-              }}
+              style={styles.archiveButton}
             >
-              <Text
-                style={{
-                  color: "white",
-                  fontWeight: "bold",
-                  fontFamily: "MoreSugar",
-                }}
-              >
-                Archive
-              </Text>
+              <FontAwesome name="archive" size={20} color="white" />
             </TouchableOpacity>
           </View>
         )}
         ListEmptyComponent={
-          <View style={{ alignItems: "center", marginTop: 50 }}>
-            <Text
-              style={{ fontSize: 18, color: color1, fontFamily: "MoreSugar" }}
-            >
-              Aucun label disponible
-            </Text>
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Aucun label disponible</Text>
           </View>
         }
+        contentContainerStyle={styles.listContent}
+        style={{ width: "100%" }}
       />
 
       {/* PAGINATION */}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          marginTop: 15,
-        }}
-      >
+      <View style={styles.paginationContainer}>
         {/* PREVIOUS */}
         <TouchableOpacity
           disabled={page === 1}
           onPress={() => setPage(page - 1)}
-          style={{
-            padding: 10,
-            marginHorizontal: 10,
-            backgroundColor: page === 1 ? "#ccc" : color1,
-            borderRadius: 8,
-          }}
+          style={[
+            styles.paginationButton,
+            page === 1 && styles.paginationButtonDisabled,
+          ]}
         >
-          <Text style={{ color: "white", fontFamily: "MoreSugar" }}>
-            Previous
-          </Text>
+          <Text style={styles.paginationButtonText}>Previous</Text>
         </TouchableOpacity>
 
-        <Text
-          style={{
-            alignSelf: "center",
-            fontSize: 16,
-            fontFamily: "MoreSugar",
-          }}
-        >
-          Page {page}
-        </Text>
+        <Text style={styles.pageIndicator}>Page {page}</Text>
 
         {/* NEXT */}
         <TouchableOpacity
           disabled={!hasNextPage}
           onPress={() => setPage(page + 1)}
-          style={{
-            padding: 10,
-            marginHorizontal: 10,
-            backgroundColor: !hasNextPage ? "#ccc" : color1,
-            borderRadius: 8,
-          }}
+          style={[
+            styles.paginationButton,
+            !hasNextPage && styles.paginationButtonDisabled,
+          ]}
         >
-          <Text style={{ color: "white", fontFamily: "MoreSugar" }}>Next</Text>
+          <Text style={styles.paginationButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
 
       {/* BOUTON CREATE */}
       <TouchableOpacity
         onPress={() => navigation.navigate("CreateLabel")}
-        style={{
-          position: "absolute",
-          bottom: 30,
-          right: 30,
-          backgroundColor: color1,
-          width: 60,
-          height: 60,
-          borderRadius: 30,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+        style={styles.addButton}
       >
-        <Text style={{ color: "white", fontSize: 30 }}>+</Text>
+        <FontAwesome name="plus" size={24} color="white" />
+        <Text style={styles.addButtonText}>Add Label</Text>
       </TouchableOpacity>
 
       {archivedMess && (
-        <Text
-          style={{
-            position: "absolute",
-            bottom: 40,
-            alignSelf: "center",
-            backgroundColor: "green",
-            padding: 15,
-            color: "white",
-            fontFamily: "MoreSugar",
-            fontSize: 18,
-            borderRadius: 15,
-          }}
-        >
-          Archived with success
-        </Text>
+        <View style={styles.successToast}>
+          <Text style={styles.successToastText}>Archived with success</Text>
+        </View>
       )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+    alignItems: "center",
+    width: "100%",
+    paddingTop: 10,
+  },
+  title: {
+    fontSize: 30,
+    fontFamily: "MoreSugar",
+    color: "#264653",
+    marginBottom: 20,
+  },
+  listContent: {
+    paddingBottom: 100,
+    paddingTop: 10,
+  },
+  itemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8f9fa",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    width: "90%",
+    alignSelf: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  labelInfo: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  iconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "rgba(38, 70, 83, 0.1)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  infoTextContainer: {
+    flex: 1,
+    marginLeft: 15,
+  },
+  labelName: {
+    fontSize: 18,
+    fontFamily: "MoreSugar",
+    color: "#264653",
+  },
+  archiveButton: {
+    backgroundColor: "#e63946",
+    padding: 12,
+    borderRadius: 10,
+    marginLeft: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#264653",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+    position: "absolute",
+    bottom: 30,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  addButtonText: {
+    color: "white",
+    fontFamily: "MoreSugar",
+    fontSize: 18,
+    marginLeft: 10,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 50,
+  },
+  emptyText: {
+    fontFamily: "MoreSugar",
+    fontSize: 18,
+    color: "#6c757d",
+  },
+  paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 15,
+    width: "100%",
+    backgroundColor: "white",
+  },
+  paginationButton: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    marginHorizontal: 10,
+    backgroundColor: "#264653",
+    borderRadius: 8,
+  },
+  paginationButtonDisabled: {
+    backgroundColor: "#ccc",
+  },
+  paginationButtonText: {
+    color: "white",
+    fontFamily: "MoreSugar",
+  },
+  pageIndicator: {
+    fontSize: 16,
+    fontFamily: "MoreSugar",
+    color: "#264653",
+  },
+  successToast: {
+    position: "absolute",
+    bottom: 90,
+    alignSelf: "center",
+    backgroundColor: "#2a9d8f",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  successToastText: {
+    color: "white",
+    fontFamily: "MoreSugar",
+    fontSize: 16,
+  },
+});

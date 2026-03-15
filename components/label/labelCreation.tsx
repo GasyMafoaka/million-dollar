@@ -13,11 +13,10 @@ type RootStackParamList = {
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, "CreateLabel">;
-const color1 = "#264653";
 
 export default function CreateLabelScreen({ navigation }: Props) {
   const [name, setName] = useState("");
-  const [color, setColor] = useState("");
+  const [color, setColor] = useState("#264653");
   const [iconRef, setIconRef] = useState("");
   const [createdMess, setCreatedMess] = useState(false);
   const [showNameAlert, setshowNameAlert] = useState(false);
@@ -57,82 +56,54 @@ export default function CreateLabelScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <h1
-        style={{
-          fontFamily: "MoreSugar ",
-          textAlign: "center",
-          fontSize: 40,
-          paddingBottom: 50,
-        }}
-      >
-        Create Label
-      </h1>
+      <Text style={styles.title}>Create Label</Text>
 
-      <TextInput
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-        style={styles.input}
-      />
-      {showNameAlert && (
-        <View style={styles.inputAlertContainer}>
-          <FontAwesome name="info-circle" size={15} color="red" />
-          <Text style={styles.inputAlertContainerText}>
-            Label with name = {name} is already exist.
-          </Text>
-        </View>
-      )}
-      <TextInput
-        placeholder="color"
-        value={color}
-        onChangeText={setColor}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="icon reference"
-        value={iconRef}
-        onChangeText={setIconRef}
-        style={styles.input}
-      />
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Label Name</Text>
+        <TextInput
+          placeholder="e.g. Food"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+        />
+        {showNameAlert && (
+          <View style={styles.inputAlertContainer}>
+            <FontAwesome name="info-circle" size={15} color="#e63946" />
+            <Text style={styles.inputAlertContainerText}>
+              Label with name = {name} already exists.
+            </Text>
+          </View>
+        )}
+      </View>
 
-      <Pressable
-        style={{
-          backgroundColor: color1,
-          padding: 20,
-          marginTop: 30,
-          borderRadius: 15,
-          width: "75%",
-        }}
-        onPress={handleCreate}
-      >
-        <Text
-          style={{
-            color: "white",
-            fontFamily: "MoreSugar",
-            fontSize: 25,
-            textAlign: "center",
-          }}
-        >
-          Create
-        </Text>
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Color (Hex)</Text>
+        <TextInput
+          placeholder="e.g. #264653"
+          value={color}
+          onChangeText={setColor}
+          style={styles.input}
+        />
+      </View>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Icon Reference</Text>
+        <TextInput
+          placeholder="e.g. tag"
+          value={iconRef}
+          onChangeText={setIconRef}
+          style={styles.input}
+        />
+      </View>
+
+      <Pressable style={styles.createButton} onPress={handleCreate}>
+        <Text style={styles.createButtonText}>Create Label</Text>
       </Pressable>
 
       {createdMess && (
-        <Text
-          style={{
-            position: "absolute",
-            bottom: 90,
-            alignSelf: "center",
-            backgroundColor: "green",
-            padding: 20,
-            color: "white",
-            fontFamily: "MoreSugar",
-            fontSize: 20,
-            borderRadius: 15,
-          }}
-        >
-          Label created
-        </Text>
+        <View style={styles.successToast}>
+          <Text style={styles.successToastText}>Label created</Text>
+        </View>
       )}
     </View>
   );
@@ -141,32 +112,75 @@ export default function CreateLabelScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    display: "flex",
-    padding: 20,
+    backgroundColor: "white",
     alignItems: "center",
+    width: "100%",
+    padding: 20,
+  },
+  title: {
+    fontSize: 30,
+    fontFamily: "MoreSugar",
+    color: "#264653",
+    marginBottom: 30,
+  },
+  inputGroup: {
+    width: "90%",
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontFamily: "MoreSugar",
+    color: "#264653",
+    marginBottom: 8,
   },
   input: {
-    borderWidth: 2,
-    borderColor: color1,
-    padding: 15,
-    marginTop: 20,
-    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ced4da",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
     fontFamily: "MoreSugar",
-    fontSize: 20,
-    width: "90%",
   },
   inputAlertContainer: {
-    display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginTop: 2,
+    marginTop: 5,
   },
   inputAlertContainerText: {
-    color: "red",
+    color: "#e63946",
     fontFamily: "MoreSugar",
-    fontSize: 15,
-    marginLeft: 10,
-    textAlign: "center",
+    fontSize: 12,
+    marginLeft: 5,
+  },
+  createButton: {
+    backgroundColor: "#264653",
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 20,
+    width: "90%",
+  },
+  createButtonText: {
+    color: "white",
+    fontFamily: "MoreSugar",
+    fontSize: 18,
+  },
+  successToast: {
+    position: "absolute",
+    bottom: 50,
+    backgroundColor: "#2a9d8f",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  successToastText: {
+    color: "white",
+    fontFamily: "MoreSugar",
+    fontSize: 16,
   },
 });

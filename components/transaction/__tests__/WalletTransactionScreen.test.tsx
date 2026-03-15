@@ -1,7 +1,10 @@
 import React from "react";
 import { render, fireEvent, waitFor, act } from "@testing-library/react-native";
 import WalletTransactionScreen from "../WalletTransactionScreen";
-import { createOneTransaction, getAllTransactions } from "@/api/transaction/index";
+import {
+  createOneTransaction,
+  getAllTransactions,
+} from "@/api/transaction/index";
 import { offlineCreateOneTransaction } from "@/api/transaction/offline";
 import { session } from "@/service/session";
 import { Alert } from "react-native";
@@ -54,10 +57,12 @@ describe("WalletTransactionScreen", () => {
       accountId: "account-123",
       date: new Date().toISOString(),
     };
-    (createOneTransaction as jest.Mock).mockResolvedValue(mockCreatedTransaction);
+    (createOneTransaction as jest.Mock).mockResolvedValue(
+      mockCreatedTransaction,
+    );
 
     const { findByText, getByPlaceholderText, getAllByText } = render(
-      <WalletTransactionScreen wallet={mockWallet} />
+      <WalletTransactionScreen wallet={mockWallet} />,
     );
 
     // Wait for loading to finish and "Add Transaction" button to appear
@@ -65,7 +70,7 @@ describe("WalletTransactionScreen", () => {
 
     // Click Add Transaction to open modal
     await act(async () => {
-        fireEvent.press(openModalButton);
+      fireEvent.press(openModalButton);
     });
 
     // Fill the form
@@ -74,10 +79,12 @@ describe("WalletTransactionScreen", () => {
 
     // Submit the form in the modal
     const addButtons = getAllByText("Add Transaction");
-    const modalAddButton = addButtons.find(b => b.parent?.type === 'Pressable') || addButtons[addButtons.length - 1];
+    const modalAddButton =
+      addButtons.find((b) => b.parent?.type === "Pressable") ||
+      addButtons[addButtons.length - 1];
 
     await act(async () => {
-        fireEvent.press(modalAddButton);
+      fireEvent.press(modalAddButton);
     });
 
     await waitFor(() => {
@@ -88,13 +95,16 @@ describe("WalletTransactionScreen", () => {
           description: "Test Trans",
           amount: 50,
           type: "OUT",
-        })
+        }),
       );
 
       // Verify that offline storage is also called for persistence
       expect(offlineCreateOneTransaction).toHaveBeenCalled();
     });
 
-    expect(Alert.alert).toHaveBeenCalledWith("Success", "Transaction added successfully");
+    expect(Alert.alert).toHaveBeenCalledWith(
+      "Success",
+      "Transaction added successfully",
+    );
   }, 10000);
 });

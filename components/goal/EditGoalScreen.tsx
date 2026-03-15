@@ -26,7 +26,9 @@ export default function EditGoalScreen({ route, navigation }: Props) {
 
   const [name, setName] = useState(goal.name || "");
   const [amount, setAmount] = useState(String(goal.amount || ""));
-  const [startingDate, setStartingDate] = useState(formatDate(goal.startingDate));
+  const [startingDate, setStartingDate] = useState(
+    formatDate(goal.startingDate),
+  );
   const [endingDate, setEndingDate] = useState(formatDate(goal.endingDate));
   const [color, setColor] = useState(goal.color || "#264653");
   const [iconRef, setIconRef] = useState(goal.iconRef || "");
@@ -51,7 +53,7 @@ export default function EditGoalScreen({ route, navigation }: Props) {
         endingDate,
         color,
         iconRef,
-        token
+        token,
       );
 
       Alert.alert("Succès", "Goal updated !");

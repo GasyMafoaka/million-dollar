@@ -72,24 +72,27 @@ export default function SignUp({ route }: Props) {
             console.log(data);
 
             if (response.ok) {
-            setSubmitted(true);
-            const data = await signUp({ username, password });
-            console.log(data);
+              setSubmitted(true);
+              const data = await signUp({ username, password });
+              console.log(data);
 
-            if (data.id) {
-              // Sign-up successful.
-              setShowSuccessAlert(true);
-              setSignedUp(true);
+              if (data.id) {
+                // Sign-up successful.
+                setShowSuccessAlert(true);
+                setSignedUp(true);
 
-              // Auto-login after sign-up
-              const signInData = await signIn({ username, password });
-              if (signInData.account && signInData.token) {
-                await session.setSession(signInData.account, signInData.token);
-              }
+                // Auto-login after sign-up
+                const signInData = await signIn({ username, password });
+                if (signInData.account && signInData.token) {
+                  await session.setSession(
+                    signInData.account,
+                    signInData.token,
+                  );
+                }
 
-              setTimeout(() => {
-                setShowSuccessAlert(false);
-              }, 3000);
+                setTimeout(() => {
+                  setShowSuccessAlert(false);
+                }, 3000);
 
                 setTimeout(() => {
                   setShowConfirmPasswordAlert(false);

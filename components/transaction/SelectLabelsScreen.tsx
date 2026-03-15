@@ -12,11 +12,12 @@ import {
 import { Label } from "../label/label";
 import { getLabels } from "../label/labelService";
 
-type RootStackParamList = {
-  SelectLabels: { currentSelectedIds: string[] };
-  TransactionForm: { selectedLabels: string[] };
-};
+// 1. IMPORTE le type depuis ton fichier de navigation (ajuste le chemin si besoin)
+import { RootStackParamList } from "../../navigation/index";
 
+// 2. SUPPRIME la définition locale de RootStackParamList qui était ici
+
+// 3. Utilise le nom d'écran correct (celui déclaré dans AppNavigator)
 type Props = NativeStackScreenProps<RootStackParamList, "SelectLabels">;
 
 export default function LabelListScreen({ navigation }: Props) {
@@ -50,18 +51,13 @@ export default function LabelListScreen({ navigation }: Props) {
   }
 
   const handleSelect = (id: string) => {
-    navigation.navigate("TransactionForm", { selectedLabels: [id] });
+    // 4. Assure-toi que le nom ici correspond à ton formulaire
+    navigation.navigate("TransactionForm", { selectedLabels: [id] } as any);
   };
 
   return (
     <View style={{ flex: 1, padding: 20 }}>
-      <Text
-        style={{
-          fontSize: 35,
-          textAlign: "center",
-          fontFamily: "MoreSugar",
-        }}
-      >
+      <Text style={{ fontSize: 35, textAlign: "center", fontFamily: "MoreSugar" }}>
         Select Label
       </Text>
 

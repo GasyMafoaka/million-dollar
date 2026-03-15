@@ -1,4 +1,5 @@
-import { Wallet, walletsApi } from "@/api/wallets.api";
+import { Wallet } from "@/api/wallet/model";
+import { walletsApi } from "@/api/wallets.api";
 import { useSession } from "@/auth/useSession";
 import { useSelectedWallet } from "@/context/WalletContext";
 import { appStyles } from "@/styles/appStyles";
@@ -29,7 +30,7 @@ export default function SelectWalletScreen({ navigation }: any) {
 
   const selectWallet = (wallet: Wallet) => {
     console.log("WALLET SELECTED =", wallet);
-    setSelectedWalletId(wallet.id);
+    setSelectedWalletId(wallet.id || "");
     navigation.goBack();
   };
 
@@ -38,15 +39,15 @@ export default function SelectWalletScreen({ navigation }: any) {
       <Text style={appStyles.title}>Choisir un Wallet</Text>
 
       <FlatList
-        data={wallets}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Pressable style={appStyles.card} onPress={() => selectWallet(item)}>
-            <Text style={appStyles.cardTitle}>{item.name}</Text>
-            <Text>{item.walletType}</Text>
-          </Pressable>
-        )}
-      />
+  data={wallets}
+  // On utilise l'opérateur ?? pour fournir une valeur de secours si id est undefined
+  keyExtractor={(item, index) => item.id ?? index.toString()} 
+  renderItem={({ item }) => (
+    <Pressable style={appStyles.card} onPress={() => selectWallet(item)}>
+      <Text style={appStyles.cardTitle}>{item.name}</Text>
+    </Pressable>
+  )}
+/>
     </View>
   );
 }

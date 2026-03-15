@@ -33,7 +33,7 @@ export type RootStackParamList = {
   Wallet: undefined;
   Settings: undefined;
   SelectWallet: undefined;
-  SelectLabels: { selectedIds?: string[] } | undefined;
+  SelectLabels: { selectedLabels?: string[] } | undefined;
 
   SignIn: { redirectScreenName?: keyof RootStackParamList };
   SignUp: { redirectScreenName?: keyof RootStackParamList };
@@ -84,9 +84,9 @@ export default function AppNavigator() {
       />
       <Stack.Screen name="Transaction" component={Transaction} />
       <Stack.Screen name="TransactionForm" component={TransactionFormScreen} />
-      <Stack.Screen name="SelectWallet" component={SelectWalletScreen} />
       <Stack.Screen name="SelectLabels" component={SelectLabelsScreen} />
       <Stack.Screen name="Wallet" component={Wallet} />
+      <Stack.Screen name="SelectWallet" component={SelectWalletScreen} />
       <Stack.Screen name="WalletTransaction" component={WalletTransaction} />
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="SignIn" component={SignIn} />

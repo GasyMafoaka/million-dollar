@@ -15,6 +15,12 @@ export const appStyles = StyleSheet.create({
     borderRadius: 40,
     marginBottom: 5,
   },
+  label: {
+    fontSize: 18,
+    fontFamily: "MoreSugar",
+    color: "#264653",
+    fontWeight: "bold",
+  },
   title: {
     fontSize: 30,
     fontFamily: "MoreSugar",

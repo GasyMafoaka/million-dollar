@@ -1,8 +1,12 @@
 import * as React from "react";
 // @ts-ignore
+import { Goal } from "@/api/goal";
+import CreateGoalScreen from "@/components/goal/CreateGoalScreen";
+import EditGoalScreen from "@/components/goal/EditGoal";
 import EditLabelScreen from "@/components/label/EditLabelScrren";
 import CreateLabelScreen from "@/components/label/labelCreation";
 import { Label } from "@/components/label/labelModel";
+import GoalListScreen from "@/screens/GoalListScreen";
 import LabelScreenList from "@/screens/LabelScreenList";
 import MainMenu from "@/screens/MainMenu";
 import Settings from "@/screens/Settings";
@@ -26,6 +30,9 @@ export type RootStackParamList = {
   LabelList: undefined;
   CreateLabel: undefined;
   EditLabel: { label: Label };
+  GoalListScreen: undefined;
+  CreateGoal: undefined;
+  EditGoal: { goal: Goal };
 };
 
 export default function AppNavigator() {
@@ -71,6 +78,9 @@ export default function AppNavigator() {
       <Stack.Screen name="LabelList" component={LabelScreenList} />
       <Stack.Screen name="CreateLabel" component={CreateLabelScreen} />
       <Stack.Screen name="EditLabel" component={EditLabelScreen} />
+      <Stack.Screen name="GoalListScreen" component={GoalListScreen} />
+      <Stack.Screen name="CreateGoal" component={CreateGoalScreen} />
+      <Stack.Screen name="EditGoal" component={EditGoalScreen} />
     </Stack.Navigator>
   );
 }

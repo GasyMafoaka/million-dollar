@@ -23,4 +23,5 @@ export interface PaginationResult {
 export interface GoalListResponse {
   pagination?: PaginationResult;
   values?: Goal[];
+  hasNext: boolean;
 }

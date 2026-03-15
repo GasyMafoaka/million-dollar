@@ -3,6 +3,7 @@ import * as React from "react";
 import { Goal } from "@/api/goal";
 import CreateGoalScreen from "@/components/goal/CreateGoalScreen";
 import EditGoalScreen from "@/components/goal/EditGoalScreen";
+import GoalDetailsScreen from "@/components/goal/GoalDetailcreen";
 import EditLabelScreen from "@/components/label/EditLabelScrren";
 import CreateLabelScreen from "@/components/label/labelCreation";
 import { Label } from "@/components/label/labelModel";
@@ -30,6 +31,7 @@ export type RootStackParamList = {
   SignUp: { redirectScreenName?: keyof RootStackParamList };
   LabelList: undefined;
   Goal: undefined;
+  GoalDetail: { goal: Goal };
   CreateLabel: undefined;
   CreateGoal: undefined;
   EditGoal: { goal: Goal };
@@ -84,6 +86,7 @@ export default function AppNavigator() {
       <Stack.Screen name="EditGoal" component={EditGoalScreen} />
       <Stack.Screen name="CreateLabel" component={CreateLabelScreen} />
       <Stack.Screen name="EditLabel" component={EditLabelScreen} />
+      <Stack.Screen name="GoalDetail" component={GoalDetailsScreen} />
     </Stack.Navigator>
   );
 }

@@ -131,4 +131,3 @@ export const archiveOneGoal = async (
   return response.json();
 };
 export { Goal };
-

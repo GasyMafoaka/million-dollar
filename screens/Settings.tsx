@@ -107,10 +107,14 @@ export default function Settings() {
   if (!fontsLoaded) return null;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
       <CustomText style={styles.title}>Settings</CustomText>
 
-      {/* Toast Message */}
       {feedback && (
         <View
           style={[
@@ -124,7 +128,6 @@ export default function Settings() {
         </View>
       )}
 
-      {/* Push Notifications */}
       <View style={styles.card}>
         <View style={styles.row}>
           <CustomText style={styles.label}>
@@ -137,7 +140,6 @@ export default function Settings() {
         </View>
       </View>
 
-      {/* Recurrence */}
       <View style={styles.card}>
         <CustomText style={styles.sectionTitle}>
           Notification Frequency
@@ -152,7 +154,6 @@ export default function Settings() {
         </Picker>
       </View>
 
-      {/* Days Count */}
       <View style={styles.card}>
         <CustomText style={styles.sectionTitle}>
           Expense Tracking Period (Days)
@@ -165,7 +166,6 @@ export default function Settings() {
         />
       </View>
 
-      {/* Subscription */}
       <View style={styles.card}>
         <CustomText style={styles.sectionTitle}>
           Current Plan: {subscription}
@@ -183,7 +183,6 @@ export default function Settings() {
         )}
       </View>
 
-      {/* Currency */}
       <View style={styles.card}>
         <CustomText style={styles.sectionTitle}>Preferred Currency</CustomText>
         <Picker
@@ -196,7 +195,6 @@ export default function Settings() {
         </Picker>
       </View>
 
-      {/* Passwordless Login */}
       <View style={styles.card}>
         <View style={styles.row}>
           <CustomText style={styles.label}>
@@ -209,15 +207,13 @@ export default function Settings() {
         </View>
       </View>
 
-      {/* Save Button */}
       <View style={{ marginTop: 20 }}>
         <Pressable style={styles.saveButton} onPress={handleSave}>
           <CustomText style={styles.saveButtonText}>Save Settings</CustomText>
         </Pressable>
       </View>
 
-      {/* Logout Button */}
-      <View style={{ marginTop: 15, marginBottom: 40 }}>
+      <View style={{ marginTop: 15 }}>
         <Pressable style={styles.logoutButton} onPress={handleLogout}>
           <CustomText style={styles.logoutButtonText}>Logout</CustomText>
         </Pressable>
@@ -229,8 +225,8 @@ export default function Settings() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    paddingBottom: 80,
     backgroundColor: "white",
-    flex: 1,
   },
 
   title: {

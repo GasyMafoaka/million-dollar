@@ -48,10 +48,13 @@ export const createOneWallet = async (
     },
     body: JSON.stringify(wallet),
   });
+
+  const data = await response.json();
   if (!response.ok) {
-    throw new Error("Failed to create wallet");
+    console.log("Wallet creation error:", data);
+    throw new Error(`Failed to create wallet(${response.status})`);
   }
-  return response.json();
+  return data;
 };
 
 export const getOneWallet = async (

@@ -57,7 +57,7 @@ export default function CreateLabelScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <h1
+      <Text
         style={{
           fontFamily: "MoreSugar ",
           textAlign: "center",
@@ -66,7 +66,7 @@ export default function CreateLabelScreen({ navigation }: Props) {
         }}
       >
         Create Label
-      </h1>
+      </Text>
 
       <TextInput
         placeholder="Name"

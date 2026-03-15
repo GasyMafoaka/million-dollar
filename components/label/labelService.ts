@@ -8,17 +8,18 @@ export const getLabels = async (
   token: string,
   page: number,
   pageSize: number,
+  name: string = ""
 ): Promise<LabelResponse> => {
-  const response = await fetch(
-    `${BASE_URL}/account/${accountId}/label?page=${page}&pageSize=${pageSize}&name=${name}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+
+  const url = `${BASE_URL}/account/${accountId}/label?page=${page}&pageSize=${pageSize}&name=${name}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
-  );
+  });
 
   if (!response.ok) {
     throw new Error("Erreur récupération labels");
@@ -32,8 +33,9 @@ export const createLabel = async (
   name: string,
   color: string,
   iconRef: string,
-  token: string,
+  token: string
 ) => {
+
   const response = await fetch(`${BASE_URL}/account/${accountId}/label`, {
     method: "POST",
     headers: {
@@ -41,9 +43,9 @@ export const createLabel = async (
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      name: name,
-      color: color,
-      iconRef: iconRef,
+      name,
+      color,
+      iconRef,
     }),
   });
 
@@ -59,9 +61,10 @@ export const updateLabel = async (
   labelId: string,
   name: string,
   color: string,
-  token: string,
   iconRef: string,
+  token: string
 ) => {
+
   const response = await fetch(
     `${BASE_URL}/account/${accountId}/label/${labelId}`,
     {
@@ -76,22 +79,22 @@ export const updateLabel = async (
         iconRef,
         accountId,
       }),
-    },
+    }
   );
-  const responseData = await response.json();
 
   if (!response.ok) {
     throw new Error("Erreur modification label");
   }
 
-  return responseData;
+  return response.json();
 };
 
 export const archiveLabel = async (
   labelId: string,
   token: string,
-  accountId: string,
+  accountId: string
 ) => {
+
   const response = await fetch(
     `${BASE_URL}/account/${accountId}/label/${labelId}/archive`,
     {
@@ -100,7 +103,7 @@ export const archiveLabel = async (
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-    },
+    }
   );
 
   if (!response.ok) {

@@ -63,7 +63,7 @@ export default function EditLabelScreen({ route, navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <h1
+      <Text
         style={{
           fontFamily: "MoreSugar ",
           textAlign: "center",
@@ -72,7 +72,7 @@ export default function EditLabelScreen({ route, navigation }: Props) {
         }}
       >
         Update Label
-      </h1>
+      </Text>
       <TextInput
         placeholder="Label name"
         value={name}

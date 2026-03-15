@@ -1,51 +1,51 @@
 /* eslint-disable no-undef */
-import 'react-native-gesture-handler/jestSetup';
+import "react-native-gesture-handler/jestSetup";
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
+jest.mock("@react-native-async-storage/async-storage", () =>
+  require("@react-native-async-storage/async-storage/jest/async-storage-mock"),
 );
 
-jest.mock('expo-font', () => ({
+jest.mock("expo-font", () => ({
   useFonts: () => [true, null],
   loadAsync: () => Promise.resolve(),
 }));
 
-jest.mock('expo-asset', () => ({
+jest.mock("expo-asset", () => ({
   Asset: {
     fromModule: () => ({
       downloadAsync: () => Promise.resolve(),
-      uri: 'uri',
+      uri: "uri",
     }),
   },
 }));
 
-jest.mock('expo-constants', () => ({
+jest.mock("expo-constants", () => ({
   expoConfig: {
-    name: 'test',
-    slug: 'test',
+    name: "test",
+    slug: "test",
   },
   default: {
-     expoConfig: {
-        name: 'test',
-        slug: 'test',
-      },
-  }
+    expoConfig: {
+      name: "test",
+      slug: "test",
+    },
+  },
 }));
 
 // Mock @expo/vector-icons
-jest.mock('@expo/vector-icons', () => ({
-  FontAwesome: 'FontAwesome',
+jest.mock("@expo/vector-icons", () => ({
+  FontAwesome: "FontAwesome",
 }));
 
 // Mock Alert
-jest.mock('react-native', () => {
-  const reactNative = jest.requireActual('react-native');
+jest.mock("react-native", () => {
+  const reactNative = jest.requireActual("react-native");
   reactNative.Alert.alert = jest.fn();
   return reactNative;
 });
 
 // Mock expo-router
-jest.mock('expo-router', () => ({
+jest.mock("expo-router", () => ({
   Stack: {
     Screen: jest.fn(),
   },
@@ -54,7 +54,7 @@ jest.mock('expo-router', () => ({
 }));
 
 // Mock expo-splash-screen
-jest.mock('expo-splash-screen', () => ({
+jest.mock("expo-splash-screen", () => ({
   preventAutoHideAsync: jest.fn(),
   hideAsync: jest.fn(),
 }));

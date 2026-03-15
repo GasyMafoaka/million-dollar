@@ -85,7 +85,7 @@ export default function LabelListScreen({ navigation }: Props) {
         justifyContent: "center",
       }}
     >
-      <h1
+      <Text
         style={{
           fontFamily: "MoreSugar ",
           textAlign: "center",
@@ -93,7 +93,7 @@ export default function LabelListScreen({ navigation }: Props) {
         }}
       >
         Labels Lists
-      </h1>
+      </Text>
       <FlatList
         style={{ paddingTop: 30 }}
         data={labels}

@@ -60,10 +60,10 @@ export const createGoal = async (
   );
 
   if (!response.ok) {
-  const errorData = await response.json();
-  console.log("Erreur API :", errorData);
-  throw new Error("Erreur création goal");
-}
+    const errorData = await response.json();
+    console.log("Erreur API :", errorData);
+    throw new Error("Erreur création goal");
+  }
 
   return response.json();
 };
@@ -89,12 +89,15 @@ export const updateGoal = async (
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
+        accountId,
         name,
         amount,
+        walletId,
         startingDate,
         endingDate,
         color,
         iconRef,
+        goalId,
       }),
     },
   );

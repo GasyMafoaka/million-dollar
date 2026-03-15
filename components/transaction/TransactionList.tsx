@@ -1,7 +1,7 @@
-import React from "react";
-import { FlatList, StyleSheet, View, Text } from "react-native";
-import TransactionItem from "./TransactionItem";
 import { Transaction } from "@/api/transaction/model";
+import React from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import TransactionItem from "./TransactionItem";
 
 interface TransactionListProps {
   transactions: Transaction[];

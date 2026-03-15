@@ -94,6 +94,7 @@ export default function SignIn({ route }: Props) {
     logo: {
       width: 200,
       height: 200,
+      borderRadius: 50,
       marginBottom: 10,
     },
     LogoTittle: {
@@ -272,7 +273,7 @@ export default function SignIn({ route }: Props) {
         )}
       </View>
       <Pressable style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Sign In</Text>
+        <Text style={styles.buttonText}>Sign in</Text>
       </Pressable>
       <Text style={styles.signIn}>
         New User ?

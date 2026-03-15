@@ -1,15 +1,15 @@
+import { CreationWallet } from "@/api/wallet/model";
+import { FontAwesome } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
   Modal,
-  View,
+  Pressable,
+  StyleSheet,
   Text,
   TextInput,
-  StyleSheet,
-  Pressable,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
-import { CreationWallet } from "@/api/wallet/model";
 
 interface CreateWalletModalProps {
   visible: boolean;
@@ -17,7 +17,7 @@ interface CreateWalletModalProps {
   onCreate: (wallet: CreationWallet) => void;
 }
 
-const WALLET_TYPES: Array<CreationWallet["type"]> = [
+const WALLET_TYPES: CreationWallet["type"][] = [
   "CASH",
   "MOBILE_MONEY",
   "BANK",
@@ -32,7 +32,7 @@ export default function CreateWalletModal({
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState<CreationWallet["type"]>("CASH");
-  const [color, setColor] = useState("#264653");
+  const [color] = useState("#264653");
 
   const handleCreate = () => {
     if (name && type) {

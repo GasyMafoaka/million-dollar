@@ -34,7 +34,7 @@ export default function LabelListScreen({ navigation }: Props) {
   const accountId = session.getAccount()?.id || "";
   const token = session.getToken() || "";
 
-  const fetchLabels = async () => {
+  const fetchLabels = React.useCallback(async () => {
     try {
       const data = await getLabels(accountId, token, page, pageSize);
 
@@ -48,7 +48,7 @@ export default function LabelListScreen({ navigation }: Props) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [accountId, token, page, pageSize]);
 
   const handleArchive = async (id: string) => {
     try {
@@ -69,7 +69,7 @@ export default function LabelListScreen({ navigation }: Props) {
   useFocusEffect(
     React.useCallback(() => {
       fetchLabels();
-    }, [page]),
+    }, [fetchLabels]),
   );
 
   if (loading) {

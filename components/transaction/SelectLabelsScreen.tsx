@@ -13,11 +13,11 @@ import { Label } from "../label/label";
 import { getLabels } from "../label/labelService";
 
 type RootStackParamList = {
-  LabelList: undefined;
+  SelectLabels: { currentSelectedIds: string[] };
   TransactionForm: { selectedLabels: string[] };
 };
 
-type Props = NativeStackScreenProps<RootStackParamList, "LabelList">;
+type Props = NativeStackScreenProps<RootStackParamList, "SelectLabels">;
 
 export default function LabelListScreen({ navigation }: Props) {
   const [labels, setLabels] = useState<Label[]>([]);

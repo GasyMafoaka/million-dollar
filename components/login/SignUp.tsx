@@ -1,233 +1,114 @@
 import { signIn, signUp } from "@/api/account";
-import { RootStackParamList } from "@/navigation";
 import { session } from "@/service/session";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useState } from "react";
 import {
   Image,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
-
-import { NativeStackScreenProps } from "react-native-screens/lib/typescript/native-stack/types";
+import { RootStackParamList } from "../../navigation/index";
 
 type Props = NativeStackScreenProps<RootStackParamList, "SignUp">;
 
 export default function SignUp({ route }: Props) {
   const { redirectScreenName = "MainMenu" } = route.params || {};
-
   const navigation = useNavigation<any>();
   const color1 = "#264653";
 
+  // États du formulaire
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setconfirmPassword] = useState("");
 
+  // États d'affichage
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // États des alertes
   const [showUsernameAlert, setShowUsernameAlert] = useState(false);
   const [userExistAlert, setUserExistAlert] = useState(false);
   const [showPasswordAlert, setShowPasswordAlert] = useState(false);
   const [showConfirmPasswordAlert, setShowConfirmPasswordAlert] =
     useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  // const [mail, setMail] = useState("");
+
   const [submitted, setSubmitted] = useState(false);
-  const [signedUp, setSignedUp] = useState(false);
-  // const [fontsLoaded] = useFonts({
-  //MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
-  //});
 
   const handleSubmit = async () => {
+    // 1. Validations Locales
     if (username.length < 4) {
       setShowUsernameAlert(true);
+      return setTimeout(() => setShowUsernameAlert(false), 3000);
+    }
 
-      setTimeout(() => {
-        setShowUsernameAlert(false);
-      }, 3000);
-    } else {
-      if (password.length < 8) {
-        setShowPasswordAlert(true);
+    if (password.length < 8) {
+      setShowPasswordAlert(true);
+      return setTimeout(() => setShowPasswordAlert(false), 3000);
+    }
 
-        setTimeout(() => {
-          setShowPasswordAlert(false);
-        }, 3000);
-      } else {
-        if (password !== confirmPassword) {
-          setShowConfirmPasswordAlert(true);
+    if (password !== confirmPassword) {
+      setShowConfirmPasswordAlert(true);
+      return setTimeout(() => setShowConfirmPasswordAlert(false), 3000);
+    }
 
-          setTimeout(() => {
-            setShowConfirmPasswordAlert(false);
-          }, 3000);
-        } else {
-          try {
-            setSubmitted(true);
-            const data = await signUp({ username, password });
-            console.log(data);
+    // 2. Appel API
+    try {
+      setSubmitted(true);
+      const data = await signUp({ username, password });
 
-            if (data.id) {
-              // Sign-up successful.
-              setShowSuccessAlert(true);
-              setSignedUp(true);
+      if (data && data.id) {
+        // Succès de l'inscription
+        setShowSuccessAlert(true);
 
-              // Auto-login after sign-up
-              const signInData = await signIn({ username, password });
-              if (signInData.account && signInData.token) {
-                await session.setSession(signInData.account, signInData.token);
-              }
-
-              setTimeout(() => {
-                setShowSuccessAlert(false);
-              }, 3000);
-
-              navigation.replace(redirectScreenName);
-            }
-          } catch (error: any) {
-            console.log(error);
-            setSubmitted(false);
-            if (
-              error.message.includes("400") ||
-              error.message.includes("already used")
-            ) {
-              setUserExistAlert(true);
-              setTimeout(() => {
-                setUserExistAlert(false);
-              }, 3000);
-            }
+        // Tentative d'Auto-login
+        try {
+          const signInData = await signIn({ username, password });
+          if (signInData.account && signInData.token) {
+            await session.setSession(signInData.account, signInData.token);
           }
+        } catch (loginError) {
+          console.log("Auto-login failed:", loginError);
         }
+
+        // Redirection après succès
+        setTimeout(() => {
+          setShowSuccessAlert(false);
+          navigation.replace(redirectScreenName);
+        }, 2000);
+      }
+    } catch (error: any) {
+      setSubmitted(false);
+      console.log("Sign up error:", error);
+
+      // Gestion de l'utilisateur déjà existant
+      if (
+        error.message?.includes("400") ||
+        error.message?.toLowerCase().includes("exist")
+      ) {
+        setUserExistAlert(true);
+        setTimeout(() => setUserExistAlert(false), 3000);
       }
     }
   };
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "white",
-      alignItems: "center",
-      width: "100%",
-      height: "100%",
-      paddingTop: 10,
-      fontFamily: "MoreSugar",
-    },
-    logo: {
-      width: 200,
-      height: 200,
-      borderRadius: 50,
-      marginBottom: 10,
-    },
-    LogoTittle: {
-      fontSize: 40,
-      marginBottom: 20,
-      fontWeight: "normal",
-      fontFamily: "MoreSugar",
-    },
-    loginText: {
-      fontSize: 20,
-      fontWeight: "normal",
-      fontFamily: "MoreSugar",
-      marginBottom: 5,
-    },
-    viewInput: {
-      width: "100%",
-      display: "flex",
-      alignItems: "center",
-    },
-    inputContainer: {
-      display: "flex",
-      width: "80%",
-      flexDirection: "row",
-      alignItems: "center",
-      borderColor: color1,
-      padding: 5,
-      paddingLeft: 10,
-      paddingRight: 15,
-      borderRadius: 10,
-      borderWidth: 2,
-      marginTop: 20,
-    },
-    text: {
-      fontSize: 20,
-      marginBottom: 20,
-      fontFamily: "MoreSugar",
-    },
-    textInput: {
-      borderWidth: 2,
-      borderColor: "white",
-      padding: 10,
-      fontSize: 16,
-      fontFamily: "MoreSugar",
-      width: "90%",
-    },
-    inputAlertContainer: {
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    inputAlertContainerText: {
-      color: "red",
-      fontFamily: "MoreSugar",
-      fontSize: 14,
-      marginLeft: 10,
-    },
-    button: {
-      backgroundColor: color1,
-      height: 60,
-      width: "80%",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: 12,
-      borderRadius: 10,
-    },
-    buttonText: {
-      fontFamily: "MoreSugar",
-      color: "white",
-      fontSize: 25,
-    },
-    signIn: {
-      marginTop: 15,
-      fontSize: 17,
-      fontFamily: "MoreSugar",
-    },
-    signInText: {
-      color: color1,
-      fontWeight: "bold",
-      fontFamily: "MoreSugar",
-    },
-    signUpSucces: {
-      backgroundColor: "green",
-      height: 60,
-      width: "45%",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: 12,
-      borderRadius: 10,
-      color: "white",
-      fontFamily: "MoreSugar",
-      fontSize: 20,
-      left: "10%",
-      bottom: "5%",
-      position: "absolute",
-    },
-  });
-
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Image
         style={styles.logo}
         source={require("@/assets/images/LogoPF.png")}
       />
       <Text style={styles.LogoTittle}>MillionDollars</Text>
-      <Text style={styles.loginText}>Login to your account</Text>
+      <Text style={styles.loginText}>Create your account</Text>
+
       <View style={styles.viewInput}>
+        {/* Champ Username */}
         <View style={styles.inputContainer}>
           <FontAwesome name="user" size={24} color={color1} />
           <TextInput
@@ -235,6 +116,7 @@ export default function SignUp({ route }: Props) {
             placeholder="Username"
             value={username}
             onChangeText={setUsername}
+            autoCapitalize="none"
           />
         </View>
         {showUsernameAlert && (
@@ -253,15 +135,8 @@ export default function SignUp({ route }: Props) {
             </Text>
           </View>
         )}
-        {/* <View style = {styles.inputContainer}>
-                    <FontAwesome name="envelope" size={24} color={color1} />
-                    <TextInput 
-                        style = {styles.textInput}
-                        placeholder="Email"
-                        value={mail}
-                        onChangeText={setMail}
-                    />
-                </View> */}
+
+        {/* Champ Password */}
         <View style={styles.inputContainer}>
           <FontAwesome name="lock" size={24} color={color1} />
           <TextInput
@@ -288,6 +163,7 @@ export default function SignUp({ route }: Props) {
           </View>
         )}
 
+        {/* Champ Confirm Password */}
         <View style={styles.inputContainer}>
           <FontAwesome name="lock" size={24} color={color1} />
           <TextInput
@@ -316,18 +192,20 @@ export default function SignUp({ route }: Props) {
           </View>
         )}
       </View>
-      {!submitted && (
+
+      {/* Bouton de soumission */}
+      {!submitted ? (
         <Pressable style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </Pressable>
+      ) : (
+        <View style={[styles.button, { opacity: 0.7 }]}>
+          <Text style={styles.buttonText}>Processing...</Text>
+        </View>
       )}
-      {signedUp && (
-        <Pressable style={styles.button} onPress={() => {}}>
-          <Text style={styles.buttonText}>Signed Up</Text>
-        </Pressable>
-      )}
+
       <Text style={styles.signIn}>
-        Already have an account ?
+        Already have an account?{" "}
         <Text
           style={styles.signInText}
           onPress={() =>
@@ -336,13 +214,114 @@ export default function SignUp({ route }: Props) {
             })
           }
         >
-          {" "}
           Sign in
         </Text>
       </Text>
+
       {showSuccessAlert && (
-        <Text style={styles.signUpSucces}>User created</Text>
+        <View style={styles.signUpSuccesContainer}>
+          <Text style={styles.signUpSuccesText}>User created!</Text>
+        </View>
       )}
-    </View>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    backgroundColor: "white",
+    alignItems: "center",
+    paddingTop: 40,
+    paddingBottom: 20,
+  },
+  logo: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    marginBottom: 10,
+  },
+  LogoTittle: {
+    fontSize: 32,
+    marginBottom: 10,
+    fontFamily: "MoreSugar",
+    color: "#264653",
+  },
+  loginText: {
+    fontSize: 18,
+    fontFamily: "MoreSugar",
+    marginBottom: 20,
+    color: "#666",
+  },
+  viewInput: {
+    width: "100%",
+    alignItems: "center",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    width: "85%",
+    alignItems: "center",
+    borderColor: "#264653",
+    paddingHorizontal: 15,
+    borderRadius: 12,
+    borderWidth: 2,
+    marginTop: 15,
+    height: 55,
+  },
+  textInput: {
+    flex: 1,
+    paddingHorizontal: 10,
+    fontSize: 16,
+    fontFamily: "MoreSugar",
+    color: "#264653",
+  },
+  inputAlertContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "80%",
+    marginTop: 5,
+  },
+  inputAlertContainerText: {
+    color: "red",
+    fontFamily: "MoreSugar",
+    fontSize: 12,
+    marginLeft: 5,
+  },
+  button: {
+    backgroundColor: "#264653",
+    height: 55,
+    width: "85%",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 25,
+    borderRadius: 12,
+  },
+  buttonText: {
+    fontFamily: "MoreSugar",
+    color: "white",
+    fontSize: 22,
+  },
+  signIn: {
+    marginTop: 20,
+    fontSize: 16,
+    fontFamily: "MoreSugar",
+    color: "#666",
+  },
+  signInText: {
+    color: "#264653",
+    fontWeight: "bold",
+  },
+  signUpSuccesContainer: {
+    position: "absolute",
+    bottom: 50,
+    backgroundColor: "#2a9d8f",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  signUpSuccesText: {
+    color: "white",
+    fontFamily: "MoreSugar",
+    fontSize: 16,
+  },
+});

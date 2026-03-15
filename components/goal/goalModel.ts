@@ -1,8 +1,8 @@
 export interface CreationGoal {
   accountId?: string;
+  walletId?: string;
   name?: string;
   amount?: number;
-  walletId?: string;
   startingDate?: string;
   endingDate?: string;
   color?: string;
@@ -23,5 +23,16 @@ export interface PaginationResult {
 export interface GoalListResponse {
   pagination?: PaginationResult;
   values?: Goal[];
-  hasNext: boolean;
+}
+
+export interface NavigationGoal {
+  id: string;
+  name?: string;
+  amount?: number;
+  startingDate?: string;
+  endingDate?: string;
+  color?: string;
+  iconRef?: string;
+  walletId?: string;
+  accountId?: string;
 }

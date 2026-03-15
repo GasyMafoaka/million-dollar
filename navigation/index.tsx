@@ -1,5 +1,9 @@
 import * as React from "react";
 // @ts-ignore
+import { Goal } from "@/api/goal";
+import CreateGoalScreen from "@/components/goal/CreateGoalScreen";
+import EditGoalScreen from "@/components/goal/EditGoalScreen";
+import GoalDetailsScreen from "@/components/goal/GoalDetailcreen";
 import EditLabelScreen from "@/components/label/EditLabelScrren";
 import CreateLabelScreen from "@/components/label/labelCreation";
 import { Label } from "@/components/label/labelModel";
@@ -12,9 +16,11 @@ import SignUp from "@/screens/SignUp";
 
 import SelectLabelsScreen from "@/components/transaction/SelectLabelsScreen";
 import SelectWalletScreen from "@/components/transaction/SelectWalletScreen";
+import GoalsScreen from "@/screens/GoalsScreen";
 import SplashScreen from "@/screens/SplashScreen";
 import Transaction from "@/screens/Transaction";
 import Wallet from "@/screens/Wallet";
+import WalletTransaction from "@/screens/WalletTransaction";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Pressable, StyleSheet, Text } from "react-native";
 
@@ -23,13 +29,22 @@ export type RootStackParamList = {
   Splash: undefined;
   MainMenu: undefined;
   Transaction: undefined;
+  TransactionForm: undefined;
   Wallet: undefined;
   Settings: undefined;
+  SelectWallet: undefined;
+  SelectLabels: { selectedIds?: string[] } | undefined;
+
   SignIn: { redirectScreenName?: keyof RootStackParamList };
   SignUp: { redirectScreenName?: keyof RootStackParamList };
   LabelList: undefined;
+  Goal: undefined;
+  GoalDetail: { goal: Goal };
   CreateLabel: undefined;
+  CreateGoal: undefined;
+  EditGoal: { goal: Goal };
   EditLabel: { label: Label };
+  WalletTransaction: undefined;
 };
 
 export default function AppNavigator() {
@@ -72,12 +87,17 @@ export default function AppNavigator() {
       <Stack.Screen name="SelectWallet" component={SelectWalletScreen} />
       <Stack.Screen name="SelectLabels" component={SelectLabelsScreen} />
       <Stack.Screen name="Wallet" component={Wallet} />
+      <Stack.Screen name="WalletTransaction" component={WalletTransaction} />
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="SignIn" component={SignIn} />
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="LabelList" component={LabelScreenList} />
+      <Stack.Screen name="Goal" component={GoalsScreen} />
+      <Stack.Screen name="CreateGoal" component={CreateGoalScreen} />
+      <Stack.Screen name="EditGoal" component={EditGoalScreen} />
       <Stack.Screen name="CreateLabel" component={CreateLabelScreen} />
       <Stack.Screen name="EditLabel" component={EditLabelScreen} />
+      <Stack.Screen name="GoalDetail" component={GoalDetailsScreen} />
     </Stack.Navigator>
   );
 }

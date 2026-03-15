@@ -4,85 +4,72 @@ import { useTransactions } from "@/context/listTransactionContext";
 import { useSelectedWallet } from "@/context/WalletContext";
 import { appStyles, color1 } from "@/styles/appStyles";
 import React, { useEffect, useState } from "react";
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 export default function TransactionFormScreen({ route, navigation }: any) {
   const { add, update } = useTransactions();
   const { accountId } = useSession();
   const { selectedWalletId } = useSelectedWallet();
 
+  // On récupère l'item si on est en mode édition
   const editingItem = route.params?.transaction;
-  const returnedLabels = route.params?.selectedLabels;
 
+  // États du formulaire
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]); // Date du jour par défaut
   const [type, setType] = useState<"IN" | "OUT">("OUT");
 
-  const [labels, setLabels] = useState<Label[]>([]);
+  // Gestion des labels
+  const [allLabels, setAllLabels] = useState<Label[]>([]);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
 
-  /*
-  ----------------
-  charger labels
-  ----------------
-  */
-
+  // 1. Charger la liste complète des labels de l'utilisateur (pour afficher les noms)
   useEffect(() => {
-    const load = async () => {
+    const loadLabels = async () => {
       if (!accountId) return;
-
       try {
         const data = await labelsApi.list(accountId);
-        setLabels(data || []);
+        setAllLabels(data || []);
       } catch (e) {
         console.log("Erreur chargement labels", e);
       }
     };
-
-    load();
+    loadLabels();
   }, [accountId]);
 
-  /*
-  ----------------
-  retour labels screen
-  ----------------
-  */
-
+  // 2. Initialiser le formulaire si on modifie une transaction existante
   useEffect(() => {
-    if (returnedLabels && Array.isArray(returnedLabels)) {
-      setSelectedLabels(returnedLabels);
-    }
-  }, [returnedLabels]);
-
-  /*
-  ----------------
-  edit transaction
-  ----------------
-  */
-
-  useEffect(() => {
-    if (!editingItem) return;
-
-    setDescription(editingItem.description);
-    setAmount(String(editingItem.amount));
-    setDate(editingItem.date?.split("T")[0]);
-    setType(editingItem.type);
-
-    if (editingItem.labels) {
-      setSelectedLabels(editingItem.labels.map((l: any) => l.id));
+    if (editingItem) {
+      setDescription(editingItem.description);
+      setAmount(String(editingItem.amount));
+      setDate(editingItem.date?.split("T")[0]);
+      setType(editingItem.type);
+      if (editingItem.labels) {
+        setSelectedLabels(editingItem.labels.map((l: any) => l.id));
+      }
     }
   }, [editingItem]);
 
-  /*
-  ----------------
-  submit
-  ----------------
-  */
+  // 3. Écouter le retour de l'écran "SelectLabels"
+  // On utilise route.params pour récupérer les données renvoyées par navigation.navigate
+  useEffect(() => {
+    if (route.params?.selectedLabels) {
+      setSelectedLabels(route.params.selectedLabels);
+    }
+  }, [route.params?.selectedLabels]);
 
   const submit = async () => {
     if (!selectedWalletId) {
-      Alert.alert("Erreur", "Sélectionner un wallet");
+      Alert.alert("Erreur", "Veuillez sélectionner un wallet");
       return;
     }
 
@@ -91,120 +78,185 @@ export default function TransactionFormScreen({ route, navigation }: any) {
       return;
     }
 
-    const data = {
+    // Vérification sommaire de la date
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+      Alert.alert("Erreur", "Format de date invalide (YYYY-MM-DD)");
+      return;
+    }
+
+    const payload = {
       description,
       amount: Number(amount),
       type,
-      date: new Date(date).toISOString(),
-      labels: selectedLabels.map((id) => ({ id })),
+      date: dateObj.toISOString(),
+      // On récupère les objets Label complets depuis la liste chargée au début
+      labels: allLabels.filter((label) => selectedLabels.includes(label.id)),
     };
 
     try {
       if (editingItem?.id) {
-        await update(editingItem.id, data);
+        await update(editingItem.id, payload);
       } else {
-        await add(data);
+        await add(payload);
       }
-
       navigation.goBack();
     } catch (e) {
       console.log(e);
-      Alert.alert("Erreur", "Impossible d'enregistrer");
+      Alert.alert("Erreur", "Impossible d'enregistrer la transaction");
     }
   };
 
-  /*
-  ----------------
-  afficher noms labels
-  ----------------
-  */
-
-  const selectedLabelNames = labels
+  // On récupère les noms des labels sélectionnés pour l'affichage
+  const displayLabels = allLabels
     .filter((l) => selectedLabels.includes(l.id))
     .map((l) => l.name)
     .join(", ");
 
   return (
-    <View style={appStyles.container}>
+    <ScrollView contentContainerStyle={appStyles.container}>
+      <Text style={styles.sectionTitle}>
+        {editingItem ? "Modifier la transaction" : "Nouvelle transaction"}
+      </Text>
+
+      <Text style={styles.label}>Description</Text>
       <TextInput
         style={appStyles.textInput}
-        placeholder="Description"
+        placeholder="Ex: Courses, Loyer..."
         value={description}
         onChangeText={setDescription}
       />
 
+      <Text style={styles.label}>Montant (MGA)</Text>
       <TextInput
         style={appStyles.textInput}
-        placeholder="Montant"
+        placeholder="0.00"
         keyboardType="numeric"
         value={amount}
         onChangeText={setAmount}
       />
 
+      <Text style={styles.label}>Date (AAAA-MM-JJ)</Text>
       <TextInput
         style={appStyles.textInput}
-        placeholder="Date YYYY-MM-DD"
+        placeholder="2026-03-15"
         value={date}
         onChangeText={setDate}
       />
 
-      {/* wallet */}
-
+      <Text style={styles.label}>Wallet</Text>
       <Pressable
-        style={appStyles.textInput}
-        onPress={() => navigation.navigate("SelectWallet")}
+        style={styles.selectorPressable}
+        onPress={() => navigation.navigate("SelectWallet", {selectedLabels : selectedLabels})}
       >
-        <Text>
+        <Text style={styles.selectorText}>
           {selectedWalletId
-            ? `Wallet: ${selectedWalletId}`
+            ? `Portefeuille actif: ${selectedWalletId}`
             : "Choisir un wallet"}
         </Text>
       </Pressable>
 
-      {/* labels */}
-
+      <Text style={styles.label}>Catégories (Labels)</Text>
       <Pressable
-        style={appStyles.textInput}
+        style={styles.selectorPressable}
         onPress={() =>
           navigation.navigate("SelectLabels", {
-            selectedLabels,
+            currentSelectedIds: selectedLabels,
           })
         }
       >
-        <Text>
-          {selectedLabels.length ? selectedLabelNames : "Choisir labels"}
+        <Text style={styles.selectorText}>
+          {selectedLabels.length ? displayLabels : "Aucun label sélectionné"}
         </Text>
       </Pressable>
 
-      {/* type */}
-
-      <View style={{ flexDirection: "row", gap: 10, marginTop: 20 }}>
+      <Text style={styles.label}>Type de flux</Text>
+      <View style={styles.typeRow}>
         <Pressable
           style={[
-            appStyles.button,
-            { backgroundColor: type === "IN" ? color1 : "#ccc" },
+            styles.typeButton,
+            { backgroundColor: type === "IN" ? "#2a9d8f" : "#eee" },
           ]}
           onPress={() => setType("IN")}
         >
-          <Text style={appStyles.buttonText}>Entrée</Text>
+          <Text
+            style={[
+              styles.typeButtonText,
+              { color: type === "IN" ? "white" : "#666" },
+            ]}
+          >
+            Entrée (+)
+          </Text>
         </Pressable>
 
         <Pressable
           style={[
-            appStyles.button,
-            { backgroundColor: type === "OUT" ? color1 : "#ccc" },
+            styles.typeButton,
+            { backgroundColor: type === "OUT" ? "#e76f51" : "#eee" },
           ]}
           onPress={() => setType("OUT")}
         >
-          <Text style={appStyles.buttonText}>Sortie</Text>
+          <Text
+            style={[
+              styles.typeButtonText,
+              { color: type === "OUT" ? "white" : "#666" },
+            ]}
+          >
+            Sortie (-)
+          </Text>
         </Pressable>
       </View>
 
-      <Pressable style={appStyles.button} onPress={submit}>
+      <Pressable style={[appStyles.button, { marginTop: 30 }]} onPress={submit}>
         <Text style={appStyles.buttonText}>
-          {editingItem ? "Modifier" : "Créer"}
+          {editingItem ? "Mettre à jour" : "Enregistrer"}
         </Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  sectionTitle: {
+    fontFamily: "MoreSugar",
+    fontSize: 24,
+    color: color1,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  label: {
+    fontFamily: "MoreSugar",
+    fontSize: 14,
+    color: "#888",
+    marginBottom: 5,
+    marginTop: 10,
+  },
+  selectorPressable: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 15,
+    backgroundColor: "#fcfcfc",
+    marginBottom: 10,
+  },
+  selectorText: {
+    fontFamily: "MoreSugar",
+    fontSize: 14,
+    color: "#444",
+  },
+  typeRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 5,
+  },
+  typeButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  typeButtonText: {
+    fontFamily: "MoreSugar",
+    fontWeight: "bold",
+  },
+});

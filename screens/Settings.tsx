@@ -1,7 +1,9 @@
 import CustomText from "@/components/CustomText";
+import { session } from "@/service/session";
 import { getData, storeData } from "@/service/storage";
 import { Picker } from "@react-native-picker/picker";
 import { useFonts } from "expo-font";
+import { useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Pressable,
@@ -24,6 +26,7 @@ type AppSettings = {
 };
 
 export default function Settings() {
+  const navigation = useNavigation<any>();
   const [pushNotifications, setPushNotifications] = useState(false);
   const [recurrence, setRecurrence] = useState("Weekly");
   const [daysCount, setDaysCount] = useState("30");
@@ -94,6 +97,11 @@ export default function Settings() {
         setFeedback(null);
       }, 3000);
     }
+  };
+
+  const handleLogout = async () => {
+    await session.logout();
+    navigation.replace("SignIn", { redirectScreenName: "MainMenu" });
   };
 
   if (!fontsLoaded) return null;
@@ -202,9 +210,16 @@ export default function Settings() {
       </View>
 
       {/* Save Button */}
-      <View style={{ marginTop: 20, marginBottom: 40 }}>
+      <View style={{ marginTop: 20 }}>
         <Pressable style={styles.saveButton} onPress={handleSave}>
           <CustomText style={styles.saveButtonText}>Save Settings</CustomText>
+        </Pressable>
+      </View>
+
+      {/* Logout Button */}
+      <View style={{ marginTop: 15, marginBottom: 40 }}>
+        <Pressable style={styles.logoutButton} onPress={handleLogout}>
+          <CustomText style={styles.logoutButtonText}>Logout</CustomText>
         </Pressable>
       </View>
     </ScrollView>
@@ -214,21 +229,29 @@ export default function Settings() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "white",
+    flex: 1,
   },
 
   title: {
-    fontSize: 32,
+    fontSize: 30,
     textAlign: "center",
     marginBottom: 30,
     color: "#264653",
+    fontFamily: "MoreSugar",
   },
 
   card: {
-    backgroundColor: "white",
+    backgroundColor: "#f8f9fa",
     padding: 15,
-    borderRadius: 12,
-    marginBottom: 20,
+    borderRadius: 10,
+    marginBottom: 15,
+    width: "90%",
+    alignSelf: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
     elevation: 3,
   },
 
@@ -268,15 +291,33 @@ const styles = StyleSheet.create({
   },
 
   saveButton: {
-    backgroundColor: "#2A9D8F",
+    backgroundColor: "#264653",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
+    width: "90%",
+    alignSelf: "center",
   },
 
   saveButtonText: {
     color: "white",
     fontSize: 18,
+    fontFamily: "MoreSugar",
+  },
+
+  logoutButton: {
+    backgroundColor: "#E74C3C",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    width: "90%",
+    alignSelf: "center",
+  },
+
+  logoutButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontFamily: "MoreSugar",
   },
 
   feedbackContainer: {

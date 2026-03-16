@@ -14,7 +14,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View
+  View,
 } from "react-native";
 
 export default function TransactionFormScreen({ route, navigation }: any) {
@@ -31,7 +31,7 @@ export default function TransactionFormScreen({ route, navigation }: any) {
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
   const [type, setType] = useState<"IN" | "OUT">("OUT");
-  
+
   const [labels, setLabels] = useState<Label[]>([]);
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
@@ -43,7 +43,7 @@ export default function TransactionFormScreen({ route, navigation }: any) {
     try {
       const [labelsData, walletsData] = await Promise.all([
         labelsApi.list(accountId),
-        walletsApi.list(accountId)
+        walletsApi.list(accountId),
       ]);
       setLabels(labelsData || []);
       setWallets(walletsData || []);
@@ -63,8 +63,7 @@ export default function TransactionFormScreen({ route, navigation }: any) {
       setAmount(preservedData.amount || "");
       setDate(preservedData.date || "");
       setType(preservedData.type || "OUT");
-    } 
-    else if (editingItem) {
+    } else if (editingItem) {
       setDescription(editingItem.description || "");
       setAmount(String(editingItem.amount || ""));
       setDate(editingItem.date ? editingItem.date.split("T")[0] : "");
@@ -100,12 +99,13 @@ export default function TransactionFormScreen({ route, navigation }: any) {
   const navigateWithState = (screenName: string, extraParams = {}) => {
     navigation.navigate(screenName, {
       ...extraParams,
-      currentForm: { description, amount, date, type } 
+      currentForm: { description, amount, date, type },
     });
   };
 
   const handleSubmit = async () => {
-    if (!selectedWalletId) return Alert.alert("Error", "Please select a wallet");
+    if (!selectedWalletId)
+      return Alert.alert("Error", "Please select a wallet");
     if (!description.trim() || !amount || !date) {
       return Alert.alert("Error", "All fields are required");
     }
@@ -115,15 +115,17 @@ export default function TransactionFormScreen({ route, navigation }: any) {
       return Alert.alert("Error", "Invalid date format (YYYY-MM-DD)");
     }
 
-    const fullSelectedLabels = labels.filter((l) => selectedLabels.includes(l.id));
+    const fullSelectedLabels = labels.filter((l) =>
+      selectedLabels.includes(l.id),
+    );
 
     const payload = {
       description: description.trim(),
-      amount: Number(amount.replace(',', '.')),
+      amount: Number(amount.replace(",", ".")),
       type,
       date: dateObj.toISOString(),
       labels: fullSelectedLabels,
-      walletId: selectedWalletId
+      walletId: selectedWalletId,
     };
 
     setIsSubmitting(true);
@@ -143,7 +145,7 @@ export default function TransactionFormScreen({ route, navigation }: any) {
   };
 
   return (
-    <ScrollView 
+    <ScrollView
       contentContainerStyle={appStyles.container}
       keyboardShouldPersistTaps="handled"
     >
@@ -195,7 +197,11 @@ export default function TransactionFormScreen({ route, navigation }: any) {
         <Pressable
           style={[
             appStyles.button,
-            { flex: 1, backgroundColor: type === "IN" ? "#2a9d8f" : "#ccc", width : 100 },
+            {
+              flex: 1,
+              backgroundColor: type === "IN" ? "#2a9d8f" : "#ccc",
+              width: 100,
+            },
           ]}
           onPress={() => setType("IN")}
         >
@@ -215,8 +221,8 @@ export default function TransactionFormScreen({ route, navigation }: any) {
 
       <Pressable
         style={[
-          appStyles.button, 
-          { marginTop: 30, backgroundColor: isSubmitting ? "#999" : color1 }
+          appStyles.button,
+          { marginTop: 30, backgroundColor: isSubmitting ? "#999" : color1 },
         ]}
         onPress={handleSubmit}
         disabled={isSubmitting}
@@ -239,11 +245,11 @@ const localStyles = StyleSheet.create({
     fontWeight: "bold",
     color: "#264653",
     marginBottom: 20,
-    textAlign: "center"
+    textAlign: "center",
   },
   typeContainer: {
     flexDirection: "row",
     gap: 10,
-    marginTop: 20
-  }
+    marginTop: 20,
+  },
 });

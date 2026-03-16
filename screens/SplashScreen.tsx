@@ -2,79 +2,74 @@ import { session } from "@/service/session";
 import { useFonts } from "expo-font";
 import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import Animated, { CSSAnimationKeyframes } from "react-native-reanimated";
-
-const march: CSSAnimationKeyframes = {
-  "0%": {
-    transform: [{ translateX: -80 }, { rotateZ: "-15deg" }],
-  },
-  "50%": {
-    transform: [{ translateX: 0 }, { rotateZ: "0deg" }],
-  },
-  "100%": {
-    transform: [{ translateX: 80 }, { rotateZ: "15deg" }],
-  },
-};
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 
 const SplashScreen = ({ navigation }: any) => {
   const [fontsLoaded] = useFonts({
     MoreSugar: require("@/assets/fonts/MoreSugar-Thin.ttf"),
   });
 
+  // Valeur partagée pour l'animation (va de -1 à 1)
+  const animationValue = useSharedValue(0);
+
   useEffect(() => {
+    // Lancer l'animation de balancement en boucle
+    animationValue.value = withRepeat(
+      withTiming(1, { duration: 1250, easing: Easing.inOut(Easing.sin) }),
+      -1, // Infini
+      true, // Retour en arrière pour un mouvement fluide
+    );
+
     const checkSession = async () => {
       if (!fontsLoaded) return;
 
       await session.init();
-
       const token = session.getToken();
 
-      setTimeout(() => {
-        if (token) {
-          navigation.replace("MainMenu");
-        } else {
-          navigation.replace("SignIn");
-        }
-      }, 2000);
+      const timer = setTimeout(() => {
+        navigation.replace(token ? "MainMenu" : "SignIn");
+      }, 3000);
+
+      return () => clearTimeout(timer);
     };
 
     checkSession();
-  }, [fontsLoaded]);
+  }, [fontsLoaded, navigation]);
+
+  // Style animé pour le logo unique
+  const animatedLogoStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateX: animationValue.value * 80 },
+        { rotateZ: `${animationValue.value * 15}deg` },
+      ],
+    };
+  });
+
+  if (!fontsLoaded) return null;
+
   return (
     <View style={styles.container}>
+      {/* Un seul logo ici maintenant */}
       <Animated.Image
         source={require("@/assets/images/LogoPF-white.png")}
-        style={[
-          styles.logoWhite,
-          {
-            animationName: march,
-            animationDuration: "2.5s",
-            animationIterationCount: "infinite",
-            animationTimingFunction: "ease-in-out",
-            animationDirection: "alternate",
-          },
-        ]}
+        style={[styles.logoWhite, animatedLogoStyle]}
       />
-      <Animated.Image
-        source={require("@/assets/images/LogoPF-white.png")}
-        style={[
-          styles.logoWhite,
-          {
-            animationName: march,
-            animationDuration: "2.5s",
-            animationIterationCount: "infinite",
-            animationTimingFunction: "ease-in-out",
-            animationDirection: "alternate",
-          },
-        ]}
-      />
+
       <Text style={styles.title}>Million Dollars</Text>
-      <Text style={styles.subtitle}>Gérez vos finances intelligemment</Text>
+      <Text style={styles.subtitle}>Manage your finances smartly</Text>
     </View>
   );
 };
 
 export default SplashScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -87,6 +82,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     fontFamily: "MoreSugar",
+    marginTop: 20,
   },
   subtitle: {
     fontSize: 16,
@@ -97,5 +93,6 @@ const styles = StyleSheet.create({
   logoWhite: {
     width: 200,
     height: 200,
+    resizeMode: "contain",
   },
 });

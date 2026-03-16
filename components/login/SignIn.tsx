@@ -59,7 +59,7 @@ export default function SignIn({ route }: Props) {
         }
       } catch (error: any) {
         console.log(error);
-        if (error.message.includes("404")) {
+        if (error.message.includes("not found")) {
           setShowUserNotFoundAlert(true);
           setTimeout(() => {
             setShowUserNotFoundAlert(false);

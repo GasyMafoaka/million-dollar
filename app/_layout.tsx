@@ -40,8 +40,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     const initNotifications = async () => {
-      const isExpoGo = Constants.executionEnvironment === "storeClient";
-      const isNative = Platform.OS !== "web" && !isExpoGo;
+      const isNative = Platform.OS !== "web";
       if (!isNative) return;
 
       try {
@@ -68,7 +67,14 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (fontsLoaded && sessionInitialized) {
-      SplashScreen.hideAsync();
+      const hideSplashScreen = async () => {
+        try {
+          await SplashScreen.hideAsync();
+        } catch (e) {
+          console.warn("Error hiding splash screen:", e);
+        }
+      };
+      hideSplashScreen();
     }
   }, [fontsLoaded, sessionInitialized]);
 

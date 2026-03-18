@@ -21,7 +21,10 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.MillionDollar"
+      "package": "com.anonymous.MillionDollar",
+      "permissions": [
+        "NOTIFICATIONS"
+      ]
     },
     "web": {
       "output": "static",

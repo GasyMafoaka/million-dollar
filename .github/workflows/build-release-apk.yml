@@ -41,9 +41,12 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew assembleRelease
-
+      
+      - name: List APK files
+        run: ls -R android/app/build/outputs/apk
+      
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
-          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          name: android-apk
+          path: android/app/build/outputs/apk/release/

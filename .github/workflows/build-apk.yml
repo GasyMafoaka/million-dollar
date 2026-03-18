@@ -22,19 +22,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          distribution: "zulu"
+          java-version: "17"
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
       - name: Prebuild Android
-        run: npx expo prebuild --platform android --no-interactive
+        run: npx expo prebuild --platform android --no-install --pnpm
 
       - name: Build APK
         run: |
